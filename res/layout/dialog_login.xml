@@ -1,0 +1,59 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="325dp"
+    android:padding="15dp"
+    >
+    
+    <EditText
+        android:id="@+id/login_dlg_edt_login"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_alignLeft="@+id/login_dlg_edt_password"
+        android:layout_alignParentRight="true"
+        android:textSize="16sp" 
+        android:paddingLeft="5dp"
+        android:inputType="text|textEmailAddress"
+        android:background="#ffffff"
+        android:text="@string/def_login"
+        />
+    
+    <EditText
+        android:id="@+id/login_dlg_edt_password"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/login_dlg_edt_login"
+        android:layout_marginTop="5dp"
+        android:paddingLeft="5dp"
+        android:layout_toRightOf="@+id/login_dlg_lbl_password"
+        android:inputType="text|textPassword"
+        android:textSize="16sp" 
+        android:background="#ffffff"
+        android:text="@string/def_password"
+        />
+
+    <TextView
+        android:id="@+id/login_dlg_lbl_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="15dp"
+        android:layout_alignBaseline="@+id/login_dlg_edt_password"
+        android:layout_alignBottom="@+id/login_dlg_edt_password"
+        android:layout_alignParentLeft="true"
+        android:text="@string/login_dlg_lbl_password" 
+        android:textColor="#eeeeee"
+        />
+
+    <TextView
+        android:id="@+id/login_dlg_lbl_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="15dp"
+        android:layout_alignBaseline="@+id/login_dlg_edt_login"
+        android:layout_alignBottom="@+id/login_dlg_edt_login"
+        android:layout_alignLeft="@+id/login_dlg_lbl_password"
+        android:text="@string/login_dlg_lbl_login" 
+        android:textColor="#eeeeee"
+        />
+    
+</RelativeLayout>
