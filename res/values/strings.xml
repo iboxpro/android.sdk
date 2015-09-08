@@ -28,10 +28,15 @@
     <string name="login_dlg_btn_ok">Вход</string>
     <string name="login_dlg_lbl_login">Логин</string>
     <string name="login_dlg_lbl_password">Пароль</string>
-            
+
+    <string name="tr_details_dlg_lbl_operation">Операция:</string>
     <string name="tr_details_dlg_lbl_id">ID транзакции:</string>
 	<string name="tr_details_dlg_lbl_invoice">Номер чека:</string>
+    <string name="tr_details_dlg_lbl_appcode">Код подтверждения:</string>
+    <string name="tr_details_dlg_lbl_terminal">Терминал:</string>
+    <string name="tr_details_dlg_lbl_iin">IIN карты:</string>
     <string name="tr_details_dlg_lbl_pan">Номер карты:</string>
+    <string name="tr_details_dlg_lbl_emv">Данные EMV:</string>
     <string name="tr_details_dlg_lbl_signature">Необходима подпись:</string>
     <string name="tr_details_btn_adjust">Отправить чек</string>
  

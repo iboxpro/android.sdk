@@ -10,6 +10,7 @@ import ibox.pro.sdk.external.PaymentController.PaymentError;
 import ibox.pro.sdk.external.PaymentControllerListener;
 import ibox.pro.sdk.external.PaymentController.ReaderEvent;
 import ibox.pro.sdk.external.PaymentException;
+import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.RegularPaymentContext;
 import ibox.pro.sdk.external.example.R;
 
@@ -151,10 +152,10 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
     }
     
     @Override
-    public void onFinished(String transactionID, String invoice, String cardNumber, boolean requiresSignature) {
+    public void onFinished(PaymentResultContext paymentResultContext) {
     	dismiss();
     	boolean isRegular = mPaymentContext instanceof RegularPaymentContext;
-    	new ResultDialog(mActivity, isRegular, transactionID, invoice, cardNumber, requiresSignature).show();
+    	new ResultDialog(mActivity, paymentResultContext).show();
     }
     
     @Override
