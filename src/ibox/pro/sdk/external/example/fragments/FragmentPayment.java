@@ -1,27 +1,5 @@
 package ibox.pro.sdk.external.example.fragments;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.text.DateFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
-import ibox.pro.sdk.external.PaymentContext;
-import ibox.pro.sdk.external.PaymentController.RegularEndType;
-import ibox.pro.sdk.external.PaymentController.RegularRepeatType;
-import ibox.pro.sdk.external.RegularPaymentContext;
-import ibox.pro.sdk.external.PaymentContext.PaymentType;
-import ibox.pro.sdk.external.PaymentController;
-import ibox.pro.sdk.external.example.BitmapUtils;
-import ibox.pro.sdk.external.example.Consts;
-import ibox.pro.sdk.external.example.R;
-import ibox.pro.sdk.external.example.dialogs.PaymentDialog;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -50,6 +28,27 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.text.DateFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
+import ibox.pro.sdk.external.PaymentContext;
+import ibox.pro.sdk.external.PaymentController;
+import ibox.pro.sdk.external.PaymentController.RegularEndType;
+import ibox.pro.sdk.external.PaymentController.RegularRepeatType;
+import ibox.pro.sdk.external.RegularPaymentContext;
+import ibox.pro.sdk.external.example.BitmapUtils;
+import ibox.pro.sdk.external.example.Consts;
+import ibox.pro.sdk.external.example.R;
+import ibox.pro.sdk.external.example.dialogs.PaymentDialog;
 
 public class FragmentPayment extends Fragment {
 
@@ -332,7 +331,7 @@ public class FragmentPayment extends Fragment {
 		context.setAmount(edtAmount.getText().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
 		context.setDescription(edtDescription.getText().toString());
 		context.setImage(photo);
-		context.setType(PaymentType.PAYMENT);
+		context.setCurrencyName("RUB");
 		
 		if (isPaymentWithProduct()) {
 			setPaymentProductData(context);
@@ -347,7 +346,6 @@ public class FragmentPayment extends Fragment {
 		context.setAmount(edtAmount.getText().toString().trim().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
 		context.setDescription(edtDescription.getText().toString());
 		context.setImage(photo);
-		context.setType(PaymentType.PAYMENT);
 		
 		context.setReceiptPhone(edtPhone.getText().toString());
 		context.setReceiptEmail(edtEmail.getText().toString());

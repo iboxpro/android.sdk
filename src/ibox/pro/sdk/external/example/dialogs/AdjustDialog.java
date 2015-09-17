@@ -22,13 +22,8 @@ public class AdjustDialog extends Dialog {
 	private SignatureView swSignature;
 	private EditText edtPhone, edtEmail;
 	private Button btnSend;
-	
-	public enum TransactionType {
-		PAYMENT,
-		REVERSE;
-	}
-	
-	public AdjustDialog(Context context, final String transactionID, final boolean isRegular) {
+
+	public AdjustDialog(Context context, final String transactionID, final boolean isRegular, final boolean isReverse) {
 		super(context);
 		this.transactionID = transactionID;
 		
@@ -50,7 +45,7 @@ public class AdjustDialog extends Dialog {
 			@Override
 			public void onClick(View v) {
 				if (!PaymentController.getInstance().isPaymentInProgress())
-					new AdjustTask().execute(isRegular);
+					new AdjustTask().execute(isRegular, isReverse);
 			}
 		});        
 	}
@@ -81,12 +76,23 @@ public class AdjustDialog extends Dialog {
 		@Override
 		protected APIResult doInBackground(Boolean... params) {
 			boolean isRegular = params[0];
+			boolean isReverse = params[1];
+
 			if (isRegular)
 				return PaymentController.getInstance().adjust(
-						getContext(), 
+						getContext(),
 						Integer.parseInt(transactionID), 
 						swSignature.getBitmapByteArray()
 						);
+			else if (isReverse)
+				return PaymentController.getInstance().adjustReverse(
+						getContext(),
+						transactionID,
+						edtPhone.getText().toString(),
+						edtEmail.getText().toString(),
+						swSignature.getBitmapByteArray()
+						);
+
 			else
 				return PaymentController.getInstance().adjust(
 						getContext(), 

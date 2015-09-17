@@ -18,12 +18,12 @@ import ibox.pro.sdk.external.example.R;
 
 public class ResultDialog extends Dialog {
 
-	private TextView lblOperation, lblID, lblInvoice, lblAppcode, lblTerminal,
+	private TextView lblOperation, lblState, lblID, lblInvoice, lblAppcode, lblTerminal,
                 lblIIN, lblPAN,
                 lblEMV, lblSignature;
 	private Button btnAdjust;
 
-	public ResultDialog(Context context, PaymentResultContext paymentResultContext) {
+	public ResultDialog(Context context, PaymentResultContext paymentResultContext, final boolean isReverse) {
 		super(context);
 		
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
@@ -38,6 +38,7 @@ public class ResultDialog extends Dialog {
 		String cardNumber = isRegular ? scheduleItem.getCard().getPanMasked() : paymentResultContext.getTransactionItem().getCard().getPanMasked();
 
         lblOperation.setText(isRegular ? "SCHEDULE" : transactionItem.getOperation());
+        lblState.setText(isRegular ? "" : transactionItem.getStateDisplay());
         lblID.setText(isRegular ? String.valueOf(scheduleItem.getID()) : transactionItem.getID());
         lblInvoice.setText(isRegular ? "" : transactionItem.getInvoice());
         lblAppcode.setText(isRegular ? "" : transactionItem.getApprovalCode());
@@ -64,7 +65,7 @@ public class ResultDialog extends Dialog {
 			@Override
 			public void onClick(View v) {
 				dismiss();
-				new AdjustDialog(getContext(), isRegular ? String.valueOf(scheduleItem.getID()) : transactionItem.getID(), isRegular).show();
+				new AdjustDialog(getContext(), isRegular ? String.valueOf(scheduleItem.getID()) : transactionItem.getID(), isRegular, isReverse).show();
 			}
 		});
         
@@ -72,6 +73,7 @@ public class ResultDialog extends Dialog {
 	
 	private void initControls() {
         lblOperation	= (TextView)findViewById(R.id.tr_details_dlg_lbl_operation);
+        lblState        = (TextView)findViewById(R.id.tr_details_dlg_lbl_state);
 		lblID 			= (TextView)findViewById(R.id.tr_details_dlg_lbl_id);
 		lblInvoice 		= (TextView)findViewById(R.id.tr_details_dlg_lbl_invoice);
         lblAppcode 		= (TextView)findViewById(R.id.tr_details_dlg_lbl_appcode);

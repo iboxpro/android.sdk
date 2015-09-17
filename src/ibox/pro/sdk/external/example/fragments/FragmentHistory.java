@@ -1,14 +1,5 @@
 package ibox.pro.sdk.external.example.fragments;
 
-import ibox.pro.sdk.external.PaymentController;
-import ibox.pro.sdk.external.entities.APIGetHistoryResult;
-import ibox.pro.sdk.external.entities.TransactionItem;
-import ibox.pro.sdk.external.example.R;
-
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -18,23 +9,41 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FragmentHistory extends Fragment {
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
+import ibox.pro.sdk.external.PaymentController;
+import ibox.pro.sdk.external.entities.APIGetHistoryResult;
+import ibox.pro.sdk.external.entities.TransactionItem;
+import ibox.pro.sdk.external.example.R;
+import ibox.pro.sdk.external.example.dialogs.ReversePaymentDialog;
+
+public class FragmentHistory extends Fragment implements ReversePaymentDialog.OnPaymentCancelledListener {
+
+    private EditText edtGetByID;
 	private ListView lvContent;
+    private boolean updateOnScroll = true;
 
 	private HistoryAdapter mAdapter;
 	private LoadHistoryTask mLoadHistoryTask;
-	
+
 	private int mPage = 1;
 	private boolean isFinished, isRunning;
 	private Typeface amountTypeface;
@@ -51,7 +60,43 @@ public class FragmentHistory extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_history, container, false);
 				
 		mPage = 1;
-		
+
+        edtGetByID = (EditText)view.findViewById(R.id.history_edt_getById);
+        edtGetByID.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 0) {
+                    edtGetByID.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(edtGetByID.getWindowToken(), 0);
+                    mLoadHistoryTask = new LoadHistoryTask();
+                    mLoadHistoryTask.execute(mPage);
+                }
+            }
+        });
+        edtGetByID.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    new FindTransactionByIDTask().execute(edtGetByID.getText().toString());
+
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(edtGetByID.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
+                    return true;
+                }
+                return false;
+            }
+        });
+
 		lvContent = (ListView)view.findViewById(R.id.history_lv_content);
 		mAdapter = new HistoryAdapter(getActivity());
 		
@@ -64,9 +109,9 @@ public class FragmentHistory extends Fragment {
 			
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-				if (totalItemCount - visibleItemCount - firstVisibleItem == 0) {
+				if (updateOnScroll && totalItemCount - visibleItemCount - firstVisibleItem == 0) {
                     if (!isFinished && !isRunning) {
-                    	mLoadHistoryTask = new LoadHistoryTask(getActivity());
+                    	mLoadHistoryTask = new LoadHistoryTask();
                     	mLoadHistoryTask.execute(mPage);
                     }
                 }
@@ -85,13 +130,14 @@ public class FragmentHistory extends Fragment {
 		return view;
 	}
 		
-	private void showTransactionDetails(TransactionItem trItem) {
+	private void showTransactionDetails(final TransactionItem trItem) {
 		View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_history_tr_details, null);
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(dialogView);
-		
+
 		AlertDialog dlgTrInfo = builder.create();
-		
+
+        ((EditText)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_id)).setText(String.valueOf(trItem.getID()));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_date)).setText(String.valueOf(trItem.getDate()));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_title)).setText(String.valueOf(trItem.getDescription()));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_amount)).setText(getFormattedAmount(trItem.getAmount(), Locale.getDefault(), trItem.getFormat().getAmountFormat()));
@@ -101,13 +147,38 @@ public class FragmentHistory extends Fragment {
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_invoice)).setText(trItem.getInvoice());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_geodata)).setText(String.valueOf(trItem.getLatitude()).concat(" , ").concat(String.valueOf(trItem.getLongitude())));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_signature_url)).setText(trItem.getSignatureUrl());
-		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_photo_url)).setText(trItem.getPhotoUrl());		
+		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_photo_url)).setText(trItem.getPhotoUrl());
 		
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_amount)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "Roboto-Regular.ttf"));
-		
+
+		dialogView.findViewById(R.id.history_tr_details_dlg_btn_cancel).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				new ReversePaymentDialog(getActivity(), trItem.getID(), PaymentController.ReverseAction.CANCEL, FragmentHistory.this).show();
+			}
+		});
+		dialogView.findViewById(R.id.history_tr_details_dlg_btn_return).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				new ReversePaymentDialog(getActivity(), trItem.getID(), PaymentController.ReverseAction.RETURN, FragmentHistory.this).show();
+			}
+		});
+
+		dialogView.findViewById(R.id.history_tr_details_dlg_btn_cancel).setVisibility(trItem.canCancel() ? View.VISIBLE : View.GONE);
+		dialogView.findViewById(R.id.history_tr_details_dlg_btn_return).setVisibility(trItem.canReturn() ? View.VISIBLE : View.GONE);
+
 		dlgTrInfo.show();
 	}
-	
+
+	@Override
+	public void onPaymentCancelled() {
+		mPage = 1;
+        mAdapter.clear();
+        mAdapter.notifyDataSetChanged();
+		mLoadHistoryTask = new LoadHistoryTask();
+		mLoadHistoryTask.execute(mPage);
+	}
+
 	private String getFormattedAmount(Double amnt, Locale locale, String mask){
     	DecimalFormatSymbols decFormSym;
     	DecimalFormat decFormAWF;
@@ -178,7 +249,7 @@ public class FragmentHistory extends Fragment {
 		
 		private ProgressDialog pDialog;
 		
-		public LoadHistoryTask(Context context) {
+		public LoadHistoryTask() {
 			pDialog = new ProgressDialog(getActivity());
 			pDialog.setCancelable(false);
 		}
@@ -187,6 +258,7 @@ public class FragmentHistory extends Fragment {
 		protected void onPreExecute() {
 			isRunning = true;
 			pDialog.show();
+            updateOnScroll = true;
 		}
 		
 		@Override
@@ -223,5 +295,54 @@ public class FragmentHistory extends Fragment {
 		}
 
 	}
+
+    private class FindTransactionByIDTask extends AsyncTask<String, Void, APIGetHistoryResult> {
+
+        private ProgressDialog pDialog;
+
+        public FindTransactionByIDTask() {
+            pDialog = new ProgressDialog(getActivity());
+            pDialog.setCancelable(false);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            updateOnScroll = false;
+            mPage = 1;
+            mAdapter.clear();
+            mAdapter.notifyDataSetChanged();
+            isRunning = true;
+            pDialog.show();
+        }
+
+        @Override
+        protected APIGetHistoryResult doInBackground(String ... params) {
+            return PaymentController.getInstance().getTransactionByID(getActivity(), params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(APIGetHistoryResult result) {
+            try {
+                if (result != null) {
+                    if (result.isValid()) {
+                        for (TransactionItem transaction : result.getTransactions())
+                            mAdapter.add(transaction);
+
+                        mAdapter.notifyDataSetChanged();
+
+                    } else {
+                        Toast.makeText(getActivity(), result.getErrorMessage(), Toast.LENGTH_LONG).show();
+                    }
+                } else
+                    Toast.makeText(getActivity(), R.string.error_no_response, Toast.LENGTH_LONG).show();
+            } finally {
+                isRunning = false;
+                isFinished = false;
+                pDialog.dismiss();
+            }
+        }
+
+
+    }
 
 }

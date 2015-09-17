@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="def_login">pf@cardport.kiev</string>
-    <string name="def_password">triton</string>
+    <string name="def_login">agent@integration.demo</string>
+    <string name="def_password">integration123</string>
 	<string name="def_product_code">PRODUCT_TEST</string>
 	<string name="def_product_field_1_code">FIELD_1</string>
 	<string name="def_product_field_2_code">FIELD_2</string>
@@ -19,6 +19,8 @@
     <string name="writing_error">Ошибка записи</string>
     <string name="error_no_response">Сервер не отвечает</string>    
     <string name="error_schedule_creation">Ошибка создания расписания\n(%s)\nПовторить попытку?</string>
+    <string name="error_cancellation_timeout">Невозможно выполнить отмену, провести возврат?</string>
+    <string name="error_no_such_transaction">Транзакция не найдена</string>
    
     <string name="tab_payment">Платеж</string>
     <string name="tab_history">История</string>
@@ -30,6 +32,7 @@
     <string name="login_dlg_lbl_password">Пароль</string>
 
     <string name="tr_details_dlg_lbl_operation">Операция:</string>
+    <string name="tr_details_dlg_lbl_state">Состояние:</string>
     <string name="tr_details_dlg_lbl_id">ID транзакции:</string>
 	<string name="tr_details_dlg_lbl_invoice">Номер чека:</string>
     <string name="tr_details_dlg_lbl_appcode">Код подтверждения:</string>
@@ -39,9 +42,11 @@
     <string name="tr_details_dlg_lbl_emv">Данные EMV:</string>
     <string name="tr_details_dlg_lbl_signature">Необходима подпись:</string>
     <string name="tr_details_btn_adjust">Отправить чек</string>
- 
+
+    <string name="history_edt_getById">Найти транзакцию по ID</string>
     <string name="history_item_no_description">Нет описания</string>
-    
+
+    <string name="history_tr_details_dlg_lbl_id">ID:</string>
     <string name="history_tr_details_dlg_lbl_date">Дата выполнения:</string>
     <string name="history_tr_details_dlg_lbl_title">Описание:</string>
     <string name="history_tr_details_dlg_lbl_amount">Сумма:</string>
@@ -51,8 +56,10 @@
     <string name="history_tr_details_dlg_lbl_invoice">Номер чека:</string>
     <string name="history_tr_details_dlg_lbl_geodata">Координаты:</string>
     <string name="history_tr_details_dlg_lbl_signature_url">Подпись:</string>
-    <string name="history_tr_details_dlg_lbl_photo_url">Приложенное изображение:</string>   
-    
+    <string name="history_tr_details_dlg_lbl_photo_url">Приложенное изображение:</string>
+    <string name="history_tr_details_dlg_btn_cancel">Отмена платежа</string>
+    <string name="history_tr_details_dlg_btn_return">Возврат платежа</string>
+
     <string name="payment_lbl_amount">Сумма :</string>
     <string name="payment_lbl_description">Описание :</string>
     <string name="payment_cb_product">Оплатить продукт</string>
@@ -100,6 +107,7 @@
     
     <string name="reader_state_disconnected">Ридер не подключен</string>
     <string name="reader_state_ready">Проведите магнитной полосой или вставьте карту в ридер</string>
+    <string name="reader_state_ready_swipeonly">Проведите магнитной полосой</string>
     <string name="reader_state_init">Инициализация ридера</string>
     <string name="reader_state_inprogress">Выполняется платеж</string>
     <string name="reader_state_init_error">Ошибка инициализации</string>
