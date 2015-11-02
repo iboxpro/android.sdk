@@ -159,8 +159,13 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 		if (error == null || error == PaymentController.PaymentError.EMV_TERMINATED || error == PaymentError.NO_SUCH_TRANSACTION)
 			dismiss();
     }
-    
-    @Override
+
+	@Override
+	public void onTransactionStarted(String transactionID) {
+		lblState.setText(String.format(getContext().getString(R.string.payment_dlg_started), transactionID));
+	}
+
+	@Override
     public void onFinished(PaymentResultContext paymentResultContext) {
     	dismiss();
     	new ResultDialog(mActivity, paymentResultContext, this instanceof ReversePaymentDialog).show();
@@ -195,6 +200,12 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	    		stopProgress();
 	    		lblState.setText(R.string.reader_state_eject);
 	    		break;
+			case BAD_SWIPE :
+				Toast.makeText(mActivity, R.string.reader_bad_swipe, Toast.LENGTH_LONG).show();
+				break;
+			case LOW_BATTERY :
+				Toast.makeText(mActivity, R.string.reader_low_battery, Toast.LENGTH_LONG).show();
+				break;
 	    	default :
 	    		break;
     	}

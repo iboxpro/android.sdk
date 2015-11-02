@@ -1,11 +1,5 @@
 package ibox.pro.sdk.external.example;
 
-import ibox.pro.sdk.external.PaymentController;
-import ibox.pro.sdk.external.PaymentController.ReaderType;
-import ibox.pro.sdk.external.example.fragments.FragmentHistory;
-import ibox.pro.sdk.external.example.fragments.FragmentPayment;
-import ibox.pro.sdk.external.example.fragments.FragmentSettings;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -13,6 +7,12 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.view.LayoutInflater;
 import android.widget.EditText;
+
+import ibox.pro.sdk.external.PaymentController;
+import ibox.pro.sdk.external.PaymentController.ReaderType;
+import ibox.pro.sdk.external.example.fragments.FragmentHistory;
+import ibox.pro.sdk.external.example.fragments.FragmentPayment;
+import ibox.pro.sdk.external.example.fragments.FragmentSettings;
 
 public class MainActivity extends FragmentActivity {
 	
@@ -51,7 +51,7 @@ public class MainActivity extends FragmentActivity {
 	}
 	
 	private void setupTabHost() {
-		mTabHost.setup(this, getSupportFragmentManager(), R.id.main_tabcontent);
+		mTabHost.setup(this, getSupportFragmentManager(), R.id.tabcontent);
 		
 		mTabHost.addTab(mTabHost.newTabSpec(getString(R.string.tab_payment)).setIndicator(getString(R.string.tab_payment)), 
 				FragmentPayment.class, null);

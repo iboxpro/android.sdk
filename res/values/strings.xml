@@ -93,7 +93,9 @@
     <string name="payment_photo_dlg_msg">Выберите источник изображения</string>
     <string name="payment_photo_dlg_btn_gallery">Галерея</string>
     <string name="payment_photo_dlg_btn_camera">Камера</string>
-    
+
+    <string name="payment_dlg_started">Выполняется транзакция %s</string>
+
     <string name="steps_dlg_lbl_title">Подтвердите расписание</string>
     <string name="steps_dlg_lbl_total">Всего :</string>
     
@@ -112,6 +114,8 @@
     <string name="reader_state_inprogress">Выполняется платеж</string>
     <string name="reader_state_init_error">Ошибка инициализации</string>
     <string name="reader_state_eject">Извлеките карту</string>
+    <string name="reader_bad_swipe">Ошибка при считывании магнитной полосы</string>
+    <string name="reader_low_battery">Ридер почти разряжен</string>
     
     <string name="reader_name_wisepad">Chip &amp; Pin</string>
 	<string name="reader_name_bbpos">Chip &amp; Sign</string>
