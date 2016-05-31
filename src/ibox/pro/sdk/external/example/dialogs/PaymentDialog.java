@@ -438,4 +438,14 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 		return mDoReturn.booleanValue();
 	}
 
+	@Override
+	public void onPinRequest() {
+		Toast.makeText(mActivity, "PinRequested", Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onPinEntered() {
+		Toast.makeText(mActivity, "PinEntered", Toast.LENGTH_SHORT).show();
+	}
+
 }
