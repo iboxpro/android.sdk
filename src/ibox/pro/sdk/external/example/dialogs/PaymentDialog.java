@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -151,6 +152,9 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
                 case NO_SUCH_TRANSACTION :
                     toastText = mActivity.getString(R.string.error_no_such_transaction);
                     break;
+				case TRANSACTION_NULL_OR_EMPTY :
+					toastText = mActivity.getString(R.string.error_tr_null_or_empty);
+					break;
                 default :
                     toastText = mActivity.getString(R.string.EMV_ERROR);
                     break;
@@ -168,11 +172,12 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	@Override
     public void onFinished(PaymentResultContext paymentResultContext) {
     	dismiss();
-    	new ResultDialog(mActivity, paymentResultContext, this instanceof ReversePaymentDialog).show();
+    	new ResultDialog(mActivity, paymentResultContext, false).show();
     }
     
     @Override
     public void onReaderEvent(ReaderEvent event) {
+		Log.i("iboxSDK", "onReaderEvent: " + event.toString());
     	switch (event) {
 	    	case CONNECTED :
 	    	case START_INIT :
@@ -446,6 +451,16 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	@Override
 	public void onPinEntered() {
 		Toast.makeText(mActivity, "PinEntered", Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onAutoConfigUpdate(double perecent) {
+
+	}
+
+	@Override
+	public void onAutoConfigFinished(boolean success, String config, boolean isDefault) {
+
 	}
 
 }

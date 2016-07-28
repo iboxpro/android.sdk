@@ -15,7 +15,9 @@ import ibox.pro.sdk.external.example.fragments.FragmentPayment;
 import ibox.pro.sdk.external.example.fragments.FragmentSettings;
 
 public class MainActivity extends FragmentActivity {
-	
+
+	private final String config = null;
+
 	private FragmentTabHost mTabHost;
 	
 	@Override
@@ -29,10 +31,12 @@ public class MainActivity extends FragmentActivity {
 		PaymentController.getInstance().onCreate(this, savedInstanceState);
 		if (PaymentController.getInstance().getReaderType() == null)
 			try {
-				PaymentController.getInstance().setReaderType(this, ReaderType.EMV_SWIPE, 0);
+				PaymentController.getInstance().setReaderType(this, ReaderType.EMV_SWIPE, 0, config);
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}
+
+		PaymentController.getInstance().setSingleStepEMV(true);
 
 		if (savedInstanceState == null)
 			showLoginDialog();

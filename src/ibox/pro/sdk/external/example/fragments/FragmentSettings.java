@@ -1,11 +1,5 @@
 package ibox.pro.sdk.external.example.fragments;
 
-import java.util.ArrayList;
-
-import ibox.pro.sdk.external.PaymentController;
-import ibox.pro.sdk.external.PaymentController.ReaderType;
-import ibox.pro.sdk.external.example.R;
-
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -18,14 +12,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+
+import ibox.pro.sdk.external.PaymentController;
+import ibox.pro.sdk.external.PaymentController.ReaderType;
+import ibox.pro.sdk.external.example.R;
+import ibox.pro.sdk.external.example.dialogs.AutoconfigDialog;
 
 public class FragmentSettings extends Fragment {
 
+	private final String config = null;
+
 	private ListView lvReaders;
 	private ReadersAdapter mAdapter;
-	
+    private Button btnAutoconfig;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_settings, container, false);
@@ -56,7 +62,7 @@ public class FragmentSettings extends Fragment {
 							.setSingleChoiceItems(devices, -1, new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
-									PaymentController.getInstance().setReaderType(getActivity(), ReaderType.WISEPAD, which);
+									PaymentController.getInstance().setReaderType(getActivity(), ReaderType.WISEPAD, which, config);
 									dialog.dismiss();
 									mAdapter.notifyDataSetChanged();
 								}
@@ -64,14 +70,25 @@ public class FragmentSettings extends Fragment {
 							.create()
 							.show();
 				} else {
-					PaymentController.getInstance().setReaderType(getActivity(), PaymentController.ReaderType.values()[pos], 0);
+					PaymentController.getInstance().setReaderType(getActivity(), PaymentController.ReaderType.values()[pos], 0, config);
 					mAdapter.notifyDataSetChanged();
 				}
 			}
 		});
 		
 		lvReaders.setAdapter(mAdapter);
-		
+
+        btnAutoconfig = (Button)view.findViewById(R.id.settings_btn_autoconfig);
+        btnAutoconfig.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PaymentController.getInstance().getReaderType() != null)
+                    new AutoconfigDialog(getActivity()).show();
+                else
+                    Toast.makeText(getActivity(), R.string.settings_lbl_title, Toast.LENGTH_LONG).show();
+            }
+        });
+
 		return view;
 	}
 	

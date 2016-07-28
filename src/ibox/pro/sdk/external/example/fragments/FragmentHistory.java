@@ -141,6 +141,7 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_date)).setText(String.valueOf(trItem.getDate()));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_title)).setText(String.valueOf(trItem.getDescription()));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_amount)).setText(getFormattedAmount(trItem.getAmount(), Locale.getDefault(), trItem.getFormat().getAmountFormat()));
+		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_amount_eff)).setText(getFormattedAmount(trItem.getAmountEff(), Locale.getDefault(), trItem.getFormat().getAmountFormat()));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_paytype)).setText(trItem.getCard().getIin());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_pan)).setText(trItem.getCard().getPanMasked());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_state)).setText(trItem.getStateDisplay());
@@ -236,7 +237,7 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 				holder.lblAmount.setPaintFlags(0);
 			}
 			
-			holder.lblAmount.setText(getFormattedAmount(getItem(position).getAmount(), Locale.getDefault(), getItem(position).getFormat().getAmountFormat()));
+			holder.lblAmount.setText(getFormattedAmount(getItem(position).getAmountEff(), Locale.getDefault(), getItem(position).getFormat().getAmountFormat()));
 		}
 		
 		private class ItemHolder {
