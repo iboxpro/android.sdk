@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="def_login"></string>
+    <string name="def_password"></string>
     <string name="app_name">IboxTestApp</string>
     <string name="EMV_CARD_BLOCKED">Card is blocked</string>
     <string name="EMV_CARD_ERROR">Card error</string>
@@ -24,12 +26,14 @@
     <string name="error_cancellation_timeout">Cancellation is not possible, do you want to perform a refund? </string>
     <string name="error_no_response">Server is not responding</string>
     <string name="error_no_such_transaction">Transaction is not found</string>
+    <string name="error_tr_null_or_empty">Transaction creation error</string>
     <string name="error_schedule_creation">Error creating schedule (%s) Retry?</string>
     <string name="history_edt_getById">Find transaction by ID</string>
     <string name="history_item_no_description">No description</string>
     <string name="history_tr_details_dlg_btn_cancel">Cancel payment</string>
     <string name="history_tr_details_dlg_btn_return">Perform a refund</string>
     <string name="history_tr_details_dlg_lbl_amount">Amount:</string>
+    <string name="history_tr_details_dlg_lbl_amount_eff">Balance:</string>
     <string name="history_tr_details_dlg_lbl_date">Date:</string>
     <string name="history_tr_details_dlg_lbl_id">ID:</string>
     <string name="history_tr_details_dlg_lbl_geodata">Coordinates:</string>
@@ -69,6 +73,8 @@
     <string name="payment_photo_dlg_btn_gallery">Gallery</string>
     <string name="payment_photo_dlg_btn_camera">Camera</string>
     <string name="payment_dlg_started">Transaction %s</string>
+    <string name="reverse_dlg_title">Payment return/cancelling</string>
+    <string name="reverse_dlg_lbl_amount">Amount to return/cancel:</string>
     <string name="payment_photo_dlg_msg">Select image source</string>
     <string name="payment_photo_dlg_title">Add image</string>
     <string name="progress">Please wait...</string>
@@ -85,6 +91,8 @@
     <string name="reader_state_ready_swipeonly">Swipe card</string>
     <string name="sdcard_needed">Insert SD card</string>
     <string name="settings_lbl_title">Select reader</string>
+    <string name="settings_btn_autoconfig">Autoconfig</string>
+    <string name="settings_autoconfig_default">Default config</string>
     <string name="steps_dlg_lbl_title">Confirm schedule</string>
     <string name="steps_dlg_lbl_total">Total:</string>
     <string name="tab_history">History</string>
@@ -103,4 +111,14 @@
     <string name="tr_details_dlg_lbl_terminal">Terminal:</string>
     <string name="writing_error">Write error</string>
     <string name="yes">Yes</string>
+    <string name="success">Success!</string>
+    <string name="failed">Failed!</string>
+    <string-array name="regular_payment_types">
+        <item>One time</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+        <item>Quarterly</item>
+        <item>Yearly</item>
+        <item>Custom dates</item>
+    </string-array>
 </resources>

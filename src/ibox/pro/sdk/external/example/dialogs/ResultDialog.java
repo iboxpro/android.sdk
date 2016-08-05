@@ -38,7 +38,7 @@ public class ResultDialog extends Dialog {
 		String cardNumber = isRegular ? scheduleItem.getCard().getPanMasked() : paymentResultContext.getTransactionItem().getCard().getPanMasked();
 
         lblOperation.setText(isRegular ? "SCHEDULE" : transactionItem.getOperation());
-        lblState.setText(isRegular ? "" : transactionItem.getStateDisplay());
+        lblState.setText(isRegular ? "" : new StringBuilder(transactionItem.getStateDisplay()).append(" (").append(transactionItem.getSubStateDisplay()).append(")"));
         lblID.setText(isRegular ? String.valueOf(scheduleItem.getID()) : transactionItem.getID());
         lblInvoice.setText(isRegular ? "" : transactionItem.getInvoice());
         lblAppcode.setText(isRegular ? "" : transactionItem.getApprovalCode());

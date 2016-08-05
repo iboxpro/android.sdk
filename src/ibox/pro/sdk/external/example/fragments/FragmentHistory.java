@@ -144,13 +144,28 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_amount_eff)).setText(getFormattedAmount(trItem.getAmountEff(), Locale.getDefault(), trItem.getFormat().getAmountFormat()));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_paytype)).setText(trItem.getCard().getIin());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_pan)).setText(trItem.getCard().getPanMasked());
-		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_state)).setText(trItem.getStateDisplay());
+		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_state)).setText(new StringBuilder(trItem.getStateDisplay()).append(" (").append(trItem.getSubStateDisplay()).append(")"));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_invoice)).setText(trItem.getInvoice());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_geodata)).setText(String.valueOf(trItem.getLatitude()).concat(" , ").concat(String.valueOf(trItem.getLongitude())));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_signature_url)).setText(trItem.getSignatureUrl());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_photo_url)).setText(trItem.getPhotoUrl());
-		
+
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_amount)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "Roboto-Regular.ttf"));
+
+		int stateColor = getContext().getResources().getColor(android.R.color.white);
+		if (trItem.getDisplayMode() != null) {
+			if (trItem.getDisplayMode() == TransactionItem.DisplayMode.SUCCESS)
+				stateColor = getResources().getColor(android.R.color.holo_green_dark);
+			if (trItem.getDisplayMode() == TransactionItem.DisplayMode.REVERSE)
+				stateColor = getResources().getColor(android.R.color.darker_gray);
+			if (trItem.getDisplayMode() == TransactionItem.DisplayMode.DECLINED)
+				stateColor = getResources().getColor(android.R.color.holo_red_light);
+			if (trItem.getDisplayMode() == TransactionItem.DisplayMode.REVERSED) {
+				stateColor = getResources().getColor(android.R.color.darker_gray);
+			}
+		}
+		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_state)).setText(new StringBuilder(trItem.getStateDisplay()).append(" (").append(trItem.getSubStateDisplay()).append(")"));
+		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_state)).setTextColor(stateColor);
 
 		dialogView.findViewById(R.id.history_tr_details_dlg_btn_cancel).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -236,6 +251,21 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 				holder.lblTitle.setPaintFlags(0);
 				holder.lblAmount.setPaintFlags(0);
 			}
+
+			int stateColor = getContext().getResources().getColor(android.R.color.black);
+			if (getItem(position).getDisplayMode() != null) {
+				if (getItem(position).getDisplayMode() == TransactionItem.DisplayMode.SUCCESS)
+					stateColor = getResources().getColor(android.R.color.holo_green_dark);
+				if (getItem(position).getDisplayMode() == TransactionItem.DisplayMode.REVERSE)
+					stateColor = getResources().getColor(android.R.color.darker_gray);
+				if (getItem(position).getDisplayMode() == TransactionItem.DisplayMode.DECLINED)
+					stateColor = getResources().getColor(android.R.color.holo_red_light);
+				if (getItem(position).getDisplayMode() == TransactionItem.DisplayMode.REVERSED) {
+					stateColor = getResources().getColor(android.R.color.darker_gray);
+				}
+			}
+			holder.lblTitle.setTextColor(stateColor);
+			holder.lblAmount.setTextColor(stateColor);
 			
 			holder.lblAmount.setText(getFormattedAmount(getItem(position).getAmountEff(), Locale.getDefault(), getItem(position).getFormat().getAmountFormat()));
 		}

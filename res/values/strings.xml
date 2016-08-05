@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="def_login">agent@integration.demo</string>
-    <string name="def_password">integration123</string>
+    <string name="def_login"></string>
+    <string name="def_password"></string>
 	<string name="def_product_code">PRODUCT_TEST</string>
 	<string name="def_product_field_1_code">FIELD_1</string>
 	<string name="def_product_field_2_code">FIELD_2</string>
@@ -15,13 +15,16 @@
     <string name="ok">Ок</string>
     <string name="yes">Да</string>
     <string name="cancel">Отмена</string>
+    <string name="success">Успешно!</string>
+    <string name="failed">Неудачно!</string>
     <string name="common_error">Произошла ошибка</string>
     <string name="writing_error">Ошибка записи</string>
     <string name="error_no_response">Сервер не отвечает</string>    
     <string name="error_schedule_creation">Ошибка создания расписания\n(%s)\nПовторить попытку?</string>
     <string name="error_cancellation_timeout">Невозможно выполнить отмену, провести возврат?</string>
     <string name="error_no_such_transaction">Транзакция не найдена</string>
-   
+    <string name="error_tr_null_or_empty">Ошибка создания транзакции</string>
+
     <string name="tab_payment">Платеж</string>
     <string name="tab_history">История</string>
     <string name="tab_settings">Настройки</string>     
@@ -50,6 +53,7 @@
     <string name="history_tr_details_dlg_lbl_date">Дата выполнения:</string>
     <string name="history_tr_details_dlg_lbl_title">Описание:</string>
     <string name="history_tr_details_dlg_lbl_amount">Сумма:</string>
+    <string name="history_tr_details_dlg_lbl_amount_eff">Остаток:</string>
     <string name="history_tr_details_dlg_lbl_paytype">Способ оплаты:</string>
     <string name="history_tr_details_dlg_lbl_pan">Номер карты:</string>
     <string name="history_tr_details_dlg_lbl_state">Статус:</string>
@@ -96,6 +100,9 @@
 
     <string name="payment_dlg_started">Выполняется транзакция %s</string>
 
+    <string name="reverse_dlg_title">Возврат/Отмена платежа</string>
+    <string name="reverse_dlg_lbl_amount">Сумма возврата/отмены:</string>
+
     <string name="steps_dlg_lbl_title">Подтвердите расписание</string>
     <string name="steps_dlg_lbl_total">Всего :</string>
     
@@ -106,7 +113,9 @@
     <string name="adjust_dlg_btn_send">Отправить чек</string>
 
     <string name="settings_lbl_title">Выберите ридер</string>
-    
+    <string name="settings_btn_autoconfig">Автонастройка</string>
+    <string name="settings_autoconfig_default">Конфигурация по-умолчанию</string>
+
     <string name="reader_state_disconnected">Ридер не подключен</string>
     <string name="reader_state_ready">Проведите магнитной полосой или вставьте карту в ридер</string>
     <string name="reader_state_ready_swipeonly">Проведите магнитной полосой</string>

@@ -36,7 +36,7 @@ public class MainActivity extends FragmentActivity {
 				e.printStackTrace();
 			}
 
-		PaymentController.getInstance().setSingleStepEMV(true);
+		//PaymentController.getInstance().setSingleStepEMV(true);
 
 		if (savedInstanceState == null)
 			showLoginDialog();
