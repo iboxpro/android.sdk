@@ -66,6 +66,7 @@
 
     <string name="payment_lbl_amount">Сумма :</string>
     <string name="payment_lbl_description">Описание :</string>
+    <string name="payment_cb_cash">Наличными</string>
     <string name="payment_cb_product">Оплатить продукт</string>
     <string name="payment_lbl_product_field_1">Поле 1 :</string>
     <string name="payment_lbl_product_field_2">Поле 2 :</string>
@@ -91,8 +92,12 @@
 	    <item>В заданные даты</item>
 	</string-array>
 	<string name="payment_default_dates">01.01.2016;02.02.2016;03.03.2016;</string>
+    <string name="payment_toast_pin_request">Введите PIN</string>
+    <string name="payment_toast_pin_entered">PIN введен</string>
+    <string name="payment_toast_battery_format">Уровень заряда: %.0f%%</string>
     
-    <string name="payment_btn_pay_card">Оплатить картой</string>
+    <string name="payment_btn_pay">Оплатить</string>
+    <string name="payment_btn_fiscal">Фискализировать</string>
     <string name="payment_photo_dlg_title">Добавление изображения</string>
     <string name="payment_photo_dlg_msg">Выберите источник изображения</string>
     <string name="payment_photo_dlg_btn_gallery">Галерея</string>
@@ -111,6 +116,13 @@
     <string name="adjust_dlg_lbl_email">Email :</string>
     <string name="adjust_dlg_lbl_phone">Телефон :</string>    
     <string name="adjust_dlg_btn_send">Отправить чек</string>
+
+    <string name="fiscal_dlg_title">Фискализация</string>
+    <string name="fiscal_dlg_lbl_trid">@string/tr_details_dlg_lbl_id</string>
+    <string name="fiscal_dlg_lbl_printer">ID принтера</string>
+    <string name="fiscal_dlg_lbl_doc">Номер документа</string>
+    <string name="fiscal_dlg_lbl_cvc">КПК</string>
+    <string name="fiscal_dlg_lbl_shift">Номер смены</string>
 
     <string name="settings_lbl_title">Выберите ридер</string>
     <string name="settings_btn_autoconfig">Автонастройка</string>

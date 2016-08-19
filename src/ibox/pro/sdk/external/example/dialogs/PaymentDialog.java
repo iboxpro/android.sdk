@@ -445,12 +445,12 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 
 	@Override
 	public void onPinRequest() {
-		Toast.makeText(mActivity, "PinRequested", Toast.LENGTH_SHORT).show();
+		Toast.makeText(mActivity, R.string.payment_toast_pin_request, Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
 	public void onPinEntered() {
-		Toast.makeText(mActivity, "PinEntered", Toast.LENGTH_SHORT).show();
+		Toast.makeText(mActivity, R.string.payment_toast_pin_entered, Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
@@ -461,6 +461,13 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	@Override
 	public void onAutoConfigFinished(boolean success, String config, boolean isDefault) {
 
+	}
+
+	@Override
+	public void onBatteryState(double percent) {
+		Toast.makeText(mActivity,
+				String.format(getContext().getString(R.string.payment_toast_battery_format), percent),
+				Toast.LENGTH_SHORT).show();
 	}
 
 }

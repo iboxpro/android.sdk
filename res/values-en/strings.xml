@@ -50,8 +50,10 @@
     <string name="login_dlg_title">Authorization</string>
     <string name="month_last_day">Last day of month</string>
     <string name="ok">Ok</string>
-    <string name="payment_btn_pay_card">Pay by card</string>
+    <string name="payment_btn_pay">Pay</string>
+    <string name="payment_btn_fiscal">Fiscal</string>
     <string name="payment_cb_end_type">Repeat count</string>
+    <string name="payment_cb_cash">Cash</string>
     <string name="payment_cb_product">Product payment</string>
     <string name="payment_cb_regular">Regular payment</string>
     <string name="payment_default_dates">01.01.2016;02.02.2016;03.03.2016;</string>
@@ -121,4 +123,13 @@
         <item>Yearly</item>
         <item>Custom dates</item>
     </string-array>
+    <string name="payment_toast_pin_request">Enter PIN</string>
+    <string name="payment_toast_pin_entered">PIN entered</string>
+    <string name="payment_toast_battery_format">Charge level: %.0f%%</string>
+    <string name="fiscal_dlg_title">Fiscal data</string>
+    <string name="fiscal_dlg_lbl_trid">@string/tr_details_dlg_lbl_id</string>
+    <string name="fiscal_dlg_lbl_printer">Printer ID</string>
+    <string name="fiscal_dlg_lbl_doc">Document ID</string>
+    <string name="fiscal_dlg_lbl_cvc">CVC</string>
+    <string name="fiscal_dlg_lbl_shift">Shift number</string>
 </resources>

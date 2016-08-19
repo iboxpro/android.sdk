@@ -61,7 +61,16 @@
 	                />	            
 	        </LinearLayout>	 
 	    </RelativeLayout>
-	    
+
+		<CheckBox
+			android:id="@+id/payment_cb_cash"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:checked="false"
+			android:textSize="16sp"
+			android:text="@string/payment_cb_cash"
+			/>
+
 	    <CheckBox
 	        android:id="@+id/payment_cb_product"
 	        android:layout_height="wrap_content"
@@ -316,10 +325,18 @@
 	    </LinearLayout>
 	    
 	    <Button 
-	        android:id="@+id/payment_btn_pay_card"
+	        android:id="@+id/payment_btn_pay"
 	        android:layout_height="wrap_content"
 	        android:layout_width="match_parent"
-	       	android:text="@string/payment_btn_pay_card"
-	        />	        
+            android:layout_marginBottom="15dp"
+	       	android:text="@string/payment_btn_pay"
+	        />
+
+		<Button
+			android:id="@+id/payment_btn_fiscal"
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:text="@string/payment_btn_fiscal"
+			/>
 	</LinearLayout>
 </ScrollView>

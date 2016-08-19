@@ -157,4 +157,11 @@ public class AutoconfigDialog extends Dialog implements PaymentControllerListene
 
     }
 
+    @Override
+    public void onBatteryState(double percent) {
+        Toast.makeText(getContext(),
+                String.format(getContext().getString(R.string.payment_toast_battery_format), percent),
+                Toast.LENGTH_SHORT).show();
+    }
+
 }

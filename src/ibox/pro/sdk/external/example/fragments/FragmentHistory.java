@@ -180,8 +180,8 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 			}
 		});
 
-		dialogView.findViewById(R.id.history_tr_details_dlg_btn_cancel).setVisibility(trItem.canCancel() ? View.VISIBLE : View.GONE);
-		dialogView.findViewById(R.id.history_tr_details_dlg_btn_return).setVisibility(trItem.canReturn() ? View.VISIBLE : View.GONE);
+		dialogView.findViewById(R.id.history_tr_details_dlg_btn_cancel).setVisibility(trItem.canCancel() || trItem.canCancelPartial() ? View.VISIBLE : View.GONE);
+		dialogView.findViewById(R.id.history_tr_details_dlg_btn_return).setVisibility(trItem.canReturn() || trItem.canReturnPartial() ? View.VISIBLE : View.GONE);
 
 		dlgTrInfo.show();
 	}

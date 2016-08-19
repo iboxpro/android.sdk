@@ -48,6 +48,7 @@ import ibox.pro.sdk.external.RegularPaymentContext;
 import ibox.pro.sdk.external.example.BitmapUtils;
 import ibox.pro.sdk.external.example.Consts;
 import ibox.pro.sdk.external.example.R;
+import ibox.pro.sdk.external.example.dialogs.FiscalDialog;
 import ibox.pro.sdk.external.example.dialogs.PaymentDialog;
 
 public class FragmentPayment extends Fragment {
@@ -56,11 +57,11 @@ public class FragmentPayment extends Fragment {
 	
 	private ImageView imgPhoto, imgProductField_2;
 	private EditText edtAmount, edtDescription;
-	private Button btnPayCard;
+	private Button btnPay, btnFiscal;
 	private byte [] photo, productPhoto;
 	
 	private LinearLayout llProduct, llRegular;
-	private CheckBox cbProduct, cbRegular, cbEndType;
+	private CheckBox cbCash, cbProduct, cbRegular, cbEndType;
 	private DatePicker pkrStart, pkrEnd;
 	private EditText edtProductField_1, edtPhone, edtEmail, edtRepeatCount, edtHour, edtMinute, edtDates;
 	private Spinner spnRegularType, spnQuarterly, spnMonth, spnDay, spnDayOfWeek;
@@ -124,7 +125,7 @@ public class FragmentPayment extends Fragment {
 			}
 		});
 		
-		btnPayCard.setOnClickListener(new View.OnClickListener() {
+		btnPay.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (cbRegular.isChecked())
@@ -133,7 +134,14 @@ public class FragmentPayment extends Fragment {
 					doSinglePayment();
 			}
 		});
-				
+
+		btnFiscal.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new FiscalDialog(getActivity()).show();
+			}
+		});
+
 		return view;
 	}
 		
@@ -141,7 +149,8 @@ public class FragmentPayment extends Fragment {
 		imgPhoto 		= (ImageView)view.findViewById(R.id.payment_img_photo);
 		edtAmount 		= (EditText)view.findViewById(R.id.payment_edt_amount);
 		edtDescription 	= (EditText)view.findViewById(R.id.payment_edt_description);
-		
+
+		cbCash				= (CheckBox)view.findViewById(R.id.payment_cb_cash);
 		cbProduct			= (CheckBox)view.findViewById(R.id.payment_cb_product);
 		llProduct			= (LinearLayout)view.findViewById(R.id.payment_ll_product);
 		edtProductField_1 	= (EditText)view.findViewById(R.id.payment_edt_product_field_1); 
@@ -173,7 +182,8 @@ public class FragmentPayment extends Fragment {
 		lblDayOfWeek 	= (TextView)view.findViewById(R.id.payment_lbl_day_of_week);
 		lblDates		= (TextView)view.findViewById(R.id.payment_lbl_dates);
 		
-		btnPayCard 		= (Button)view.findViewById(R.id.payment_btn_pay_card);
+		btnPay 			= (Button)view.findViewById(R.id.payment_btn_pay);
+		btnFiscal		= (Button)view.findViewById(R.id.payment_btn_fiscal);
 		
 		imgProductField_2.setOnClickListener(new View.OnClickListener() {			
 			@Override
@@ -327,7 +337,8 @@ public class FragmentPayment extends Fragment {
 	
 	private void doSinglePayment() {
 		PaymentContext context = new PaymentContext();
-				
+
+		context.setCash(cbCash.isChecked());
 		context.setAmount(edtAmount.getText().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
 		context.setDescription(edtDescription.getText().toString());
 		context.setImage(photo);
