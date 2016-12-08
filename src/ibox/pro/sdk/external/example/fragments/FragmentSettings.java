@@ -42,12 +42,15 @@ public class FragmentSettings extends Fragment {
 		lvReaders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-				if (PaymentController.ReaderType.values()[pos] == ReaderType.WISEPAD) {
-					ArrayList<BluetoothDevice> bondedDevices = PaymentController.getInstance().getBluetoothDevices(getActivity()); 
-					String [] devices = new String [bondedDevices.size()];
-					
-					int i = 0;
-					for (BluetoothDevice device : bondedDevices) 
+				final ReaderType reader = PaymentController.ReaderType.values()[pos];
+				if (reader.isWireless()) {
+					final ArrayList<BluetoothDevice> bondedDevices = PaymentController.getInstance().getBluetoothDevices(getActivity());
+					final boolean usbSupported = reader.isUsbSupported();
+					String [] devices = new String [bondedDevices.size() + (usbSupported ? 1 : 0)];
+					if (usbSupported)
+						devices[0] = "USB";
+					int i = usbSupported ? 1 : 0;
+					for (BluetoothDevice device : bondedDevices)
 						devices[i++] = (device.getName() != null && device.getName().length() > 0) ? device.getName() : device.getAddress();										
 					
 					AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -62,7 +65,10 @@ public class FragmentSettings extends Fragment {
 							.setSingleChoiceItems(devices, -1, new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
-									PaymentController.getInstance().setReaderType(getActivity(), ReaderType.WISEPAD, which, config);
+									String address = usbSupported
+										? (which > 0 ? bondedDevices.get(which - 1).getAddress() : PaymentController.USB_MODE_KEY)
+										: bondedDevices.get(which).getAddress();
+									PaymentController.getInstance().setReaderType(getActivity(), reader, address, config);
 									dialog.dismiss();
 									mAdapter.notifyDataSetChanged();
 								}
@@ -70,7 +76,7 @@ public class FragmentSettings extends Fragment {
 							.create()
 							.show();
 				} else {
-					PaymentController.getInstance().setReaderType(getActivity(), PaymentController.ReaderType.values()[pos], 0, config);
+					PaymentController.getInstance().setReaderType(getActivity(), reader, null, config);
 					mAdapter.notifyDataSetChanged();
 				}
 			}
@@ -93,14 +99,7 @@ public class FragmentSettings extends Fragment {
 	}
 	
 	private String getReaderName(PaymentController.ReaderType reader) {
-		switch(reader) {
-			case EMV_SWIPE :
-				return getString(R.string.reader_name_bbpos);
-			case WISEPAD :
-				return getString(R.string.reader_name_wisepad);			
-			default : 
-				return "UNKNOWN";
-		}
+		return reader.name();
 	}
 	
 	private class ReadersAdapter extends ArrayAdapter<PaymentController.ReaderType> {

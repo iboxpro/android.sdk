@@ -70,7 +70,7 @@ public class ReversePaymentDialog extends Dialog {
         @Override
         protected void action() {
             try {
-                PaymentController.getInstance().reversePayment(getContext(), transactionID, action, reverseAmount);
+                PaymentController.getInstance().reversePayment(getContext(), transactionID, action, reverseAmount, PaymentController.Currency.RUB);
             } catch (PaymentException e) {
                 onError(null, e.getMessage());
             }
@@ -88,8 +88,6 @@ public class ReversePaymentDialog extends Dialog {
             if (cancelledListener != null)
                 cancelledListener.onPaymentCancelled();
         }
-
-
 
         @Override
         public void onAutoConfigUpdate(double perecent) {

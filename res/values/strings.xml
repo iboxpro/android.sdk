@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="def_login"></string>
-    <string name="def_password"></string>
+    <string name="def_login">pf@cardport.kiev</string>
+    <string name="def_password">triton</string>
 	<string name="def_product_code">PRODUCT_TEST</string>
 	<string name="def_product_field_1_code">FIELD_1</string>
 	<string name="def_product_field_2_code">FIELD_2</string>
@@ -129,6 +129,7 @@
     <string name="settings_autoconfig_default">Конфигурация по-умолчанию</string>
 
     <string name="reader_state_disconnected">Ридер не подключен</string>
+    <string name="reader_state_ready_multiinput">Проведите магнитной полосой или приложите карту, или вставьте карту в ридер</string>
     <string name="reader_state_ready">Проведите магнитной полосой или вставьте карту в ридер</string>
     <string name="reader_state_ready_swipeonly">Проведите магнитной полосой</string>
     <string name="reader_state_init">Инициализация ридера</string>
@@ -137,12 +138,10 @@
     <string name="reader_state_eject">Извлеките карту</string>
     <string name="reader_bad_swipe">Ошибка при считывании магнитной полосы</string>
     <string name="reader_low_battery">Ридер почти разряжен</string>
-    
-    <string name="reader_name_wisepad">Chip &amp; Pin</string>
-	<string name="reader_name_bbpos">Chip &amp; Sign</string>
   
 	<string name="EMV_ERROR">Ошибка EMV</string>
 	<string name="EMV_NOT_ALLOWED">Чиповые транзакции не разрешены</string>
+    <string name="NFC_NOT_ALLOWED">NFC транзакции не разрешены</string>
     <string name="EMV_CARD_ERROR">Ошибка карты</string>
 	<string name="EMV_TRANSACTION_DECLINED">Транзакция отклонена</string>
 	<string name="EMV_TRANSACTION_CANCELED">Транзакция отменена</string>
@@ -150,5 +149,4 @@
 	<string name="EMV_READER_ERROR">Ошибка ридера</string>
 	<string name="EMV_CARD_NOT_SUPPORTED">Карта не поддерживается</string>
 	<string name="EMV_TRANSACTION_TERMINATED">Транзакция прервана</string>
-    		
 </resources>

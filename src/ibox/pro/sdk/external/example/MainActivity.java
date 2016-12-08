@@ -31,7 +31,7 @@ public class MainActivity extends FragmentActivity {
 		PaymentController.getInstance().onCreate(this, savedInstanceState);
 		if (PaymentController.getInstance().getReaderType() == null)
 			try {
-				PaymentController.getInstance().setReaderType(this, ReaderType.EMV_SWIPE, 0, config);
+				PaymentController.getInstance().setReaderType(this, ReaderType.EMV_SWIPE, null, config);
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}

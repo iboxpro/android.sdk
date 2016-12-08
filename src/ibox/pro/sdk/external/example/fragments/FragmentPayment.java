@@ -355,6 +355,7 @@ public class FragmentPayment extends Fragment {
 		RegularPaymentContext context = new RegularPaymentContext();
 		
 		context.setAmount(edtAmount.getText().toString().trim().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
+		context.setCurrency(PaymentController.Currency.RUB);
 		context.setDescription(edtDescription.getText().toString());
 		context.setImage(photo);
 		

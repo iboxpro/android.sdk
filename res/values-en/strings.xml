@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="def_login"></string>
-    <string name="def_password"></string>
+    <string name="def_login">agent@mac.kiev</string>
+    <string name="def_password">123123123</string>
     <string name="app_name">IboxTestApp</string>
     <string name="EMV_CARD_BLOCKED">Card is blocked</string>
     <string name="EMV_CARD_ERROR">Card error</string>
     <string name="EMV_CARD_NOT_SUPPORTED">Card is not supported</string>
     <string name="EMV_ERROR">EMV Error</string>
     <string name="EMV_NOT_ALLOWED">EMV is not allowed</string>
+    <string name="NFC_NOT_ALLOWED">NFC is not allowed</string>
     <string name="EMV_READER_ERROR">Reader error</string>
     <string name="EMV_TRANSACTION_CANCELED">Transaction cancelled</string>
     <string name="EMV_TRANSACTION_DECLINED">Transaction declined</string>
@@ -80,8 +81,6 @@
     <string name="payment_photo_dlg_msg">Select image source</string>
     <string name="payment_photo_dlg_title">Add image</string>
     <string name="progress">Please wait...</string>
-    <string name="reader_name_bbpos">Chip&amp;Sign</string>
-    <string name="reader_name_wisepad">Chip&amp;PIN</string>
     <string name="reader_state_disconnected">Reader is not connected</string>
     <string name="reader_state_eject">Eject card</string>
     <string name="reader_bad_swipe">Error occurred while reading magnetic stripe</string>
@@ -89,6 +88,7 @@
     <string name="reader_state_init">Reader initialization</string>
     <string name="reader_state_init_error">Initialization error</string>
     <string name="reader_state_inprogress">Processing payment</string>
+    <string name="reader_state_ready_multiinput">Swipe or insert or tap card</string>
     <string name="reader_state_ready">Swipe or insert card</string>
     <string name="reader_state_ready_swipeonly">Swipe card</string>
     <string name="sdcard_needed">Insert SD card</string>

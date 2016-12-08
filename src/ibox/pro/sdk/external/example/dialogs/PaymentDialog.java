@@ -90,7 +90,11 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	}
 
 	protected int getReadyStringID() {
-		return mPaymentContext instanceof RegularPaymentContext ? R.string.reader_state_ready_swipeonly : R.string.reader_state_ready;
+		return mPaymentContext instanceof RegularPaymentContext
+				? R.string.reader_state_ready_swipeonly
+				: PaymentController.getInstance().getReaderType().isMultiInputSupported()
+					? R.string.reader_state_ready_multiinput
+					: R.string.reader_state_ready;
 	}
 
     private void startProgress() {
@@ -128,6 +132,9 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
                 case EMV_NOT_ALLOWED :
                     toastText = mActivity.getString(R.string.EMV_NOT_ALLOWED);
                     break;
+                case NFC_NOT_ALLOWED :
+                    toastText = mActivity.getString(R.string.NFC_NOT_ALLOWED);
+                    break;
                 case EMV_CANCEL :
                     toastText = mActivity.getString(R.string.EMV_TRANSACTION_CANCELED);
                     break;
@@ -160,8 +167,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
                     break;
             }
 		Toast.makeText(getContext(), String.format("%s (%s)", toastText, (error == null ? "null" : error.toString())), Toast.LENGTH_LONG).show();
-		if (error == null || error == PaymentController.PaymentError.EMV_TERMINATED || error == PaymentError.NO_SUCH_TRANSACTION)
-			dismiss();
+		dismiss();
     }
 
 	@Override
@@ -188,7 +194,8 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	    		lblState.setText(R.string.reader_state_disconnected);
 	    		break;
 	    	case SWIPE_CARD :
-	    	case TRANSACTION_STARTED :
+	    	case EMV_TRANSACTION_STARTED :
+            case NFC_TRANSACTION_STARTED :
 	    		startProgress();
 	    		break;	    	
 	    	case WAITING_FOR_CARD :
