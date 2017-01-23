@@ -13,13 +13,44 @@ import ibox.pro.sdk.external.PaymentController.ReaderType;
 import ibox.pro.sdk.external.example.fragments.FragmentHistory;
 import ibox.pro.sdk.external.example.fragments.FragmentPayment;
 import ibox.pro.sdk.external.example.fragments.FragmentSettings;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 public class MainActivity extends FragmentActivity {
 
 	private final String config = null;
 
 	private FragmentTabHost mTabHost;
-	
+
+	public void SaveConfig(ReaderType rt, String address, String config) {
+		SharedPreferences p =  this.getSharedPreferences(getLocalClassName(), MODE_PRIVATE);
+		Editor editor = p.edit();
+
+		//TODO add other readers
+		String rdr = rt == ReaderType.WISEPAD ? "WISEPAD" : null;
+
+		editor.putString("ReaderType", rdr);
+		editor.putString("ReaderAddress", address);
+		editor.putString("ReaderConfig", config);
+
+		editor.commit();
+	}
+
+	public void LoadConfig() {
+		SharedPreferences p =  this.getSharedPreferences(getLocalClassName(), MODE_PRIVATE);
+
+		ReaderType rt = "WISEPAD".equals(p.getString("ReaderType", null))  ? ReaderType.WISEPAD : null;
+		String address = p.getString("ReaderAddress", null);
+		String config = p.getString("ReaderConfig", null);
+
+		if (rt != null)
+			PaymentController.getInstance().setReaderType(this, rt, address, config);
+		else
+			PaymentController.getInstance().setReaderType(this, ReaderType.EMV_SWIPE, null, config);
+
+	}
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -31,10 +62,11 @@ public class MainActivity extends FragmentActivity {
 		PaymentController.getInstance().onCreate(this, savedInstanceState);
 		if (PaymentController.getInstance().getReaderType() == null)
 			try {
-				PaymentController.getInstance().setReaderType(this, ReaderType.EMV_SWIPE, null, config);
+				LoadConfig();
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			}
+
 
 		//PaymentController.getInstance().setSingleStepEMV(true);
 
