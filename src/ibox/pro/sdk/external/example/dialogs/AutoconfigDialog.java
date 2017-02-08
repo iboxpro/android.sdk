@@ -19,7 +19,6 @@ import java.util.Map;
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentControllerListener;
 import ibox.pro.sdk.external.PaymentResultContext;
-import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 
 public class AutoconfigDialog extends Dialog implements PaymentControllerListener {
@@ -110,9 +109,6 @@ public class AutoconfigDialog extends Dialog implements PaymentControllerListene
                 .append(success ? getContext().getString(R.string.success) : getContext().getString(R.string.failed))
                 .append(" ")
                 .append(isDefault ? getContext().getString(R.string.settings_autoconfig_default) : config);
-
-        ((MainActivity)getContext()).SaveConfig(PaymentController.getInstance().getReaderType(), null, isDefault ? null : config);
-
         Toast.makeText(getContext(), result.toString(),Toast.LENGTH_LONG).show();
     }
 

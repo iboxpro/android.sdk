@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
+import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -16,8 +19,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import ibox.pro.sdk.external.PaymentContext;
@@ -28,6 +35,7 @@ import ibox.pro.sdk.external.PaymentControllerListener;
 import ibox.pro.sdk.external.PaymentException;
 import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.RegularPaymentContext;
+import ibox.pro.sdk.external.entities.TransactionItem;
 import ibox.pro.sdk.external.example.R;
 
 public class PaymentDialog extends Dialog implements PaymentControllerListener {
@@ -176,9 +184,66 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	}
 
 	@Override
-    public void onFinished(PaymentResultContext paymentResultContext) {
-    	dismiss();
-    	new ResultDialog(mActivity, paymentResultContext, false).show();
+    public void onFinished(final PaymentResultContext paymentResultContext) {
+		if (PaymentController.getInstance().getReaderType() == PaymentController.ReaderType.WISEPAD2_PLUS)
+			new AsyncTask<Void, Void, PaymentController.PrintResult>() {
+				StringBuilder slipBuilder = new StringBuilder();
+				int tapeWidth = 34;
+
+				private void appendKeyValue(String key, String value) {
+					slipBuilder.append("\n").append(key);
+					for (int i = key.length(); i < tapeWidth - value.length(); i++)
+						slipBuilder.append(' ');
+					slipBuilder.append(value);
+				}
+
+				@Override
+				protected void onPreExecute() {
+					super.onPreExecute();
+					appendKeyValue("Client: ", "Test client");
+					appendKeyValue("Legal name: ", "Legal name");
+					appendKeyValue("Phone: ", "+8 012 345 6789");
+					appendKeyValue("Web: ", "www.testclient.com");
+					appendKeyValue("Date and time: "
+					   , new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.UK)
+							.format(paymentResultContext.getTransactionItem().getDate()));
+					appendKeyValue("Terminal: ", paymentResultContext.getTransactionItem().getTerminalName());
+					appendKeyValue("Receipt: ", paymentResultContext.getTransactionItem().getInvoice());
+					appendKeyValue("Approval code: ", paymentResultContext.getTransactionItem().getApprovalCode());
+					appendKeyValue("Card: ", paymentResultContext.getTransactionItem().getCard().getPanMasked().replace("*", " **** "));
+					if (paymentResultContext.getEmvData() != null) {
+						for (Map.Entry<String, String> tag : paymentResultContext.getEmvData().entrySet())
+							appendKeyValue(tag.getKey() + ": ", tag.getValue());
+					}
+					appendKeyValue("Card holder: ", paymentResultContext.getTransactionItem().getCardholderName());
+					appendKeyValue("Operation: ", paymentResultContext.getTransactionItem().getOperation());
+					appendKeyValue("Total: ", String.valueOf(paymentResultContext.getTransactionItem().getAmount()));
+					if (paymentResultContext.isRequiresSignature()) {
+						slipBuilder.append("\n\n");
+						slipBuilder.append("\nCustomer sign.____________________");
+					} else if (paymentResultContext.getTransactionItem().getInputType() == TransactionItem.InputType.CHIP) {
+						slipBuilder.append("\nConfirmed by entering PIN");
+					}
+					slipBuilder.append("\n\n\n\n\n");
+				}
+
+				@Override
+				protected PaymentController.PrintResult doInBackground(Void... params) {
+					return PaymentController.getInstance().printText(slipBuilder.toString(), Layout.Alignment.ALIGN_NORMAL);
+				}
+
+				@Override
+				protected void onPostExecute(PaymentController.PrintResult result) {
+					dismiss();
+					new ResultDialog(mActivity, paymentResultContext, false).show();
+					if (result != PaymentController.PrintResult.SUCCESS)
+						Toast.makeText(mActivity, "Printer error: " + result, Toast.LENGTH_LONG).show();
+				}
+			}.execute();
+		else {
+			dismiss();
+			new ResultDialog(mActivity, paymentResultContext, false).show();
+		}
     }
     
     @Override

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentController.ReaderType;
-import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.dialogs.AutoconfigDialog;
 
@@ -70,7 +69,6 @@ public class FragmentSettings extends Fragment {
 										? (which > 0 ? bondedDevices.get(which - 1).getAddress() : PaymentController.USB_MODE_KEY)
 										: bondedDevices.get(which).getAddress();
 									PaymentController.getInstance().setReaderType(getActivity(), reader, address, config);
-									((MainActivity)getActivity()).SaveConfig(reader, address, config);
 									dialog.dismiss();
 									mAdapter.notifyDataSetChanged();
 								}
@@ -79,7 +77,6 @@ public class FragmentSettings extends Fragment {
 							.show();
 				} else {
 					PaymentController.getInstance().setReaderType(getActivity(), reader, null, config);
-					((MainActivity)getActivity()).SaveConfig(reader, null, config);
 					mAdapter.notifyDataSetChanged();
 				}
 			}
