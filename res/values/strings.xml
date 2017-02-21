@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="def_login">pf@cardport.kiev</string>
-    <string name="def_password">triton</string>
+    <string name="def_login"></string>
+    <string name="def_password"></string>
 	<string name="def_product_code">PRODUCT_TEST</string>
 	<string name="def_product_field_1_code">FIELD_1</string>
 	<string name="def_product_field_2_code">FIELD_2</string>
