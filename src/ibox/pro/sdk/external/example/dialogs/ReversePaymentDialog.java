@@ -16,6 +16,8 @@ import ibox.pro.sdk.external.example.R;
 public class ReversePaymentDialog extends Dialog {
 
     private String transactionID;
+    private Double amount;
+    private String currency;
     private PaymentController.ReverseAction action;
     private OnPaymentCancelledListener cancelledListener;
 
@@ -23,12 +25,15 @@ public class ReversePaymentDialog extends Dialog {
     private EditText edtAmount;
     private Button btnConfirm;
 
-    public ReversePaymentDialog(Activity context, String transactionID, PaymentController.ReverseAction action, OnPaymentCancelledListener cancelledListener) {
+
+    public ReversePaymentDialog(Activity context, String transactionID, Double amount, String currency, PaymentController.ReverseAction action, OnPaymentCancelledListener cancelledListener) {
         super(context);
         mActivity = context;
         this.transactionID = transactionID;
         this.action = action;
         this.cancelledListener = cancelledListener;
+        this.amount = amount;
+        this.currency = currency;
         init();
     }
 
@@ -40,6 +45,8 @@ public class ReversePaymentDialog extends Dialog {
         edtAmount = (EditText)findViewById(R.id.reverse_dlg_edt_amount);
         btnConfirm = (Button)findViewById(R.id.reverse_btn_confirm);
 
+        edtAmount.setText(this.amount.toString());
+
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -49,7 +56,14 @@ public class ReversePaymentDialog extends Dialog {
     }
 
     private void startReverse() {
-        double reverseAmount = Double.parseDouble(edtAmount.getText().toString().replace(',', '.'));
+        String amt = edtAmount.getText().toString().replace(',', '.');
+        Double reverseAmount = null;
+        try {
+            reverseAmount = Double.parseDouble(amt);
+        }
+        catch (Exception ex) {
+            reverseAmount = null;
+        }
         new ProgressDialog(reverseAmount).show();
         dismiss();
     }
@@ -60,9 +74,9 @@ public class ReversePaymentDialog extends Dialog {
 
     private class ProgressDialog extends PaymentDialog {
 
-        private double reverseAmount;
+        private Double reverseAmount;
 
-        public ProgressDialog(double reverseAmount) {
+        public ProgressDialog(Double reverseAmount) {
             super(mActivity, null);
             this.reverseAmount = reverseAmount;
         }
@@ -70,7 +84,17 @@ public class ReversePaymentDialog extends Dialog {
         @Override
         protected void action() {
             try {
-                PaymentController.getInstance().reversePayment(getContext(), transactionID, action, reverseAmount, PaymentController.Currency.RUB);
+
+                PaymentController.Currency curr = PaymentController.Currency.RUB;
+
+                if ("RUB".equals(ReversePaymentDialog.this.currency))
+                    curr = PaymentController.Currency.RUB;
+
+                if ("VND".equals(ReversePaymentDialog.this.currency))
+                    curr = PaymentController.Currency.VND;
+
+                PaymentController.getInstance().reversePayment(getContext(), transactionID, action, reverseAmount, curr);
+
             } catch (PaymentException e) {
                 onError(null, e.getMessage());
             }
