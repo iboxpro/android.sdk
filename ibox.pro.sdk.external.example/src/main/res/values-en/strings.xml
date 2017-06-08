@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="def_login">agent@mac.demo</string>
-    <string name="def_password">123123123</string>
+    <string name="def_login"></string>
+    <string name="def_password"></string>
     <string name="app_name">IboxTestApp</string>
     <string name="EMV_CARD_BLOCKED">Card is blocked</string>
     <string name="EMV_CARD_ERROR">Card error</string>
