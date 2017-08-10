@@ -30,6 +30,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormatSymbols;
@@ -45,6 +48,7 @@ import ibox.pro.sdk.external.PaymentContext;
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentController.RegularEndType;
 import ibox.pro.sdk.external.PaymentController.RegularRepeatType;
+import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.RegularPaymentContext;
 import ibox.pro.sdk.external.example.BitmapUtils;
 import ibox.pro.sdk.external.example.Consts;
@@ -58,11 +62,11 @@ public class FragmentPayment extends Fragment {
 	
 	private ImageView imgPhoto, imgProductField_2;
 	private EditText edtAmount, edtDescription;
-	private Button btnPay, btnFiscal, btnPayNFC;
+	private Button btnPay, btnFiscal, btnPayNFC, btnPayBackground;
 	private byte [] photo, productPhoto;
 	
 	private LinearLayout llProduct, llRegular;
-	private CheckBox cbCash, cbProduct, cbRegular, cbEndType;
+	private CheckBox cbCash, cbProduct, cbRegular, cbEndType, cbAuxData;
 	private DatePicker pkrStart, pkrEnd;
 	private EditText edtProductField_1, edtPhone, edtEmail, edtRepeatCount, edtHour, edtMinute, edtDates;
 	private Spinner spnRegularType, spnQuarterly, spnMonth, spnDay, spnDayOfWeek;
@@ -73,59 +77,59 @@ public class FragmentPayment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_payment, container, false);
-		
+
 		initControls(view);
-	
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(getString(R.string.payment_photo_dlg_title))
-			.setMessage(getString(R.string.payment_photo_dlg_msg))
-			.setPositiveButton(getString(R.string.payment_photo_dlg_btn_gallery), new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					getImageFromGallery(imgPhoto);
-					dialog.dismiss();
-				}
-			})
-			.setNegativeButton(getString(R.string.payment_photo_dlg_btn_camera), new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					getImageFromCamera(imgPhoto);
-					dialog.dismiss();
-				}
-			});
-		
+				.setMessage(getString(R.string.payment_photo_dlg_msg))
+				.setPositiveButton(getString(R.string.payment_photo_dlg_btn_gallery), new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						getImageFromGallery(imgPhoto);
+						dialog.dismiss();
+					}
+				})
+				.setNegativeButton(getString(R.string.payment_photo_dlg_btn_camera), new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						getImageFromCamera(imgPhoto);
+						dialog.dismiss();
+					}
+				});
+
 		dlgPhoto = builder.create();
-		
+
 		builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(getString(R.string.payment_photo_dlg_title))
-			.setMessage(getString(R.string.payment_photo_dlg_msg))
-			.setPositiveButton(getString(R.string.payment_photo_dlg_btn_gallery), new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					getImageFromGallery(imgProductField_2);
-					dialog.dismiss();
-				}
-			})
-			.setNegativeButton(getString(R.string.payment_photo_dlg_btn_camera), new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					getImageFromCamera(imgProductField_2);
-					dialog.dismiss();
-				}
-			});
+				.setMessage(getString(R.string.payment_photo_dlg_msg))
+				.setPositiveButton(getString(R.string.payment_photo_dlg_btn_gallery), new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						getImageFromGallery(imgProductField_2);
+						dialog.dismiss();
+					}
+				})
+				.setNegativeButton(getString(R.string.payment_photo_dlg_btn_camera), new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						getImageFromCamera(imgProductField_2);
+						dialog.dismiss();
+					}
+				});
 		dlgProductPhoto = builder.create();
-		
-		imgPhoto.setOnClickListener(new View.OnClickListener() {			
+
+		imgPhoto.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dlgPhoto.show();
 			}
 		});
-		
+
 		btnPay.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -154,6 +158,48 @@ public class FragmentPayment extends Fragment {
 			}
 		});
 
+		btnPayBackground.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				AsyncTask<Void, Void, PaymentResultContext> task = new AsyncTask<Void, Void, PaymentResultContext>() {
+
+					PaymentContext paymentContext = null;
+
+					@Override
+					protected void onPreExecute() {
+						super.onPreExecute();
+
+						paymentContext = new PaymentContext();
+
+						paymentContext.setAmount(edtAmount.getText().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
+						paymentContext.setDescription(edtDescription.getText().toString());
+						paymentContext.setImage(photo);
+						paymentContext.setCurrency(PaymentController.Currency.RUB);
+
+						if (isPaymentWithProduct()) {
+							setPaymentProductData(paymentContext);
+						}
+					}
+
+					@Override
+					protected PaymentResultContext doInBackground(Void... voids) {
+						return PaymentController.getInstance().submitCash(getActivity(), paymentContext);
+					}
+
+					@Override
+					protected void onPostExecute(PaymentResultContext paymentResultContext) {
+						super.onPostExecute(paymentResultContext);
+
+						if (paymentResultContext != null) {
+							Toast.makeText(getActivity(), "Invoice: " + paymentResultContext.getTransactionItem().getInvoice(), Toast.LENGTH_LONG).show();
+						}
+					}
+
+					;
+				}.execute();
+			}
+		});
+
 		return view;
 	}
 		
@@ -164,6 +210,7 @@ public class FragmentPayment extends Fragment {
 
 		cbCash				= (CheckBox)view.findViewById(R.id.payment_cb_cash);
 		cbProduct			= (CheckBox)view.findViewById(R.id.payment_cb_product);
+		cbAuxData			= (CheckBox)view.findViewById(R.id.payment_cb_auxdata);
 		llProduct			= (LinearLayout)view.findViewById(R.id.payment_ll_product);
 		edtProductField_1 	= (EditText)view.findViewById(R.id.payment_edt_product_field_1); 
 		imgProductField_2 	= (ImageView)view.findViewById(R.id.payment_img_product_field_2); 
@@ -197,6 +244,7 @@ public class FragmentPayment extends Fragment {
 		btnPay 			= (Button)view.findViewById(R.id.payment_btn_pay);
 		btnPayNFC 			= (Button)view.findViewById(R.id.payment_btn_pay_nfc);
 		btnFiscal		= (Button)view.findViewById(R.id.payment_btn_fiscal);
+		btnPayBackground = (Button)view.findViewById(R.id.payment_btn_pay_background);
 		
 		imgProductField_2.setOnClickListener(new View.OnClickListener() {			
 			@Override
@@ -353,11 +401,35 @@ public class FragmentPayment extends Fragment {
 
 		context.setCash(cbCash.isChecked());
 		context.setAmount(edtAmount.getText().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
+		if (context.isCash())
+			context.setAmountCashGot(context.getAmount() + 1d);
 		context.setDescription(edtDescription.getText().toString());
 		context.setImage(photo);
 		context.setCurrency(PaymentController.Currency.RUB);
 		context.setNFC(NFCOnly);
-		
+
+		if (cbAuxData.isChecked()) {
+			try {
+				JSONObject auxData = new JSONObject();
+
+				String purchases =
+								"[{" +
+								"    \"Title\": \"Позиция без ндс \"," +
+								"            \"Price\": 111.256," +
+								"            \"Quantity\": 2," +
+								"           \"TaxCode\": []" +
+								"}]";
+
+				JSONArray jxPurchases = new JSONArray(purchases);
+				auxData.put("Purchases", jxPurchases);
+
+				context.setAuxData(auxData);
+			}
+			catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+
 		if (isPaymentWithProduct()) {
 			setPaymentProductData(context);
 		}

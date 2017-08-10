@@ -24,6 +24,7 @@
     <string name="error_cancellation_timeout">Невозможно выполнить отмену, провести возврат?</string>
     <string name="error_no_such_transaction">Транзакция не найдена</string>
     <string name="error_tr_null_or_empty">Ошибка создания транзакции</string>
+    <string name="error_invalid_input_type">Неправильный тип ввода</string>
 
     <string name="tab_payment">Платеж</string>
     <string name="tab_history">История</string>
@@ -71,6 +72,7 @@
     <string name="payment_lbl_product_field_1">Поле 1 :</string>
     <string name="payment_lbl_product_field_2">Поле 2 :</string>
     <string name="payment_cb_regular">Регулярный платеж</string>
+    <string name="payment_cb_auxdata">AuxData</string>
     <string name="payment_cb_end_type">Завершать по количеству повторов</string>
 	<string name="payment_lbl_type">Тип платежа :</string>
 	<string name="payment_lbl_start">Дата начала :</string>
@@ -99,6 +101,7 @@
     <string name="payment_btn_pay">Оплатить</string>
     <string name="payment_btn_pay_nfc">Оплатить NFC</string>
     <string name="payment_btn_fiscal">Фискализировать</string>
+    <string name="payment_btn_pay_background">Оплатить (фон)</string>
     <string name="payment_photo_dlg_title">Добавление изображения</string>
     <string name="payment_photo_dlg_msg">Выберите источник изображения</string>
     <string name="payment_photo_dlg_btn_gallery">Галерея</string>
@@ -134,6 +137,8 @@
     <string name="reader_state_ready">Проведите магнитной полосой или вставьте карту в ридер</string>
     <string name="reader_state_ready_swipeonly">Проведите магнитной полосой</string>
     <string name="reader_state_ready_nfconly">Приложите карту</string>
+    <string name="reader_state_ready_emvonly">Вставьте карту</string>
+    <string name="reader_state_ready_emv_or_tap">Вставьте или приложите карту</string>
     <string name="reader_state_init">Инициализация ридера</string>
     <string name="reader_state_inprogress">Выполняется платеж</string>
     <string name="reader_state_init_error">Ошибка инициализации</string>
@@ -151,4 +156,12 @@
 	<string name="EMV_READER_ERROR">Ошибка ридера</string>
 	<string name="EMV_CARD_NOT_SUPPORTED">Карта не поддерживается</string>
 	<string name="EMV_TRANSACTION_TERMINATED">Транзакция прервана</string>
+
+    <string-array name="input_types">
+        <item>Наличными</item>
+        <item>Магнитной лентой</item>
+        <item>Чипом</item>
+        <item>Безконтактная оплата</item>
+        <item>Предоплата</item>
+    </string-array>
 </resources>

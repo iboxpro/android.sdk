@@ -49,8 +49,8 @@ public class FiscalDialog extends Dialog {
     private void sendFiscalData() {
         new AsyncTask<Void, Void, APIResult>() {
 
-            private String transactionID;
-            private int printerID, docID, CVC, shift;
+            private String transactionID, printerID;
+            private int docID, CVC, shift;
             private ProgressDialog progressDialog;
 
             @Override
@@ -59,7 +59,7 @@ public class FiscalDialog extends Dialog {
 
                 transactionID = edtTransaction.getText().toString();
                 try {
-                    printerID   = Integer.parseInt(edtPrinter.getText().toString());
+                    printerID   = edtPrinter.getText().toString();
                     docID       = Integer.parseInt(edtDoc.getText().toString());
                     CVC         = Integer.parseInt(edtCVC.getText().toString());
                     shift       = Integer.parseInt(edtShift.getText().toString());

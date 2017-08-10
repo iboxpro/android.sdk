@@ -28,6 +28,7 @@
     <string name="error_no_response">Server is not responding</string>
     <string name="error_no_such_transaction">Transaction is not found</string>
     <string name="error_tr_null_or_empty">Transaction creation error</string>
+    <string name="error_invalid_input_type">Invalid input type</string>
     <string name="error_schedule_creation">Error creating schedule (%s) Retry?</string>
     <string name="history_edt_getById">Find transaction by ID</string>
     <string name="history_item_no_description">No description</string>
@@ -93,6 +94,8 @@
     <string name="reader_state_ready">Swipe or insert card</string>
     <string name="reader_state_ready_swipeonly">Swipe card</string>
     <string name="reader_state_ready_nfconly">Tap card</string>
+    <string name="reader_state_ready_emvonly">Insert card</string>
+    <string name="reader_state_ready_emv_or_tap">Tap or insert card</string>
     <string name="sdcard_needed">Insert SD card</string>
     <string name="settings_lbl_title">Select reader</string>
     <string name="settings_btn_autoconfig">Autoconfig</string>
@@ -134,4 +137,11 @@
     <string name="fiscal_dlg_lbl_doc">Document ID</string>
     <string name="fiscal_dlg_lbl_cvc">CVC</string>
     <string name="fiscal_dlg_lbl_shift">Shift number</string>
+    <string-array name="input_types">
+        <item>Cash</item>
+        <item>Magnetic tape</item>
+        <item>Chip</item>
+        <item>NFC</item>
+        <item>Prepaid</item>
+    </string-array>
 </resources>

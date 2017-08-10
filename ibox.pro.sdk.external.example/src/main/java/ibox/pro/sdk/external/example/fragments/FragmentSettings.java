@@ -20,10 +20,11 @@ import java.util.ArrayList;
 
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentController.ReaderType;
+import ibox.pro.sdk.external.example.Consts;
 import ibox.pro.sdk.external.example.R;
+import ibox.pro.sdk.external.example.Utils;
 
 public class FragmentSettings extends Fragment {
-
 	private ListView lvReaders;
 	private ReadersAdapter mAdapter;
 
@@ -66,6 +67,8 @@ public class FragmentSettings extends Fragment {
 									PaymentController.getInstance().setReaderType(getActivity(), reader, address);
 									dialog.dismiss();
 									mAdapter.notifyDataSetChanged();
+									Utils.setString(getActivity(), Consts.SavedParams.READER_TYPE_KEY, reader.name());
+									Utils.setString(getActivity(), Consts.SavedParams.READER_ADDRESS_KEY, address);
 								}
 							})
 							.create()

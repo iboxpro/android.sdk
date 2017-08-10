@@ -6,7 +6,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Looper;
 import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +34,7 @@ import ibox.pro.sdk.external.PaymentException;
 import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.RegularPaymentContext;
 import ibox.pro.sdk.external.entities.TransactionItem;
+import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 
 public class PaymentDialog extends Dialog implements PaymentControllerListener {
@@ -90,7 +89,10 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
     }
 
     protected void action() {
+
 		try {
+			//PaymentController.getInstance().setReaderType(getContext(), PaymentController.ReaderType.P15, null);
+			//PaymentController.getInstance().setPaymentControllerListener(PaymentDialog.this);
 			PaymentController.getInstance().startPayment(getContext(), mPaymentContext);
 		} catch (PaymentException e) {
 			onError(null, e.getMessage());
@@ -103,8 +105,6 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 				: PaymentController.getInstance().getReaderType().isMultiInputSupported()
 					? R.string.reader_state_ready_multiinput
 					: mPaymentContext.getNFC() ? R.string.reader_state_ready_nfconly : R.string.reader_state_ready;
-
-
 	}
 
     private void startProgress() {
@@ -172,12 +172,15 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 				case TRANSACTION_NULL_OR_EMPTY :
 					toastText = mActivity.getString(R.string.error_tr_null_or_empty);
 					break;
+				case INVALID_INPUT_TYPE:
+					toastText = mActivity.getString(R.string.error_invalid_input_type);
+					break;
                 default :
                     toastText = mActivity.getString(R.string.EMV_ERROR);
                     break;
             }
-		Toast.makeText(getContext(), String.format("%s (%s)", toastText, (error == null ? "null" : error.toString())), Toast.LENGTH_LONG).show();
 		dismiss();
+		Toast.makeText(mActivity, String.format("%s (%s)", toastText, (error == null ? "null" : error.toString())), Toast.LENGTH_LONG).show();
     }
 
 	@Override
@@ -202,10 +205,13 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 				@Override
 				protected void onPreExecute() {
 					super.onPreExecute();
-					appendKeyValue("Client: ", "Test client");
-					appendKeyValue("Legal name: ", "Legal name");
-					appendKeyValue("Phone: ", "+8 012 345 6789");
-					appendKeyValue("Web: ", "www.testclient.com");
+
+					appendKeyValue("Bank: ", ((MainActivity)mActivity).BankName);
+					appendKeyValue("Client: ", ((MainActivity)mActivity).ClientName);
+					appendKeyValue("Legal name: ", ((MainActivity)mActivity).ClientLegalName);
+					appendKeyValue("Phone: ", ((MainActivity)mActivity).ClientPhone);
+					appendKeyValue("Web: ", ((MainActivity)mActivity).ClientWeb);
+
 					appendKeyValue("Date and time: "
 					   , new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.UK)
 							.format(paymentResultContext.getTransactionItem().getDate()));
@@ -530,7 +536,6 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 		lblState.setText(lblState.getText() + "\n" + getContext().getString(R.string.payment_toast_pin_entered));
 	}
 
-
 	@Override
 	public void onBatteryState(double percent) {
 		Toast.makeText(mActivity,
@@ -538,4 +543,91 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 				Toast.LENGTH_SHORT).show();
 	}
 
+	@Override
+	public TransactionItem.InputType onSelectInputType(List<TransactionItem.InputType> allowedInputTypes) {
+		class ResultWrapper {
+			int result = -1;
+		}
+
+		final ResultWrapper resultWrapper = new ResultWrapper();
+		final Object lock = new Object();
+		final String[] inputTypesArray = new String [allowedInputTypes.size()];
+		for (int i = 0; i < allowedInputTypes.size(); i++) {
+			String inputType = null;
+			String [] inputTypesStrings = mActivity.getResources().getStringArray(R.array.input_types);
+			switch (allowedInputTypes.get(i)) {
+				case CASH:
+					inputType = inputTypesStrings[0];
+					break;
+				case SWIPE:
+					inputType = inputTypesStrings[1];
+					break;
+				case CHIP:
+					inputType = inputTypesStrings[2];
+					break;
+				case NFC:
+					inputType = inputTypesStrings[3];
+					break;
+				case PREPAID:
+					inputType = inputTypesStrings[4];
+					break;
+				default:
+					inputType = "";
+			}
+			inputTypesArray[i] = inputType;
+		}
+		final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+		builder.setCancelable(false)
+				.setTitle("Select input type")
+				.setNegativeButton(mActivity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						resultWrapper.result = -1;
+					}
+				})
+				.setSingleChoiceItems(inputTypesArray, -1, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						synchronized (lock) {
+							resultWrapper.result = which;
+							lock.notifyAll();
+						}
+					}
+				});
+
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				dlgSelectApp = builder.create();
+				dlgSelectApp.setOnDismissListener(new OnDismissListener() {
+					@Override
+					public void onDismiss(DialogInterface dialogInterface) {
+						synchronized (lock) {
+							lock.notifyAll();
+						}
+					}
+				});
+				dlgSelectApp.show();
+			}
+		});
+
+		synchronized (lock) {
+			try {
+				lock.wait(30000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				dlgSelectApp.dismiss();
+				if (resultWrapper.result < 0)
+					PaymentDialog.this.dismiss();
+			}
+		});
+
+		return resultWrapper.result >= 0 ? allowedInputTypes.get(resultWrapper.result) : null;
+	}
 }

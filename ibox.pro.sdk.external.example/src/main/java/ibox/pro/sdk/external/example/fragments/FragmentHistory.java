@@ -173,13 +173,13 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 		dialogView.findViewById(R.id.history_tr_details_dlg_btn_cancel).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				new ReversePaymentDialog(getActivity(), trItem.getID(), trItem.getAmountEff(), trItem.getCurrencyId(), PaymentController.ReverseAction.CANCEL, FragmentHistory.this).show();
+				new ReversePaymentDialog(getActivity(), trItem, PaymentController.ReverseAction.CANCEL, FragmentHistory.this).show();
 			}
 		});
 		dialogView.findViewById(R.id.history_tr_details_dlg_btn_return).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				new ReversePaymentDialog(getActivity(), trItem.getID(), trItem.getAmountEff(), trItem.getCurrencyId(), PaymentController.ReverseAction.RETURN, FragmentHistory.this).show();
+				new ReversePaymentDialog(getActivity(), trItem, PaymentController.ReverseAction.RETURN, FragmentHistory.this).show();
 			}
 		});
 

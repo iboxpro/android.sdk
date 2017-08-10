@@ -1,22 +1,32 @@
 package ibox.pro.sdk.external.example;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.view.LayoutInflater;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentController.ReaderType;
+import ibox.pro.sdk.external.entities.APIAuthResult;
+import ibox.pro.sdk.external.entities.APIResult;
 import ibox.pro.sdk.external.example.fragments.FragmentHistory;
 import ibox.pro.sdk.external.example.fragments.FragmentPayment;
 import ibox.pro.sdk.external.example.fragments.FragmentSettings;
 
 public class MainActivity extends FragmentActivity {
 
+	public String BankName;
+	public String ClientName;
+	public String ClientLegalName;
+	public String ClientPhone;
+	public String ClientWeb;
 
 
 	private FragmentTabHost mTabHost;
@@ -30,6 +40,13 @@ public class MainActivity extends FragmentActivity {
 		setupTabHost();
 
 		PaymentController.getInstance().onCreate(this, savedInstanceState);
+		if (savedInstanceState == null) {
+			String readerType = Utils.getString(this, Consts.SavedParams.READER_TYPE_KEY);
+			String readerAddress = Utils.getString(this, Consts.SavedParams.READER_ADDRESS_KEY);
+
+			if (readerType != null && readerType.length() > 0)
+				PaymentController.getInstance().setReaderType(this, ReaderType.valueOf(readerType), readerAddress);
+		}
 
 		if (Build.MANUFACTURER.equalsIgnoreCase("BBPOS"))
 			try {
@@ -82,7 +99,21 @@ public class MainActivity extends FragmentActivity {
 					String login = ((EditText)((AlertDialog)dialog).findViewById(R.id.login_dlg_edt_login)).getText().toString();
 					String password = ((EditText)((AlertDialog)dialog).findViewById(R.id.login_dlg_edt_password)).getText().toString();
 					PaymentController.getInstance().setCredentials(login, password);
-					dialog.dismiss();
+
+					APIAuthResult result = PaymentController.getInstance().auth(MainActivity.this);
+
+					if (result == null)
+						Toast.makeText(MainActivity.this, "Connection lost", Toast.LENGTH_LONG).show();
+					else if (!result.isValid())
+						Toast.makeText(MainActivity.this, "Invalid credentials", Toast.LENGTH_LONG).show();
+					else {
+						BankName = result.getAccount().getBankName();
+						ClientName = result.getAccount().getClientName();
+						ClientLegalName = result.getAccount().getClientLegalName();
+						ClientPhone = result.getAccount().getClientPhone();
+						ClientWeb = result.getAccount().getClientWeb();
+						dialog.dismiss();
+					}
 				}
 			})
 			.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {				
@@ -101,5 +132,4 @@ public class MainActivity extends FragmentActivity {
 			.create()
 			.show();
 	}
-	
 }
