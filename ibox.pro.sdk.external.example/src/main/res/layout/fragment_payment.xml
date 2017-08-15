@@ -126,9 +126,18 @@
 	        android:checked="false"
 	        android:textSize="16sp"
 	        android:text="@string/payment_cb_regular"
-	        />   
-	         
-	    <LinearLayout 
+	        />
+
+        <CheckBox
+            android:id="@+id/payment_cb_auxdata"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:checked="false"
+            android:textSize="16sp"
+            android:text="@string/payment_cb_auxdata"
+            />
+
+        <LinearLayout
 	        android:id="@+id/payment_ll_regular"
 	        android:layout_height="wrap_content"
 	        android:layout_width="match_parent"
@@ -344,7 +353,15 @@
 			android:id="@+id/payment_btn_fiscal"
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
+			android:layout_marginBottom="15dp"
 			android:text="@string/payment_btn_fiscal"
+			/>
+
+		<Button
+			android:id="@+id/payment_btn_pay_background"
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:text="@string/payment_btn_pay_background"
 			/>
 	</LinearLayout>
 </ScrollView>
