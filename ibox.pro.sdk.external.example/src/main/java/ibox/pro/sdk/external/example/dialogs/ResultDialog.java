@@ -8,6 +8,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import ibox.pro.sdk.external.example.R;
 public class ResultDialog extends Dialog {
 
 	private TextView lblOperation, lblState, lblID, lblInvoice, lblAppcode, lblTerminal,
-                lblIIN, lblPAN,
+                lblIIN, lblPAN, lblLink,
                 lblEMV, lblSignature;
 	private Button btnAdjust;
 
@@ -59,7 +60,18 @@ public class ResultDialog extends Dialog {
             }
             lblEMV.setText(emvData.toString());
         }
-        
+
+        if (!isRegular) {
+            TransactionItem.ExternalPayment externalPayment = paymentResultContext.getTransactionItem().getExternalPayment();
+            if (externalPayment != null) {
+                if (externalPayment.getType() == TransactionItem.ExternalPayment.Type.QR) {
+                    lblLink.setText("QR: " + Arrays.toString(externalPayment.getQR().toArray()));
+                } else if (externalPayment.getType() == TransactionItem.ExternalPayment.Type.LINK) {
+                    lblLink.setText(externalPayment.getLink());
+                }
+            }
+        }
+
         btnAdjust.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -81,6 +93,7 @@ public class ResultDialog extends Dialog {
         lblIIN  		= (TextView)findViewById(R.id.tr_details_dlg_lbl_iin);
 		lblPAN 			= (TextView)findViewById(R.id.tr_details_dlg_lbl_pan);
         lblEMV          = (TextView)findViewById(R.id.tr_details_dlg_lbl_emv);
+        lblLink         = (TextView)findViewById(R.id.tr_details_dlg_lbl_link);
 		lblSignature 	= (TextView)findViewById(R.id.tr_details_dlg_lbl_signature);
 		btnAdjust 		= (Button)findViewById(R.id.tr_details_dlg_btn_adjust);
 	}

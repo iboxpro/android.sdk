@@ -141,6 +141,22 @@
 			android:layout_width="wrap_content"
 			android:layout_marginTop="10dp"
 			android:textColor="#ffffff"
+			android:text="@string/tr_details_dlg_lbl_link"
+			/>
+
+		<TextView
+			android:id="@+id/tr_details_dlg_lbl_link"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:textColor="#aaaaaa"
+			android:autoLink="web"
+			/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_marginTop="10dp"
+			android:textColor="#ffffff"
 			android:text="@string/tr_details_dlg_lbl_emv"
 			/>
 

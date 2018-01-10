@@ -1,21 +1,23 @@
 package ibox.pro.sdk.external.example;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.MainThread;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentController.ReaderType;
 import ibox.pro.sdk.external.entities.APIAuthResult;
-import ibox.pro.sdk.external.entities.APIResult;
 import ibox.pro.sdk.external.example.fragments.FragmentHistory;
 import ibox.pro.sdk.external.example.fragments.FragmentPayment;
 import ibox.pro.sdk.external.example.fragments.FragmentSettings;
@@ -27,7 +29,7 @@ public class MainActivity extends FragmentActivity {
 	public String ClientLegalName;
 	public String ClientPhone;
 	public String ClientWeb;
-
+	public HashMap<PaymentController.PaymentMethod, Map<String, String>> AcquirersByMethods;
 
 	private FragmentTabHost mTabHost;
 	
@@ -40,6 +42,7 @@ public class MainActivity extends FragmentActivity {
 		setupTabHost();
 
 		PaymentController.getInstance().onCreate(this, savedInstanceState);
+		//PaymentController.setRequestType(PaymentController.RequestType.URLENCODED);
 		if (savedInstanceState == null) {
 			String readerType = Utils.getString(this, Consts.SavedParams.READER_TYPE_KEY);
 			String readerAddress = Utils.getString(this, Consts.SavedParams.READER_ADDRESS_KEY);
@@ -62,6 +65,7 @@ public class MainActivity extends FragmentActivity {
 			}
 
 	 	PaymentController.getInstance().setSingleStepEMV(true);
+		PaymentController.getInstance().setClientProductCode(getString(R.string.app_name));
 		if (savedInstanceState == null)
 			showLoginDialog();
 	}
@@ -112,6 +116,7 @@ public class MainActivity extends FragmentActivity {
 						ClientLegalName = result.getAccount().getClientLegalName();
 						ClientPhone = result.getAccount().getClientPhone();
 						ClientWeb = result.getAccount().getClientWeb();
+						AcquirersByMethods = result.getAccount().getAcquirersByMethods();
 						dialog.dismiss();
 					}
 				}

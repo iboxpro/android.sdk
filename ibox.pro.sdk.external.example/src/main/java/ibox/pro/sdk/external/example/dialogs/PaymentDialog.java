@@ -79,24 +79,32 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
         spinRotation.setRepeatCount(Animation.INFINITE);
         
         PaymentController.getInstance().setPaymentControllerListener(this);
-        PaymentController.getInstance().enable();
     }
+
+    protected boolean usesReader() {
+		return mPaymentContext.getMethod() == PaymentController.PaymentMethod.CARD;
+	}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        action();
+		if (usesReader())
+			PaymentController.getInstance().enable();
     }
 
-    protected void action() {
-
+	@Override
+	protected void onStart() {
+		super.onStart();
 		try {
-			//PaymentController.getInstance().setReaderType(getContext(), PaymentController.ReaderType.P15, null);
-			//PaymentController.getInstance().setPaymentControllerListener(PaymentDialog.this);
-			PaymentController.getInstance().startPayment(getContext(), mPaymentContext);
+			action();
 		} catch (PaymentException e) {
+			e.printStackTrace();
 			onError(null, e.getMessage());
 		}
+	}
+
+	protected void action() throws PaymentException {
+		PaymentController.getInstance().startPayment(getContext(), mPaymentContext);
 	}
 
 	protected int getReadyStringID() {
@@ -107,10 +115,14 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 					: mPaymentContext.getNFC() ? R.string.reader_state_ready_nfconly : R.string.reader_state_ready;
 	}
 
-    private void startProgress() {
+	protected String getProgressString() {
+        return getContext().getString(R.string.reader_state_inprogress);
+    }
+
+    protected void startProgress() {
     	imgSpinner.setVisibility(View.VISIBLE);
     	imgSpinner.startAnimation(spinRotation);
-    	lblState.setText(R.string.reader_state_inprogress);
+    	lblState.setText(getProgressString());
     }
     
     private void stopProgress() {
@@ -175,6 +187,9 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 				case INVALID_INPUT_TYPE:
 					toastText = mActivity.getString(R.string.error_invalid_input_type);
 					break;
+				case INVALID_AMOUNT:
+					toastText = mActivity.getString(R.string.error_invalid_amount);
+					break;
                 default :
                     toastText = mActivity.getString(R.string.EMV_ERROR);
                     break;
@@ -185,96 +200,100 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 
 	@Override
 	public void onTransactionStarted(String transactionID) {
+        if (mPaymentContext.getMethod() != PaymentController.PaymentMethod.CARD)
+            startProgress();
 		lblState.setText(String.format(getContext().getString(R.string.payment_dlg_started), transactionID));
 	}
 
 	@Override
     public void onFinished(final PaymentResultContext paymentResultContext) {
-		if (PaymentController.getInstance().getReaderType() == PaymentController.ReaderType.P16R)
-			new AsyncTask<Void, Void, PaymentController.PrintResult>() {
-				StringBuilder slipBuilder = new StringBuilder();
-				int tapeWidth = 34;
+				if (PaymentController.getInstance().getReaderType() == PaymentController.ReaderType.P16R)
+					new AsyncTask<Void, Void, PaymentController.PrintResult>() {
+						StringBuilder slipBuilder = new StringBuilder();
+						int tapeWidth = 34;
 
-				private void appendKeyValue(String key, String value) {
-					slipBuilder.append("\n").append(key);
-					for (int i = key.length(); i < tapeWidth - value.length(); i++)
-						slipBuilder.append(' ');
-					slipBuilder.append(value);
-				}
+						private void appendKeyValue(String key, String value) {
+							slipBuilder.append("\n").append(key);
+							for (int i = key.length(); i < tapeWidth - value.length(); i++)
+								slipBuilder.append(' ');
+							slipBuilder.append(value);
+						}
 
-				@Override
-				protected void onPreExecute() {
-					super.onPreExecute();
+						@Override
+						protected void onPreExecute() {
+							super.onPreExecute();
 
-					appendKeyValue("Bank: ", ((MainActivity)mActivity).BankName);
-					appendKeyValue("Client: ", ((MainActivity)mActivity).ClientName);
-					appendKeyValue("Legal name: ", ((MainActivity)mActivity).ClientLegalName);
-					appendKeyValue("Phone: ", ((MainActivity)mActivity).ClientPhone);
-					appendKeyValue("Web: ", ((MainActivity)mActivity).ClientWeb);
+							appendKeyValue("Bank: ", ((MainActivity)mActivity).BankName);
+							appendKeyValue("Client: ", ((MainActivity)mActivity).ClientName);
+							appendKeyValue("Legal name: ", ((MainActivity)mActivity).ClientLegalName);
+							appendKeyValue("Phone: ", ((MainActivity)mActivity).ClientPhone);
+							appendKeyValue("Web: ", ((MainActivity)mActivity).ClientWeb);
 
-					appendKeyValue("Date and time: "
-					   , new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.UK)
-							.format(paymentResultContext.getTransactionItem().getDate()));
-					appendKeyValue("Terminal: ", paymentResultContext.getTransactionItem().getTerminalName());
-					appendKeyValue("Receipt: ", paymentResultContext.getTransactionItem().getInvoice());
-					appendKeyValue("Approval code: ", paymentResultContext.getTransactionItem().getApprovalCode());
-					appendKeyValue("Card: ", paymentResultContext.getTransactionItem().getCard().getPanMasked().replace("*", " **** "));
-					if (paymentResultContext.getEmvData() != null) {
-						for (Map.Entry<String, String> tag : paymentResultContext.getEmvData().entrySet())
-							appendKeyValue(tag.getKey() + ": ", tag.getValue());
-					}
-					appendKeyValue("Card holder: ", paymentResultContext.getTransactionItem().getCardholderName());
-					appendKeyValue("Operation: ", paymentResultContext.getTransactionItem().getOperation());
-					appendKeyValue("Total: ", String.valueOf(paymentResultContext.getTransactionItem().getAmount()));
-					if (paymentResultContext.isRequiresSignature()) {
-						slipBuilder.append("\n\n");
-						slipBuilder.append("\nCustomer sign.____________________");
-					} else if (paymentResultContext.getTransactionItem().getInputType() == TransactionItem.InputType.CHIP) {
-						slipBuilder.append("\nConfirmed by entering PIN");
-					}
-					slipBuilder.append("\n\n\n\n\n");
-				}
+							appendKeyValue("Date and time: "
+									, new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.UK)
+											.format(paymentResultContext.getTransactionItem().getDate()));
+							appendKeyValue("Terminal: ", paymentResultContext.getTransactionItem().getTerminalName());
+							appendKeyValue("Receipt: ", paymentResultContext.getTransactionItem().getInvoice());
+							appendKeyValue("Approval code: ", paymentResultContext.getTransactionItem().getApprovalCode());
+							appendKeyValue("Card: ", paymentResultContext.getTransactionItem().getCard().getPanMasked().replace("*", " **** "));
+							if (paymentResultContext.getEmvData() != null) {
+								for (Map.Entry<String, String> tag : paymentResultContext.getEmvData().entrySet())
+									appendKeyValue(tag.getKey() + ": ", tag.getValue());
+							}
+							appendKeyValue("Card holder: ", paymentResultContext.getTransactionItem().getCardholderName());
+							appendKeyValue("Operation: ", paymentResultContext.getTransactionItem().getOperation());
+							appendKeyValue("Total: ", String.valueOf(paymentResultContext.getTransactionItem().getAmount()));
 
-				@Override
-				protected PaymentController.PrintResult doInBackground(Void... params) {
-					return PaymentController.getInstance().printText(slipBuilder.toString(), Layout.Alignment.ALIGN_NORMAL);
-				}
+							if (paymentResultContext.isRequiresSignature()) {
+								slipBuilder.append("\n\n");
+								slipBuilder.append("\nCustomer sign.____________________");
+							} else if (paymentResultContext.getTransactionItem().getInputType() == PaymentController.PaymentInputType.CHIP) {
+								slipBuilder.append("\nConfirmed by entering PIN");
+							}
+							slipBuilder.append("\n\n\n\n\n");
+						}
 
-				@Override
-				protected void onPostExecute(PaymentController.PrintResult result) {
+						@Override
+						protected PaymentController.PrintResult doInBackground(Void... params) {
+							return PaymentController.getInstance().printText(slipBuilder.toString(), Layout.Alignment.ALIGN_NORMAL);
+						}
+
+						@Override
+						protected void onPostExecute(PaymentController.PrintResult result) {
+							dismiss();
+							new ResultDialog(mActivity, paymentResultContext, false).show();
+							if (result != PaymentController.PrintResult.SUCCESS)
+								Toast.makeText(mActivity, "Printer error: " + result, Toast.LENGTH_LONG).show();
+						}
+					}.execute();
+				else {
 					dismiss();
 					new ResultDialog(mActivity, paymentResultContext, false).show();
-					if (result != PaymentController.PrintResult.SUCCESS)
-						Toast.makeText(mActivity, "Printer error: " + result, Toast.LENGTH_LONG).show();
 				}
-			}.execute();
-		else {
-			dismiss();
-			new ResultDialog(mActivity, paymentResultContext, false).show();
-		}
-    }
-    
-    @Override
-    public void onReaderEvent(ReaderEvent event) {
-		Log.i("iboxSDK", "onReaderEvent: " + event.toString());
-    	switch (event) {
-	    	case CONNECTED :
-	    	case START_INIT :
-	    		lblState.setText(R.string.reader_state_init);
-	    		break;
-	    	case DISCONNECTED :
-	    		stopProgress();
-	    		lblState.setText(R.string.reader_state_disconnected);
-	    		break;
-	    	case SWIPE_CARD :
-	    	case EMV_TRANSACTION_STARTED :
-            case NFC_TRANSACTION_STARTED :
-	    		startProgress();
-	    		break;	    	
-	    	case WAITING_FOR_CARD :
+			}
+
+			@Override
+			public void onReaderEvent(ReaderEvent event) {
+				Log.i("iboxSDK", "onReaderEvent: " + event.toString());
+				switch (event) {
+					case CONNECTED :
+					case START_INIT :
+						lblState.setText(R.string.reader_state_init);
+						break;
+					case DISCONNECTED :
+						stopProgress();
+						lblState.setText(R.string.reader_state_disconnected);
+						break;
+					case SWIPE_CARD :
+					case EMV_TRANSACTION_STARTED :
+					case NFC_TRANSACTION_STARTED :
+						startProgress();
+						break;
+					case WAITING_FOR_CARD :
 	    		lblState.setText(getReadyStringID());
 	    		break;
 	    	case PAYMENT_CANCELED :
+				Toast.makeText(mActivity, R.string.payment_dlg_canceled, Toast.LENGTH_LONG).show();
 	    		dismiss();
 	    		break;
 	    	case INIT_FAILED : 
@@ -544,7 +563,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	}
 
 	@Override
-	public TransactionItem.InputType onSelectInputType(List<TransactionItem.InputType> allowedInputTypes) {
+	public PaymentController.PaymentInputType onSelectInputType(List<PaymentController.PaymentInputType> allowedInputTypes) {
 		class ResultWrapper {
 			int result = -1;
 		}
@@ -570,6 +589,9 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 					break;
 				case PREPAID:
 					inputType = inputTypesStrings[4];
+					break;
+				case CREDIT:
+					inputType = inputTypesStrings[5];
 					break;
 				default:
 					inputType = "";

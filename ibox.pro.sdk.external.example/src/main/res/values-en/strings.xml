@@ -19,6 +19,7 @@
     <string name="adjust_dlg_lbl_phone">Phone :</string>
     <string name="adjust_dlg_lbl_signature">Signature</string>
     <string name="adjust_dlg_title">Send receipt</string>
+    <string name="adjust_dlg_error">Please sign or set phone or email!</string>
     <string name="cancel">Cancel</string>
     <string name="common_error">Error occured</string>
     <string name="def_product_code">PRODUCT_TEST</string>
@@ -29,9 +30,11 @@
     <string name="error_no_such_transaction">Transaction is not found</string>
     <string name="error_tr_null_or_empty">Transaction creation error</string>
     <string name="error_invalid_input_type">Invalid input type</string>
+    <string name="error_invalid_amount">Invalid amount</string>
     <string name="error_schedule_creation">Error creating schedule (%s) Retry?</string>
     <string name="history_edt_getById">Find transaction by ID</string>
     <string name="history_item_no_description">No description</string>
+    <string name="history_item_inprocess">In process</string>
     <string name="history_tr_details_dlg_btn_cancel">Cancel payment</string>
     <string name="history_tr_details_dlg_btn_return">Perform a refund</string>
     <string name="history_tr_details_dlg_lbl_amount">Amount:</string>
@@ -56,7 +59,10 @@
     <string name="payment_btn_pay_nfc">Pay with NFC</string>
     <string name="payment_btn_fiscal">Fiscal</string>
     <string name="payment_cb_end_type">Repeat count</string>
-    <string name="payment_cb_cash">Cash</string>
+    <string name="payment_rb_card">Card</string>
+    <string name="payment_rb_cash">Cash</string>
+    <string name="payment_rb_credit">Credit</string>
+    <string name="payment_rb_link">By link</string>
     <string name="payment_cb_product">Product payment</string>
     <string name="payment_cb_regular">Regular payment</string>
     <string name="payment_default_dates">01.01.2016;02.02.2016;03.03.2016;</string>
@@ -78,6 +84,8 @@
     <string name="payment_photo_dlg_btn_gallery">Gallery</string>
     <string name="payment_photo_dlg_btn_camera">Camera</string>
     <string name="payment_dlg_started">Transaction %s</string>
+    <string name="payment_dlg_reverse_started">Cancellation/refund of transaction %s</string>
+    <string name="payment_dlg_canceled">Payment canceled</string>
     <string name="reverse_dlg_title">Payment return/cancelling</string>
     <string name="reverse_dlg_lbl_amount">Amount to return/cancel:</string>
     <string name="payment_photo_dlg_msg">Select image source</string>
@@ -113,6 +121,7 @@
     <string name="tr_details_dlg_lbl_invoice">Invoice:</string>
     <string name="tr_details_dlg_lbl_operation">Operation:</string>
     <string name="tr_details_dlg_lbl_pan">Card number:</string>
+    <string name="tr_details_dlg_lbl_link">Link to pay:</string>
     <string name="tr_details_dlg_lbl_signature">Signature required:</string>
     <string name="tr_details_dlg_lbl_state">State:</string>
     <string name="tr_details_dlg_lbl_terminal">Terminal:</string>
@@ -143,5 +152,9 @@
         <item>Chip</item>
         <item>NFC</item>
         <item>Prepaid</item>
+        <item>@string/payment_rb_credit</item>
     </string-array>
+
+    <string name="payment_cb_auxdata">AuxData</string>
+    <string name="payment_btn_pay_background">Pay (background)</string>
 </resources>

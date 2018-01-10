@@ -44,8 +44,14 @@ public class AdjustDialog extends Dialog {
         btnSend.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (!PaymentController.getInstance().isPaymentInProgress())
-					new AdjustTask().execute(isRegular, isReverse);
+				String email = edtEmail.getText().toString();
+				String phone = edtPhone.getText().toString();
+				if (email.trim().length() > 0 || phone.trim().length() > 0 || !swSignature.isEmpty()) {
+					if (!PaymentController.getInstance().isPaymentInProgress())
+						new AdjustTask(email, phone).execute(isRegular, isReverse);
+				} else
+					Toast.makeText(getContext(), R.string.adjust_dlg_error, Toast.LENGTH_LONG).show();
+
 			}
 		});        
 	}
@@ -58,9 +64,14 @@ public class AdjustDialog extends Dialog {
 	}
 	
 	private class AdjustTask extends AsyncTask<Boolean, Void, APIResult> {
-		
 		private ProgressDialog progressDialog = new ProgressDialog(getContext());
-		
+		private final String email, phone;
+
+		public AdjustTask(String email, String phone) {
+			this.email = email;
+			this.phone = phone;
+		}
+
 		@Override
 		protected void onPreExecute() {
 			progressDialog.setMessage(getContext().getString(R.string.progress));
@@ -82,24 +93,24 @@ public class AdjustDialog extends Dialog {
 				return PaymentController.getInstance().adjust(
 						getContext(),
 						Integer.parseInt(transactionID), 
-						swSignature.getBitmapByteArray()
+						swSignature.isEmpty() ? null : swSignature.getBitmapByteArray()
 						);
 			else if (isReverse)
 				return PaymentController.getInstance().adjustReverse(
 						getContext(),
 						transactionID,
-						edtPhone.getText().toString(),
-						edtEmail.getText().toString(),
-						swSignature.getBitmapByteArray()
+						phone,
+						email,
+						swSignature.isEmpty() ? null : swSignature.getBitmapByteArray()
 						);
 
 			else
 				return PaymentController.getInstance().adjust(
 						getContext(), 
 						transactionID, 
-						edtPhone.getText().toString(), 
-						edtEmail.getText().toString(), 
-						swSignature.getBitmapByteArray()
+						phone,
+						email,
+						swSignature.isEmpty() ? null : swSignature.getBitmapByteArray()
 						);
 		}
 		

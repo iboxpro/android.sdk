@@ -27,6 +27,8 @@ import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 import ibox.pro.sdk.external.PaymentController;
@@ -152,6 +154,16 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_amount)).setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "Roboto-Regular.ttf"));
 
+		TransactionItem.ExternalPayment externalPayment = trItem.getExternalPayment();
+		if (externalPayment != null) {
+			String text = "";
+			if (externalPayment.getType() == TransactionItem.ExternalPayment.Type.QR)
+				text = "QR: " + Arrays.toString(externalPayment.getQR().toArray());
+			else if (externalPayment.getType() == TransactionItem.ExternalPayment.Type.LINK)
+				text = externalPayment.getLink();
+			((TextView) dialogView.findViewById(R.id.history_tr_details_dlg_lbl_link)).setText(text);
+		}
+
 		int stateColor = getContext().getResources().getColor(android.R.color.white);
 		if (trItem.getDisplayMode() != null) {
 			if (trItem.getDisplayMode() == TransactionItem.DisplayMode.SUCCESS)
@@ -210,9 +222,31 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
     }
 			
 	private class HistoryAdapter extends ArrayAdapter<TransactionItem> {
-								
+		private ArrayList<TransactionItem> inProcessTransactions, finishedTran;
+
 		public HistoryAdapter(Context context) {
 			super(context, 0);
+			inProcessTransactions = new ArrayList<TransactionItem>();
+			finishedTran = new ArrayList<TransactionItem>();
+		}
+
+		@Override
+		public int getCount() {
+			return inProcessTransactions.size() + finishedTran.size();
+		}
+
+		@Override
+		public void clear() {
+			super.clear();
+			inProcessTransactions.clear();
+			finishedTran.clear();
+		}
+
+		@Override
+		public TransactionItem getItem(int position) {
+			return position < inProcessTransactions.size()
+				? inProcessTransactions.get(position)
+				: finishedTran.get(position - inProcessTransactions.size());
 		}
 
 		@Override
@@ -238,16 +272,22 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 		
 		private void bindView(View convertView, int position) {
 			ItemHolder holder = (ItemHolder)convertView.getTag();
-			
-			if (getItem(position).getDescription().length() > 0) {
-				holder.lblTitle.setText(getItem(position).getDescription());
-				holder.lblTitle.setTextColor(Color.BLACK);
-			} else {
-				holder.lblTitle.setText(getString(R.string.history_item_no_description));
-				holder.lblTitle.setTextColor(Color.LTGRAY);
-			}		
-			
-			if (!getItem(position).isNotCanceled()) {
+
+				if (getItem(position).getDescription().length() > 0) {
+					String description = getItem(position).getDescription();
+					if (inProcessTransactions.contains(getItem(position)))
+						description += "\n" + getString(R.string.history_item_inprocess);
+					holder.lblTitle.setText(description);
+					holder.lblTitle.setTextColor(Color.BLACK);
+				} else {
+					String description = getString(R.string.history_item_no_description);
+					if (inProcessTransactions.contains(getItem(position)))
+						description += "\n" + getString(R.string.history_item_inprocess);
+					holder.lblTitle.setText(description);
+					holder.lblTitle.setTextColor(Color.LTGRAY);
+				}
+
+				if (!getItem(position).isNotCanceled()) {
 				holder.lblTitle.setPaintFlags(holder.lblTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 				holder.lblAmount.setPaintFlags(holder.lblTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 			} else { 
@@ -280,7 +320,6 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 	}
 	
 	private class LoadHistoryTask extends AsyncTask<Integer, Void, APIGetHistoryResult> {
-		
 		private ProgressDialog pDialog;
 		
 		public LoadHistoryTask() {
@@ -305,18 +344,18 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 			try {
 				if (result != null) {
 					if (result.isValid()) {
-						if (result.getTransactions().isEmpty()) {
+						if (result.getTransactions() == null || result.getTransactions().isEmpty()) {
 							isFinished = true;
 							return;
 						}
-						
-						for (TransactionItem transaction : result.getTransactions())
-							mAdapter.add(transaction);					
-
+						mAdapter.inProcessTransactions.clear();
+						if (result.getInProcessTransactions() != null)
+							mAdapter.inProcessTransactions.addAll(result.getInProcessTransactions());
+						if (result.getTransactions() != null)
+							mAdapter.finishedTran.addAll(result.getTransactions());
 						mPage ++;
 						
 						mAdapter.notifyDataSetChanged();
-	
 					} else {
 						Toast.makeText(getActivity(), result.getErrorMessage(), Toast.LENGTH_LONG).show();
 					}
@@ -331,7 +370,6 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 	}
 
     private class FindTransactionByIDTask extends AsyncTask<String, Void, APIGetHistoryResult> {
-
         private ProgressDialog pDialog;
 
         public FindTransactionByIDTask() {
@@ -359,8 +397,10 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
             try {
                 if (result != null) {
                     if (result.isValid()) {
-                        for (TransactionItem transaction : result.getTransactions())
-                            mAdapter.add(transaction);
+						if (result.getInProcessTransactions() != null)
+							mAdapter.inProcessTransactions.addAll(result.getInProcessTransactions());
+						if (result.getTransactions() != null)
+							mAdapter.finishedTran.addAll(result.getTransactions());
 
                         mAdapter.notifyDataSetChanged();
 

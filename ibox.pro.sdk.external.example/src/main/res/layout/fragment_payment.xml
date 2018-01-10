@@ -61,16 +61,32 @@
 	                />	            
 	        </LinearLayout>	 
 	    </RelativeLayout>
-
-		<CheckBox
-			android:id="@+id/payment_cb_cash"
+		<RadioGroup
+			android:id="@+id/payment_rg_input"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:checked="false"
-			android:textSize="16sp"
-			android:text="@string/payment_cb_cash"
-			/>
-
+			>
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/payment_rb_card"
+				/>
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/payment_rb_cash"
+				/>
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/payment_rb_credit"
+				/>
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/payment_rb_link"
+				/>
+		</RadioGroup>
 	    <CheckBox
 	        android:id="@+id/payment_cb_product"
 	        android:layout_height="wrap_content"

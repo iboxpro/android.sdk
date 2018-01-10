@@ -81,10 +81,11 @@ public class ReversePaymentDialog extends Dialog {
 
     private class ProgressDialog extends PaymentDialog {
 
+        private String tran2reverseID;
         private Double reverseAmount;
         private int readyStringID;
         private int chipRetries;
-        private List<TransactionItem.InputType> allowedInputTypes = new ArrayList<TransactionItem.InputType>();
+        private List<PaymentController.PaymentInputType> allowedInputTypes = new ArrayList<PaymentController.PaymentInputType>();
 
         public ProgressDialog(Double reverseAmount) {
             super(mActivity, null);
@@ -92,17 +93,26 @@ public class ReversePaymentDialog extends Dialog {
 
             if (transaction.getCancelReturnTypes() != null)
                 allowedInputTypes.addAll(transaction.getCancelReturnTypes());
-            else if (transaction.getInputType() != TransactionItem.InputType.CHIP && transaction.getInputType() != TransactionItem.InputType.NFC)
+            else if (transaction.getInputType() != PaymentController.PaymentInputType.CHIP && transaction.getInputType() != PaymentController.PaymentInputType.NFC)
                 allowedInputTypes.add(transaction.getInputType());
             else
-                allowedInputTypes.add(TransactionItem.InputType.SWIPE);
+                allowedInputTypes.add(PaymentController.PaymentInputType.SWIPE);
 
 
             configInputTypes();
         }
 
+        @Override
+        protected boolean usesReader() {
+            return allowedInputTypes.contains(PaymentController.PaymentInputType.SWIPE)
+                    || allowedInputTypes.contains(PaymentController.PaymentInputType.CHIP)
+                    || allowedInputTypes.contains(PaymentController.PaymentInputType.NFC);
+        }
+
         private void configInputTypes() {
-            boolean hasNonCardReverseInputTypes = allowedInputTypes.contains(TransactionItem.InputType.CASH) || allowedInputTypes.contains(TransactionItem.InputType.PREPAID);
+            boolean hasNonCardReverseInputTypes = allowedInputTypes.contains(PaymentController.PaymentInputType.CASH)
+                    || allowedInputTypes.contains(PaymentController.PaymentInputType.PREPAID)
+                    || allowedInputTypes.contains(PaymentController.PaymentInputType.CREDIT);
             if (!hasNonCardReverseInputTypes) {
                 if (allowedInputTypes.size() == 1) {
                     switch (allowedInputTypes.get(0)) {
@@ -129,25 +139,27 @@ public class ReversePaymentDialog extends Dialog {
         }
 
         @Override
-        protected void action() {
-            try {
-                PaymentController.Currency curr = PaymentController.Currency.RUB;
+        protected void action() throws PaymentException {
+            PaymentController.Currency curr = PaymentController.Currency.RUB;
 
-                if ("RUB".equals(ReversePaymentDialog.this.currency))
-                    curr = PaymentController.Currency.RUB;
+            if ("RUB".equals(ReversePaymentDialog.this.currency))
+                curr = PaymentController.Currency.RUB;
 
-                if ("VND".equals(ReversePaymentDialog.this.currency))
-                    curr = PaymentController.Currency.VND;
+            if ("VND".equals(ReversePaymentDialog.this.currency))
+                curr = PaymentController.Currency.VND;
 
-                PaymentController.getInstance().reversePayment(getContext(), transaction.getID(), action, reverseAmount, curr, auxData);
-            } catch (PaymentException e) {
-                onError(null, e.getMessage());
-            }
+            PaymentController.getInstance().reversePayment(getContext(), transaction.getID(), action, reverseAmount, curr, auxData, "+71234567891", "test@test.email");
         }
 
         @Override
-        public TransactionItem.InputType onSelectInputType(List<TransactionItem.InputType> allowedInputTypes) {
-            TransactionItem.InputType result = super.onSelectInputType(allowedInputTypes);
+        public void onTransactionStarted(String transactionID) {
+            tran2reverseID = transactionID;
+            startProgress();
+        }
+
+        @Override
+        public PaymentController.PaymentInputType onSelectInputType(List<PaymentController.PaymentInputType> allowedInputTypes) {
+            PaymentController.PaymentInputType result = super.onSelectInputType(allowedInputTypes);
             if (result != null)
                 switch (result) {
                     case CHIP:
@@ -173,11 +185,16 @@ public class ReversePaymentDialog extends Dialog {
         @Override
         protected int getReadyStringID() {
             if (chipRetries >= PaymentController.MAX_EMV_RETRIES)
-                if (!allowedInputTypes.contains(TransactionItem.InputType.SWIPE)) {
-                    allowedInputTypes.add(TransactionItem.InputType.SWIPE);
+                if (!allowedInputTypes.contains(PaymentController.PaymentInputType.SWIPE)) {
+                    allowedInputTypes.add(PaymentController.PaymentInputType.SWIPE);
                     configInputTypes();
                 }
             return readyStringID;
+        }
+
+        @Override
+        protected String getProgressString() {
+            return String.format(getContext().getString(R.string.payment_dlg_reverse_started), tran2reverseID);
         }
 
         @Override

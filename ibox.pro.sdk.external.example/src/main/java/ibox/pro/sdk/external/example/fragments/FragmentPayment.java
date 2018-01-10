@@ -26,6 +26,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +43,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import ibox.pro.sdk.external.PaymentContext;
 import ibox.pro.sdk.external.PaymentController;
@@ -52,6 +56,7 @@ import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.RegularPaymentContext;
 import ibox.pro.sdk.external.example.BitmapUtils;
 import ibox.pro.sdk.external.example.Consts;
+import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.dialogs.FiscalDialog;
 import ibox.pro.sdk.external.example.dialogs.PaymentDialog;
@@ -66,7 +71,8 @@ public class FragmentPayment extends Fragment {
 	private byte [] photo, productPhoto;
 	
 	private LinearLayout llProduct, llRegular;
-	private CheckBox cbCash, cbProduct, cbRegular, cbEndType, cbAuxData;
+	private CheckBox cbProduct, cbRegular, cbEndType, cbAuxData;
+	private RadioGroup rgInput;
 	private DatePicker pkrStart, pkrEnd;
 	private EditText edtProductField_1, edtPhone, edtEmail, edtRepeatCount, edtHour, edtMinute, edtDates;
 	private Spinner spnRegularType, spnQuarterly, spnMonth, spnDay, spnDayOfWeek;
@@ -208,7 +214,7 @@ public class FragmentPayment extends Fragment {
 		edtAmount 		= (EditText)view.findViewById(R.id.payment_edt_amount);
 		edtDescription 	= (EditText)view.findViewById(R.id.payment_edt_description);
 
-		cbCash				= (CheckBox)view.findViewById(R.id.payment_cb_cash);
+		rgInput				= (RadioGroup)view.findViewById(R.id.payment_rg_input);
 		cbProduct			= (CheckBox)view.findViewById(R.id.payment_cb_product);
 		cbAuxData			= (CheckBox)view.findViewById(R.id.payment_cb_auxdata);
 		llProduct			= (LinearLayout)view.findViewById(R.id.payment_ll_product);
@@ -397,9 +403,22 @@ public class FragmentPayment extends Fragment {
 	}
 	
 	private void doSinglePayment(boolean NFCOnly) {
-		PaymentContext context = new PaymentContext();
+		final PaymentContext context = new PaymentContext();
 
-		context.setCash(cbCash.isChecked());
+		switch (rgInput.indexOfChild(rgInput.findViewById(rgInput.getCheckedRadioButtonId()))) {
+			case 1:
+				context.setMethod(PaymentController.PaymentMethod.CASH);
+				break;
+			case 2:
+				context.setMethod(PaymentController.PaymentMethod.CREDIT);
+				break;
+			case 3:
+				context.setMethod(PaymentController.PaymentMethod.OTHER);
+				break;
+			default:
+				context.setMethod(PaymentController.PaymentMethod.CARD);
+				break;
+		}
 		context.setAmount(edtAmount.getText().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
 		if (context.isCash())
 			context.setAmountCashGot(context.getAmount() + 1d);
@@ -407,6 +426,8 @@ public class FragmentPayment extends Fragment {
 		context.setImage(photo);
 		context.setCurrency(PaymentController.Currency.RUB);
 		context.setNFC(NFCOnly);
+		context.setReceiptPhone("+71234567891");
+		context.setReceiptEmail("test@test.email");
 
 		if (cbAuxData.isChecked()) {
 			try {
@@ -433,8 +454,39 @@ public class FragmentPayment extends Fragment {
 		if (isPaymentWithProduct()) {
 			setPaymentProductData(context);
 		}
-		
-		new PaymentDialog(getActivity(), context).show();
+
+		HashMap<PaymentController.PaymentMethod, Map<String, String>> acquirersByMethods = ((MainActivity) getActivity()).AcquirersByMethods;
+		if (acquirersByMethods != null) {
+			if (acquirersByMethods.containsKey(context.getMethod())) {
+				final Map<String, String> acquirers = acquirersByMethods.get(context.getMethod());
+				final Object [] acuirersArray =  acquirers.entrySet().toArray();
+				if (acquirers != null && acquirers.size() > 0) {
+					if (acquirers.size() == 1) {
+						context.setAcquirerCode(((Map.Entry<String, String>) acuirersArray[0]).getKey());
+						new PaymentDialog(getActivity(), context).show();
+					} else {
+						CharSequence [] items = new CharSequence[acquirers.size()];
+						int i = 0;
+						for (Object acquirer : acuirersArray)
+							items [i++] = ((Map.Entry<String, String>) acquirer).getValue();
+
+						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+							.setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialogInterface, int i) {
+									context.setAcquirerCode(((Map.Entry<String, String>) acuirersArray[i]).getKey());
+									dialogInterface.dismiss();
+									new PaymentDialog(getActivity(), context).show();
+								}
+							});
+						builder.create().show();
+					}
+				} else
+					new PaymentDialog(getActivity(), context).show();
+			} else
+				new PaymentDialog(getActivity(), context).show();
+		} else
+			new PaymentDialog(getActivity(), context).show();
 	}
 	
 	private void doRegularPayment() {

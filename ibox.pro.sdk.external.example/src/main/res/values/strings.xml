@@ -25,6 +25,7 @@
     <string name="error_no_such_transaction">Транзакция не найдена</string>
     <string name="error_tr_null_or_empty">Ошибка создания транзакции</string>
     <string name="error_invalid_input_type">Неправильный тип ввода</string>
+    <string name="error_invalid_amount">Неправильная сумма</string>
 
     <string name="tab_payment">Платеж</string>
     <string name="tab_history">История</string>
@@ -43,12 +44,14 @@
     <string name="tr_details_dlg_lbl_terminal">Терминал:</string>
     <string name="tr_details_dlg_lbl_iin">IIN карты:</string>
     <string name="tr_details_dlg_lbl_pan">Номер карты:</string>
+    <string name="tr_details_dlg_lbl_link">Ссылка для оплаты:</string>
     <string name="tr_details_dlg_lbl_emv">Данные EMV:</string>
     <string name="tr_details_dlg_lbl_signature">Необходима подпись:</string>
     <string name="tr_details_btn_adjust">Отправить чек</string>
 
     <string name="history_edt_getById">Найти транзакцию по ID</string>
     <string name="history_item_no_description">Нет описания</string>
+    <string name="history_item_inprocess">В обработке</string>
 
     <string name="history_tr_details_dlg_lbl_id">ID:</string>
     <string name="history_tr_details_dlg_lbl_date">Дата выполнения:</string>
@@ -67,7 +70,10 @@
 
     <string name="payment_lbl_amount">Сумма :</string>
     <string name="payment_lbl_description">Описание :</string>
-    <string name="payment_cb_cash">Наличными</string>
+    <string name="payment_rb_card">Картой</string>
+    <string name="payment_rb_cash">Наличными</string>
+    <string name="payment_rb_credit">Кредит</string>
+    <string name="payment_rb_link">Ссылкой</string>
     <string name="payment_cb_product">Оплатить продукт</string>
     <string name="payment_lbl_product_field_1">Поле 1 :</string>
     <string name="payment_lbl_product_field_2">Поле 2 :</string>
@@ -108,6 +114,8 @@
     <string name="payment_photo_dlg_btn_camera">Камера</string>
 
     <string name="payment_dlg_started">Выполняется транзакция %s</string>
+    <string name="payment_dlg_reverse_started">Отмена/возврат транзакции %s</string>
+    <string name="payment_dlg_canceled">Платеж отменен</string>
 
     <string name="reverse_dlg_title">Возврат/Отмена платежа</string>
     <string name="reverse_dlg_lbl_amount">Сумма возврата/отмены:</string>
@@ -120,6 +128,7 @@
     <string name="adjust_dlg_lbl_email">Email :</string>
     <string name="adjust_dlg_lbl_phone">Телефон :</string>    
     <string name="adjust_dlg_btn_send">Отправить чек</string>
+    <string name="adjust_dlg_error">Необходимо выполнить подпись или указать email или телефон!</string>
 
     <string name="fiscal_dlg_title">Фискализация</string>
     <string name="fiscal_dlg_lbl_trid">@string/tr_details_dlg_lbl_id</string>
@@ -163,5 +172,6 @@
         <item>Чипом</item>
         <item>Безконтактная оплата</item>
         <item>Предоплата</item>
+        <item>@string/payment_rb_credit</item>
     </string-array>
 </resources>
