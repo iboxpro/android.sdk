@@ -108,9 +108,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	}
 
 	protected int getReadyStringID() {
-		return mPaymentContext instanceof RegularPaymentContext
-				? R.string.reader_state_ready_swipeonly
-				: PaymentController.getInstance().getReaderType().isMultiInputSupported()
+		return PaymentController.getInstance().getReaderType().isMultiInputSupported()
 					? R.string.reader_state_ready_multiinput
 					: mPaymentContext.getNFC() ? R.string.reader_state_ready_nfconly : R.string.reader_state_ready;
 	}
@@ -660,6 +658,11 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 
 	@Override
 	public void onAutoConfigFinished(boolean success, String config, boolean isDefault) {
+
+	}
+
+	@Override
+	public void onSwitchedToCNP() {
 
 	}
 }

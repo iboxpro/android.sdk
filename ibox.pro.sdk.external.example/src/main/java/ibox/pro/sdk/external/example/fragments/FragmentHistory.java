@@ -139,6 +139,12 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 
 		AlertDialog dlgTrInfo = builder.create();
 
+		String [] fiscalStates = getResources().getStringArray(R.array.fiscal_states);
+		String fiscalStatus = fiscalStates[0];
+		if (trItem.getFiscalInfo() != null)
+			fiscalStatus = fiscalStates[trItem.getFiscalInfo().getFiscalStatus().ordinal()];
+
+
         ((EditText)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_id)).setText(String.valueOf(trItem.getID()));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_date)).setText(String.valueOf(trItem.getDate()));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_title)).setText(String.valueOf(trItem.getDescription()));
@@ -147,6 +153,7 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_paytype)).setText(trItem.getCard().getIin());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_pan)).setText(trItem.getCard().getPanMasked());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_state)).setText(new StringBuilder(trItem.getStateDisplay()).append(" (").append(trItem.getSubStateDisplay()).append(")"));
+		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_fiscal_status)).setText(fiscalStatus);
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_invoice)).setText(trItem.getInvoice());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_geodata)).setText(String.valueOf(trItem.getLatitude()).concat(" , ").concat(String.valueOf(trItem.getLongitude())));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_signature_url)).setText(trItem.getSignatureUrl());
@@ -418,5 +425,4 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 
 
     }
-
 }

@@ -181,4 +181,9 @@ public class AutoconfigDialog extends Dialog implements PaymentControllerListene
     public PaymentController.PaymentInputType onSelectInputType(List<PaymentController.PaymentInputType> allowedInputTypes) {
         return null;
     }
+
+    @Override
+    public void onSwitchedToCNP() {
+
+    }
 }

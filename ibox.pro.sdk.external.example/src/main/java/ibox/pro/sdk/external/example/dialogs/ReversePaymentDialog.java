@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import ibox.pro.sdk.external.ReversePaymentContext;
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentException;
 import ibox.pro.sdk.external.PaymentResultContext;
@@ -148,7 +149,16 @@ public class ReversePaymentDialog extends Dialog {
             if ("VND".equals(ReversePaymentDialog.this.currency))
                 curr = PaymentController.Currency.VND;
 
-            PaymentController.getInstance().reversePayment(getContext(), transaction.getID(), action, reverseAmount, curr, auxData, "+71234567891", "test@test.email");
+            ReversePaymentContext reversePaymentContext = new ReversePaymentContext();
+            reversePaymentContext.setTransactionID(transaction.getID());
+            reversePaymentContext.setAction(action);
+            reversePaymentContext.setReturnAmount(reverseAmount);
+            reversePaymentContext.setCurrency(curr);
+            reversePaymentContext.setAuxData(auxData);
+            reversePaymentContext.setReceiptPhone("+71234567891");
+            reversePaymentContext.setReceiptEmail("test@test.email");
+            reversePaymentContext.setExtID("TEST_APP");
+            PaymentController.getInstance().reversePayment(getContext(), reversePaymentContext);
         }
 
         @Override

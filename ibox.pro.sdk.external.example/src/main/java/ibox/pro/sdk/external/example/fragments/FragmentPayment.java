@@ -172,7 +172,6 @@ public class FragmentPayment extends Fragment {
 			@Override
 			public void onClick(View view) {
 				AsyncTask<Void, Void, PaymentResultContext> task = new AsyncTask<Void, Void, PaymentResultContext>() {
-
 					PaymentContext paymentContext = null;
 
 					@Override
@@ -185,7 +184,7 @@ public class FragmentPayment extends Fragment {
 						paymentContext.setDescription(edtDescription.getText().toString());
 						paymentContext.setImage(photo);
 						paymentContext.setCurrency(PaymentController.Currency.RUB);
-
+						paymentContext.setExtID("TEST_APP");
 						if (isPaymentWithProduct()) {
 							setPaymentProductData(paymentContext);
 						}
@@ -472,6 +471,9 @@ public class FragmentPayment extends Fragment {
 				context.setMethod(PaymentController.PaymentMethod.LINKED_CARD);
 				context.setLinkedCardID(selectedLinkedCard.getID());
 				break;
+			case 5:
+				context.setMethod(PaymentController.PaymentMethod.OUTER_CARD);
+				break;
 			default:
 				context.setMethod(PaymentController.PaymentMethod.CARD);
 				break;
@@ -485,6 +487,7 @@ public class FragmentPayment extends Fragment {
 		context.setNFC(NFCOnly);
 		context.setReceiptPhone("+71234567891");
 		context.setReceiptEmail("test@test.email");
+		context.setExtID("TEST_APP");
 
 		if (cbAuxData.isChecked()) {
 			try {
@@ -553,6 +556,7 @@ public class FragmentPayment extends Fragment {
 		context.setCurrency(PaymentController.Currency.RUB);
 		context.setDescription(edtDescription.getText().toString());
 		context.setImage(photo);
+		context.setExtID("TEST_APP");
 		
 		context.setReceiptPhone(edtPhone.getText().toString());
 		context.setReceiptEmail(edtEmail.getText().toString());

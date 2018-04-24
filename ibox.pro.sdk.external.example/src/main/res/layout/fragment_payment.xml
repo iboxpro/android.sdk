@@ -91,6 +91,11 @@
 				android:layout_height="wrap_content"
 				android:text="@string/payment_rb_linked_card_format"
 				/>
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/payment_rb_outer"
+				/>
 		</RadioGroup>
 	    <CheckBox
 	        android:id="@+id/payment_cb_product"
