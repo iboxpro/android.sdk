@@ -13,8 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -23,10 +25,14 @@ import ibox.pro.sdk.external.PaymentController.ReaderType;
 import ibox.pro.sdk.external.example.Consts;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.Utils;
+import ibox.pro.sdk.external.example.dialogs.AutoconfigDialog;
 
 public class FragmentSettings extends Fragment {
 	private ListView lvReaders;
 	private ReadersAdapter mAdapter;
+	private Button btnAutoconfig;
+
+	private final String config = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -64,7 +70,7 @@ public class FragmentSettings extends Fragment {
 									String address = usbSupported
 										? (which > 0 ? bondedDevices.get(which - 1).getAddress() : PaymentController.USB_MODE_KEY)
 										: bondedDevices.get(which).getAddress();
-									PaymentController.getInstance().setReaderType(getActivity(), reader, address);
+									PaymentController.getInstance().setReaderType(getActivity(), reader, address, config);
 									dialog.dismiss();
 									mAdapter.notifyDataSetChanged();
 									Utils.setString(getActivity(), Consts.SavedParams.READER_TYPE_KEY, reader.name());
@@ -75,6 +81,8 @@ public class FragmentSettings extends Fragment {
 							.show();
 				} else {
 					PaymentController.getInstance().setReaderType(getActivity(), reader, null);
+					Utils.setString(getActivity(), Consts.SavedParams.READER_TYPE_KEY, reader.name());
+					Utils.setString(getActivity(), Consts.SavedParams.READER_ADDRESS_KEY, null);
 					mAdapter.notifyDataSetChanged();
 				}
 			}
@@ -82,6 +90,17 @@ public class FragmentSettings extends Fragment {
 
 		if (!Build.MANUFACTURER.equalsIgnoreCase("BBPOS"))
 			lvReaders.setAdapter(mAdapter);
+
+		btnAutoconfig = (Button)view.findViewById(R.id.settings_btn_autoconfig);
+		btnAutoconfig.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (PaymentController.getInstance().getReaderType() != null)
+					new AutoconfigDialog(getActivity()).show();
+				else
+					Toast.makeText(getActivity(), R.string.settings_lbl_title, Toast.LENGTH_LONG).show();
+			}
+		});
 
 		return view;
 	}
@@ -91,7 +110,6 @@ public class FragmentSettings extends Fragment {
 	}
 	
 	private class ReadersAdapter extends ArrayAdapter<PaymentController.ReaderType> {
-		
 		public ReadersAdapter(Context c) {
 			super(c, 0, PaymentController.ReaderType.values());
 		}

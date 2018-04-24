@@ -63,6 +63,7 @@
     <string name="payment_rb_cash">Cash</string>
     <string name="payment_rb_credit">Credit</string>
     <string name="payment_rb_link">By link</string>
+    <string name="payment_rb_linked_card_format">Linked card %s</string>
     <string name="payment_cb_product">Product payment</string>
     <string name="payment_cb_regular">Regular payment</string>
     <string name="payment_default_dates">01.01.2016;02.02.2016;03.03.2016;</string>
@@ -111,6 +112,7 @@
     <string name="steps_dlg_lbl_title">Confirm schedule</string>
     <string name="steps_dlg_lbl_total">Total:</string>
     <string name="tab_history">History</string>
+    <string name="tab_cards">Cards</string>
     <string name="tab_payment">Payment</string>
     <string name="tab_settings">Settings</string>
     <string name="tr_details_btn_adjust">Send receipt</string>
@@ -154,7 +156,13 @@
         <item>Prepaid</item>
         <item>@string/payment_rb_credit</item>
     </string-array>
-
+    <string name="linked_dlg_title">Select card</string>
+    <string name="linked_dlg_empty">No linked cards</string>
     <string name="payment_cb_auxdata">AuxData</string>
     <string name="payment_btn_pay_background">Pay (background)</string>
+    <string name="cards_btn_add">Add</string>
+    <string name="cards_btn_refresh">Refresh</string>
+    <string name="cards_btn_balance">Balance</string>
+    <string name="cards_dlg_balance_result_format">Balance is %.2f</string>
+    <string name="cards_dlg_remove_format">Remove card %s?</string>
 </resources>

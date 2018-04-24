@@ -29,8 +29,9 @@
 
     <string name="tab_payment">Платеж</string>
     <string name="tab_history">История</string>
-    <string name="tab_settings">Настройки</string>     
-       
+    <string name="tab_settings">Настройки</string>
+    <string name="tab_cards">Карты</string>
+
     <string name="login_dlg_title">Авторизация</string>
     <string name="login_dlg_btn_ok">Вход</string>
     <string name="login_dlg_lbl_login">Логин</string>
@@ -74,6 +75,7 @@
     <string name="payment_rb_cash">Наличными</string>
     <string name="payment_rb_credit">Кредит</string>
     <string name="payment_rb_link">Ссылкой</string>
+    <string name="payment_rb_linked_card_format">Привязанной картой %s</string>
     <string name="payment_cb_product">Оплатить продукт</string>
     <string name="payment_lbl_product_field_1">Поле 1 :</string>
     <string name="payment_lbl_product_field_2">Поле 2 :</string>
@@ -137,9 +139,18 @@
     <string name="fiscal_dlg_lbl_cvc">КПК</string>
     <string name="fiscal_dlg_lbl_shift">Номер смены</string>
 
+    <string name="linked_dlg_title">Выберите карту</string>
+    <string name="linked_dlg_empty">Нет привязанных карт</string>
+
+    <string name="cards_btn_add">Добавить</string>
+    <string name="cards_btn_refresh">Обновить</string>
+    <string name="cards_btn_balance">Баланс</string>
+    <string name="cards_dlg_balance_result_format">Баланс составляет %.2f</string>
+    <string name="cards_dlg_remove_format">Удалить карту %s?</string>
+
     <string name="settings_lbl_title">Выберите ридер</string>
     <string name="settings_btn_autoconfig">Автонастройка</string>
-    <string name="settings_autoconfig_default">Конфигурация по-умолчанию</string>
+    <string name="settings_autoconfig_default">Конфигурация по умолчанию</string>
 
     <string name="reader_state_disconnected">Ридер не подключен</string>
     <string name="reader_state_ready_multiinput">Проведите магнитной полосой или приложите карту, или вставьте карту в ридер</string>

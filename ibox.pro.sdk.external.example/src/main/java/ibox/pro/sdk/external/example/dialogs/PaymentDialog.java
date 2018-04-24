@@ -272,47 +272,47 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 				}
 			}
 
-			@Override
-			public void onReaderEvent(ReaderEvent event) {
-				Log.i("iboxSDK", "onReaderEvent: " + event.toString());
-				switch (event) {
-					case CONNECTED :
-					case START_INIT :
-						lblState.setText(R.string.reader_state_init);
-						break;
-					case DISCONNECTED :
-						stopProgress();
-						lblState.setText(R.string.reader_state_disconnected);
-						break;
-					case SWIPE_CARD :
-					case EMV_TRANSACTION_STARTED :
-					case NFC_TRANSACTION_STARTED :
-						startProgress();
-						break;
-					case WAITING_FOR_CARD :
-	    		lblState.setText(getReadyStringID());
-	    		break;
-	    	case PAYMENT_CANCELED :
+	@Override
+	public void onReaderEvent(ReaderEvent event) {
+		Log.i("iboxSDK", "onReaderEvent: " + event.toString());
+		switch (event) {
+			case CONNECTED :
+			case START_INIT :
+				lblState.setText(R.string.reader_state_init);
+				break;
+			case DISCONNECTED :
+				stopProgress();
+				lblState.setText(R.string.reader_state_disconnected);
+				break;
+			case SWIPE_CARD :
+			case EMV_TRANSACTION_STARTED :
+			case NFC_TRANSACTION_STARTED :
+				startProgress();
+				break;
+			case WAITING_FOR_CARD :
+				lblState.setText(getReadyStringID());
+				break;
+			case PAYMENT_CANCELED :
 				Toast.makeText(mActivity, R.string.payment_dlg_canceled, Toast.LENGTH_LONG).show();
-	    		dismiss();
-	    		break;
-	    	case INIT_FAILED : 
-	    		stopProgress();
-	    		lblState.setText(R.string.reader_state_init_error);
-	    		break;
-	    	case EJECT_CARD :
-	    		stopProgress();
-	    		lblState.setText(R.string.reader_state_eject);
-	    		break;
+				dismiss();
+				break;
+			case INIT_FAILED :
+				stopProgress();
+				lblState.setText(R.string.reader_state_init_error);
+				break;
+			case EJECT_CARD :
+				stopProgress();
+				lblState.setText(R.string.reader_state_eject);
+				break;
 			case BAD_SWIPE :
 				Toast.makeText(mActivity, R.string.reader_bad_swipe, Toast.LENGTH_LONG).show();
 				break;
 			case LOW_BATTERY :
 				Toast.makeText(mActivity, R.string.reader_low_battery, Toast.LENGTH_LONG).show();
 				break;
-	    	default :
-	    		break;
-    	}
+			default :
+				break;
+		}
     }
     
     @Override
@@ -651,5 +651,15 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 		});
 
 		return resultWrapper.result >= 0 ? allowedInputTypes.get(resultWrapper.result) : null;
+	}
+
+	@Override
+	public void onAutoConfigUpdate(double perecent) {
+
+	}
+
+	@Override
+	public void onAutoConfigFinished(boolean success, String config, boolean isDefault) {
+
 	}
 }

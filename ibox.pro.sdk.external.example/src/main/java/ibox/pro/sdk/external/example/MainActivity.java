@@ -18,6 +18,8 @@ import java.util.Map;
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentController.ReaderType;
 import ibox.pro.sdk.external.entities.APIAuthResult;
+import ibox.pro.sdk.external.entities.LinkedCard;
+import ibox.pro.sdk.external.example.fragments.FragmentCards;
 import ibox.pro.sdk.external.example.fragments.FragmentHistory;
 import ibox.pro.sdk.external.example.fragments.FragmentPayment;
 import ibox.pro.sdk.external.example.fragments.FragmentSettings;
@@ -30,6 +32,7 @@ public class MainActivity extends FragmentActivity {
 	public String ClientPhone;
 	public String ClientWeb;
 	public HashMap<PaymentController.PaymentMethod, Map<String, String>> AcquirersByMethods;
+	public List<LinkedCard> LinkedCards;
 
 	private FragmentTabHost mTabHost;
 	
@@ -89,6 +92,8 @@ public class MainActivity extends FragmentActivity {
 				FragmentPayment.class, null);
 		mTabHost.addTab(mTabHost.newTabSpec(getString(R.string.tab_history)).setIndicator(getString(R.string.tab_history)), 
 				FragmentHistory.class, null);
+		mTabHost.addTab(mTabHost.newTabSpec(getString(R.string.tab_cards)).setIndicator(getString(R.string.tab_cards)),
+				FragmentCards.class, null);
 		mTabHost.addTab(mTabHost.newTabSpec(getString(R.string.tab_settings)).setIndicator(getString(R.string.tab_settings)), 
 				FragmentSettings.class, null);
 	}
@@ -105,7 +110,7 @@ public class MainActivity extends FragmentActivity {
 					PaymentController.getInstance().setCredentials(login, password);
 
 					APIAuthResult result = PaymentController.getInstance().auth(MainActivity.this);
-
+					LinkedCards = new ArrayList<LinkedCard>();
 					if (result == null)
 						Toast.makeText(MainActivity.this, "Connection lost", Toast.LENGTH_LONG).show();
 					else if (!result.isValid())
@@ -117,6 +122,7 @@ public class MainActivity extends FragmentActivity {
 						ClientPhone = result.getAccount().getClientPhone();
 						ClientWeb = result.getAccount().getClientWeb();
 						AcquirersByMethods = result.getAccount().getAcquirersByMethods();
+						LinkedCards = result.getAccount().getLinkedCards();
 						dialog.dismiss();
 					}
 				}

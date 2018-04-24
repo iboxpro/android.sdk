@@ -26,6 +26,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -46,7 +47,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import ibox.pro.sdk.external.PaymentContext;
 import ibox.pro.sdk.external.PaymentController;
@@ -54,11 +54,13 @@ import ibox.pro.sdk.external.PaymentController.RegularEndType;
 import ibox.pro.sdk.external.PaymentController.RegularRepeatType;
 import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.RegularPaymentContext;
+import ibox.pro.sdk.external.entities.LinkedCard;
 import ibox.pro.sdk.external.example.BitmapUtils;
 import ibox.pro.sdk.external.example.Consts;
 import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.dialogs.FiscalDialog;
+import ibox.pro.sdk.external.example.dialogs.LinkedCardsDialog;
 import ibox.pro.sdk.external.example.dialogs.PaymentDialog;
 
 public class FragmentPayment extends Fragment {
@@ -69,6 +71,7 @@ public class FragmentPayment extends Fragment {
 	private EditText edtAmount, edtDescription;
 	private Button btnPay, btnFiscal, btnPayNFC, btnPayBackground;
 	private byte [] photo, productPhoto;
+	private LinkedCard selectedLinkedCard = null;
 	
 	private LinearLayout llProduct, llRegular;
 	private CheckBox cbProduct, cbRegular, cbEndType, cbAuxData;
@@ -82,9 +85,10 @@ public class FragmentPayment extends Fragment {
 		
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_payment, container, false);
+		final View view = inflater.inflate(R.layout.fragment_payment, container, false);
 
 		initControls(view);
+		updateLinkedCardRBText();
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(getString(R.string.payment_photo_dlg_title))
@@ -205,6 +209,49 @@ public class FragmentPayment extends Fragment {
 				}.execute();
 			}
 		});
+
+		rgInput.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			int oldCheckedIndex = -1;
+
+			@Override
+			public void onCheckedChanged(final RadioGroup group, int checkedId) {
+				if (checkedId > 0 && ((RadioButton) group.findViewById(checkedId)).isChecked()) {
+					if (group.indexOfChild(group.findViewById(checkedId)) == 4) {
+						List<LinkedCard> linkedCards = ((MainActivity) getActivity()).LinkedCards;
+
+						if (linkedCards != null && linkedCards.size() > 0) {
+							LinkedCardsDialog linkedCardsDialog = new LinkedCardsDialog(getActivity(), new LinkedCardsDialog.Listener() {
+								@Override
+								public void onCardSelected(LinkedCard card) {
+									oldCheckedIndex = 4;
+									selectedLinkedCard = card;
+									updateLinkedCardRBText();
+								}
+							});
+							linkedCardsDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+								@Override
+								public void onCancel(DialogInterface dialog) {
+									rgInput.check(oldCheckedIndex >= 0 ? group.getChildAt(oldCheckedIndex).getId() : oldCheckedIndex);
+									selectedLinkedCard = null;
+									updateLinkedCardRBText();
+								}
+							});
+							linkedCardsDialog.show();
+						} else {
+							selectedLinkedCard = null;
+							Toast.makeText(getActivity(), R.string.linked_dlg_empty, Toast.LENGTH_LONG).show();
+							rgInput.check(oldCheckedIndex);
+							updateLinkedCardRBText();
+						}
+					} else {
+						selectedLinkedCard = null;
+						updateLinkedCardRBText();
+						oldCheckedIndex = group.indexOfChild(group.findViewById(checkedId));
+					}
+				}
+			}
+		});
+
 
 		return view;
 	}
@@ -401,7 +448,13 @@ public class FragmentPayment extends Fragment {
 		dayOfWeekAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spnDayOfWeek.setAdapter(dayOfWeekAdapter);
 	}
-	
+
+	private void updateLinkedCardRBText() {
+		((RadioButton) rgInput.getChildAt(4))
+				.setText(String.format(getString(R.string.payment_rb_linked_card_format),
+						selectedLinkedCard == null ? "" : selectedLinkedCard.getAlias()));
+	}
+
 	private void doSinglePayment(boolean NFCOnly) {
 		final PaymentContext context = new PaymentContext();
 
@@ -414,6 +467,10 @@ public class FragmentPayment extends Fragment {
 				break;
 			case 3:
 				context.setMethod(PaymentController.PaymentMethod.OTHER);
+				break;
+			case 4:
+				context.setMethod(PaymentController.PaymentMethod.LINKED_CARD);
+				context.setLinkedCardID(selectedLinkedCard.getID());
 				break;
 			default:
 				context.setMethod(PaymentController.PaymentMethod.CARD);
