@@ -1,0 +1,93 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="250dp"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:gravity="center_horizontal"
+    >
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="10dp"
+        android:text="@string/fiscal_dlg_title"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fiscal_dlg_lbl_trid"
+            />
+        <EditText
+            android:id="@+id/fiscal_dlg_edt_trid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fiscal_dlg_lbl_printer"
+            />
+        <EditText
+            android:id="@+id/fiscal_dlg_edt_printer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number|numberDecimal"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fiscal_dlg_lbl_doc"
+            />
+        <EditText
+            android:id="@+id/fiscal_dlg_edt_doc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number|numberDecimal"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fiscal_dlg_lbl_cvc"
+            />
+        <EditText
+            android:id="@+id/fiscal_dlg_edt_cvc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number|numberDecimal"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fiscal_dlg_lbl_shift"
+            />
+        <EditText
+            android:id="@+id/fiscal_dlg_edt_shift"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number|numberDecimal"
+            />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/fiscal_btn_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/ok"
+        />
+
+</LinearLayout>

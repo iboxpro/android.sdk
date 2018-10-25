@@ -1,0 +1,41 @@
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+	android:layout_width="match_parent"
+	android:orientation="vertical"	
+    >
+
+    <!-- focus catcher -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:focusableInTouchMode="true"
+        android:focusable="true"
+        />
+
+	<EditText
+		android:id="@+id/history_edt_getById"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:textColorHint="#999999"
+		android:hint="@string/history_edt_getById"
+		android:imeOptions="actionSearch"
+		android:inputType="text"
+		/>
+
+	<View
+		android:layout_width="match_parent"
+		android:layout_height="1dp"
+		android:background="#000000"
+		/>
+
+	<ListView 
+	    android:id="@+id/history_lv_content"
+	    android:layout_height="match_parent"
+	    android:layout_width="match_parent"
+	    android:paddingLeft="@dimen/activity_horizontal_margin"
+	    android:paddingRight="@dimen/activity_horizontal_margin"
+	    android:scrollbarStyle="outsideOverlay"
+	    android:listSelector="#00000000"
+	    />
+
+</LinearLayout>
