@@ -2,11 +2,9 @@ package ibox.pro.sdk.external.example.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -26,6 +24,7 @@ import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.entities.APITryGetPaymentStatusResult;
 import ibox.pro.sdk.external.entities.ScheduleItem;
 import ibox.pro.sdk.external.entities.TransactionItem;
+import ibox.pro.sdk.external.example.CommonAsyncTask;
 import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.Utils;
@@ -35,7 +34,7 @@ public class ResultDialog extends Dialog {
 	private TextView lblOperation, lblState, lblID, lblInvoice, lblAppcode, lblTerminal,
                 lblIIN, lblPAN, lblLink,
                 lblEMV, lblSignature, lblFiscalStatus;
-	private Button btnAdjust, btnFiscalStatus, btnInvoice;
+	private Button btnAdjust, btnFiscalStatus, btnInvoice, btnFiscalize;
 
 	public ResultDialog(final Context context, final PaymentResultContext paymentResultContext, final boolean isReverse) {
 		super(context, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
@@ -85,12 +84,19 @@ public class ResultDialog extends Dialog {
             }
         });
 
-        if (paymentResultContext.getTransactionItem() != null)
+        btnFiscalize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new FiscalizeTask(ResultDialog.this).execute(transactionItem.getID());
+            }
+        });
+
+        if (transactionItem != null) {
             btnInvoice.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String invoice = Utils.BuildInvoice(((MainActivity) context).Account, paymentResultContext.getTransactionItem());
-                    Log.i(paymentResultContext.getTransactionItem().getID(), invoice);
+                    String invoice = Utils.BuildInvoice(((MainActivity) context).Account, transactionItem);
+                    Log.i(transactionItem.getID(), invoice);
                     TextView textView = new TextView(getContext());
                     textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
                     textView.setTypeface(Typeface.MONOSPACE);
@@ -102,11 +108,17 @@ public class ResultDialog extends Dialog {
                             .create().show();
                 }
             });
-        else
+
+            TransactionItem.FiscalInfo fiscalInfo = transactionItem.getFiscalInfo();
+            boolean fiscalizeRequired = fiscalInfo != null
+                    && fiscalInfo.getFiscalStatus() != TransactionItem.FiscalInfo.FiscalStatus.CREATED
+                    && fiscalInfo.getFiscalStatus() != TransactionItem.FiscalInfo.FiscalStatus.SUCCESS;
+            btnFiscalize.setVisibility(fiscalizeRequired ? View.VISIBLE : View.GONE);
+        } else
             btnInvoice.setVisibility(View.GONE);
 
 
-        if (paymentResultContext.getTransactionItem() == null) {
+        if (transactionItem == null) {
             LinearLayout container = (LinearLayout) lblState.getParent();
 
             container.getChildAt(container.indexOfChild(lblState) - 1).setVisibility(View.GONE);
@@ -123,6 +135,7 @@ public class ResultDialog extends Dialog {
             lblEMV.setVisibility(View.GONE);
             container.getChildAt(container.indexOfChild(lblFiscalStatus) - 1).setVisibility(View.GONE);
             lblFiscalStatus.setVisibility(View.GONE);
+            btnFiscalize.setVisibility(View.GONE);
         }
 	}
 	
@@ -142,6 +155,7 @@ public class ResultDialog extends Dialog {
 		btnAdjust 		= (Button)findViewById(R.id.tr_details_dlg_btn_adjust);
         btnFiscalStatus = (Button)findViewById(R.id.tr_details_dlg_btn_fiscal_status);
         btnInvoice      = (Button)findViewById(R.id.tr_details_dlg_btn_invoice);
+        btnFiscalize    = (Button)findViewById(R.id.tr_details_dlg_btn_fiscalize);
 	}
 
 	private void update(TransactionItem transactionItem) {
@@ -184,19 +198,12 @@ public class ResultDialog extends Dialog {
         lblPAN.setText(scheduleItem.getCard().getPanMasked().replace("*", " **** "));
     }
 
-	private static class CheckFiscalStatusTask extends AsyncTask<String, Void, APITryGetPaymentStatusResult> {
+	private static class CheckFiscalStatusTask extends CommonAsyncTask<String, Void, APITryGetPaymentStatusResult> {
         private ResultDialog parent;
-        private ProgressDialog progressDialog;
 
 	    public CheckFiscalStatusTask(ResultDialog parent) {
+	        super(parent.getContext());
             this.parent = parent;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = new ProgressDialog(parent.getContext());
-            progressDialog.show();
         }
 
         @Override
@@ -207,7 +214,6 @@ public class ResultDialog extends Dialog {
         @Override
         protected void onPostExecute(APITryGetPaymentStatusResult result) {
             super.onPostExecute(result);
-            progressDialog.dismiss();
 
             if (result != null && result.isValid() && result.getTransaction() != null) {
                 Toast.makeText(parent.getContext(), R.string.success, Toast.LENGTH_LONG).show();
@@ -217,6 +223,17 @@ public class ResultDialog extends Dialog {
 
             if (!parent.isShowing())
                 parent.show();
+        }
+    }
+
+    private static class FiscalizeTask extends CheckFiscalStatusTask {
+        public FiscalizeTask(ResultDialog parent) {
+            super(parent);
+        }
+
+        @Override
+        protected APITryGetPaymentStatusResult doInBackground(String... strings) {
+            return PaymentController.getInstance().fiscalize(getContext().getApplicationContext(), strings[0]);
         }
     }
 }

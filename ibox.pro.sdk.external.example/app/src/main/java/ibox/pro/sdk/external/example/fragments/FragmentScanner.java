@@ -187,4 +187,9 @@ public class FragmentScanner extends Fragment implements PaymentControllerListen
     public void onCapkConfigFinished(boolean success) {
 
     }
+
+    @Override
+    public void onReaderConfigFinished(boolean success) {
+
+    }
 }

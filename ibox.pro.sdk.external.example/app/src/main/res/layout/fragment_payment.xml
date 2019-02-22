@@ -157,44 +157,6 @@
 	        android:textSize="16sp"
 	        android:text="@string/payment_cb_product"
 	        />
-	    <LinearLayout 
-	        android:id="@+id/payment_ll_product"
-	        android:layout_height="wrap_content"
-	        android:layout_width="match_parent"
-	        android:orientation="vertical"
-	        android:visibility="gone"
-	        >
-	        
-	        <TextView
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="@string/payment_lbl_product_field_1" 
-		        />
-	        
-	        <EditText 
-		    	android:id="@+id/payment_edt_product_field_1"
-		       	android:layout_height="35dp"
-		       	android:layout_width="match_parent"
-		       	android:textSize="16sp"
-		       />
-	        
-	        <TextView
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="@string/payment_lbl_product_field_2" 
-		        />
-	        
-	        <ImageView 
-		    	android:id="@+id/payment_img_product_field_2"
-		       	android:layout_width="100dp"
-	            android:layout_height="100dp"
-	            android:background="#dddddd"
-	            android:contentDescription="@null"
-	            android:padding="1dp"
-	            android:scaleType="centerCrop"
-	            android:src="#ffffff" 
-		       />	        
-	    </LinearLayout>
 	    <CheckBox 
 	        android:id="@+id/payment_cb_regular"
 	        android:layout_height="wrap_content"

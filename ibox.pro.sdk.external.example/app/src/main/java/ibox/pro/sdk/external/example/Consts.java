@@ -4,8 +4,6 @@ public class Consts {
 	public static final class RequestCodes {
         public static final int SELECT_PHOTO = 100;
         public static final int PHOTO_CAPTURE = 101;
-        public static final int PRODUCT_SELECT_PHOTO = 102;
-        public static final int PRODUCT_PHOTO_CAPTURE = 103;
     }
 	
 	public static final class Parameters {

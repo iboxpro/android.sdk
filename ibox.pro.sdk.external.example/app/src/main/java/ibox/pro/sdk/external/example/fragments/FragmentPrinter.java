@@ -256,4 +256,9 @@ public class FragmentPrinter extends Fragment implements PaymentControllerListen
     public void onReturnPowerOffNFCResult(boolean result) {
 
     }
+
+    @Override
+    public void onReaderConfigFinished(boolean success) {
+
+    }
 }

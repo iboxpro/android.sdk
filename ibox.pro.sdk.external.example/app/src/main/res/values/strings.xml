@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="def_login">agent@mac.demo</string>
-    <string name="def_password">123123123</string>
-    <string name="def_product_code">PRODUCT_TEST</string>
-    <string name="def_product_field_1_code">FIELD_1</string>
-    <string name="def_product_field_2_code">FIELD_2</string>
+    <string name="def_login"></string>
+    <string name="def_password"></string>
 
     <string name="app_name">IboxTestApp</string>
     <string name="action_settings">Settings</string>
@@ -32,8 +29,6 @@
     <string name="tab_history">История</string>
     <string name="tab_settings">Настройки</string>
     <string name="tab_cards">Карты</string>
-    <string name="tab_scan">Сканнер</string>
-    <string name="tab_print">Принтер</string>
     <string name="tab_mifare">Mifare</string>
 
     <string name="login_dlg_title">Авторизация</string>
@@ -54,6 +49,8 @@
     <string name="tr_details_dlg_lbl_signature">Необходима подпись:</string>
     <string name="tr_details_btn_adjust">Отправить чек</string>
     <string name="tr_details_btn_fiscal_status">Проверить фискальный статус</string>
+    <string name="tr_details_dlg_btn_fiscalize">Дофискализировать</string>
+
 
     <string name="history_edt_getById">Найти транзакцию по ID</string>
     <string name="history_item_no_description">Нет описания</string>
@@ -112,9 +109,13 @@
         <item>В заданные даты</item>
     </string-array>
     <string name="payment_default_dates">01.01.2016;02.02.2016;03.03.2016;</string>
+    <string name="payment_dlg_product_btn_prepare">Заполнить</string>
+    <string name="payment_toast_amount_prepared">Сумма изменена согласно продукту</string>
+    <string name="payment_toast_receipt_prepared">Данные для отправки чека изменены согласно продукту</string>
     <string name="payment_toast_pin_request">Введите PIN</string>
     <string name="payment_toast_pin_entered">PIN введен</string>
     <string name="payment_toast_battery_format">Уровень заряда: %.0f%%</string>
+    <string name="payment_toast_error_field_format">Неправильное значение поля %1$s</string>
 
     <string name="payment_btn_pay">Оплатить</string>
     <string name="payment_btn_pay_nfc">Оплатить NFC</string>
@@ -162,12 +163,6 @@
     <string name="settings_lbl_title">Выберите ридер</string>
     <string name="settings_btn_autoconfig">Автонастройка</string>
     <string name="settings_autoconfig_default">Конфигурация по умолчанию</string>
-    <string name="settings_btn_keys">Прошить ключи</string>
-
-    <string name="printer_lbl_print_hint">Текст для печати</string>
-    <string name="printer_btn_print">Печать</string>
-
-    <string name="scanner_lbl_hint">Наведите сканер на штрих-код и нажмите кнопку SCAN на устройстве</string>
 
     <string name="reader_state_disconnected">Ридер не подключен</string>
     <string name="reader_state_ready_multiinput">Проведите магнитной полосой или приложите карту, или вставьте карту в ридер</string>

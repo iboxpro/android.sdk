@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="@color/text_color_light_grey"
         android:gravity="top|center_horizontal"
         android:text="@string/scanner_lbl_hint"
         />
@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="26sp"
-        android:textColor="#000000"
+        android:textColor="@color/black"
         android:gravity="center"
         />
 </LinearLayout>

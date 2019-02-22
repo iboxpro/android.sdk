@@ -26,6 +26,7 @@ import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.entities.APIReadLinkedCardsResult;
 import ibox.pro.sdk.external.entities.APIResult;
 import ibox.pro.sdk.external.entities.LinkedCard;
+import ibox.pro.sdk.external.example.CommonAsyncTask;
 import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.dialogs.PaymentDialog;
@@ -139,18 +140,12 @@ public class FragmentCards extends Fragment {
         }
     }
 
-    private class RefreshTask extends AsyncTask<Void, Void, APIReadLinkedCardsResult> {
-        private ProgressDialog pDialog;
+    private class RefreshTask extends CommonAsyncTask<Void, Void, APIReadLinkedCardsResult> {
 
         public RefreshTask() {
-            pDialog = new ProgressDialog(getActivity());
-            pDialog.setCancelable(false);
+            super(getActivity());
         }
 
-        @Override
-        protected void onPreExecute() {
-            pDialog.show();
-        }
 
         @Override
         protected APIReadLinkedCardsResult doInBackground(Void ... params) {
@@ -159,36 +154,28 @@ public class FragmentCards extends Fragment {
 
         @Override
         protected void onPostExecute(APIReadLinkedCardsResult result) {
-            try {
-                if (result != null) {
-                    if (result.isValid()) {
-                        MainActivity activity = (MainActivity) getActivity();
-                        activity.LinkedCards.clear();
-                        if (result.getLinkedCards() != null)
-                            activity.LinkedCards.addAll(result.getLinkedCards());
-                        cardsAdapter.notifyDataSetChanged();
-                    } else {
-                        Toast.makeText(getActivity(), result.getErrorMessage(), Toast.LENGTH_LONG).show();
-                    }
-                } else
-                    Toast.makeText(getActivity(), R.string.error_no_response, Toast.LENGTH_LONG).show();
-            } finally {
-                pDialog.dismiss();
-            }
+            super.onPostExecute(result);
+
+            if (result != null) {
+                if (result.isValid()) {
+                    MainActivity activity = (MainActivity) getActivity();
+                    activity.LinkedCards.clear();
+                    if (result.getLinkedCards() != null)
+                        activity.LinkedCards.addAll(result.getLinkedCards());
+                    cardsAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(getActivity(), result.getErrorMessage(), Toast.LENGTH_LONG).show();
+                }
+            } else
+                Toast.makeText(getActivity(), R.string.error_no_response, Toast.LENGTH_LONG).show();
+
         }
     }
 
-    private class RemoveTask extends AsyncTask<Integer, Void, APIResult> {
-        private ProgressDialog pDialog;
+    private class RemoveTask extends CommonAsyncTask<Integer, Void, APIResult> {
 
         public RemoveTask() {
-            pDialog = new ProgressDialog(getActivity());
-            pDialog.setCancelable(false);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            pDialog.show();
+            super(getActivity());
         }
 
         @Override
@@ -198,18 +185,16 @@ public class FragmentCards extends Fragment {
 
         @Override
         protected void onPostExecute(APIResult result) {
-            try {
-                if (result != null) {
-                    if (result.isValid()) {
-                        refresh();
-                    } else {
-                        Toast.makeText(getActivity(), result.getErrorMessage(), Toast.LENGTH_LONG).show();
-                    }
-                } else
-                    Toast.makeText(getActivity(), R.string.error_no_response, Toast.LENGTH_LONG).show();
-            } finally {
-                pDialog.dismiss();
-            }
+            super.onPostExecute(result);
+
+            if (result != null) {
+                if (result.isValid()) {
+                    refresh();
+                } else {
+                    Toast.makeText(getActivity(), result.getErrorMessage(), Toast.LENGTH_LONG).show();
+                }
+            } else
+                Toast.makeText(getActivity(), R.string.error_no_response, Toast.LENGTH_LONG).show();
         }
     }
 

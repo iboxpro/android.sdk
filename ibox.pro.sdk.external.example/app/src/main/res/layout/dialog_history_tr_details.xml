@@ -250,6 +250,12 @@
             android:text="@string/history_tr_details_dlg_btn_return"
             />
 
+        <Button
+            android:id="@+id/histoty_tr_details_dlg_btn_fiscalize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tr_details_dlg_btn_fiscalize"
+            />
 
     </LinearLayout>
     

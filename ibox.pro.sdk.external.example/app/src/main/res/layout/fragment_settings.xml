@@ -38,13 +38,5 @@
 			android:layout_gravity="center_horizontal"
 			android:text="@string/settings_btn_autoconfig"
 			/>
-		<Button
-			android:id="@+id/settings_btn_keys"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="10dp"
-			android:layout_gravity="center_horizontal"
-			android:text="@string/settings_btn_keys"
-			/>
 	</LinearLayout>
 </LinearLayout>

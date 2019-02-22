@@ -23,6 +23,7 @@ import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentControllerListener;
 import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.example.R;
+import sunmi.sunmiui.edit.Edit;
 
 public class FragmentMifare extends Fragment  implements PaymentControllerListener {
 
@@ -348,26 +349,4 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
     public void onSwitchedToCNP() {
 
     }
-
-    @Override
-    public void onInjectFinished(boolean success) {
-
-    }
-
-    @Override
-    public void onEmvConfigFinished(boolean success) {
-
-    }
-
-    @Override
-    public void onCapkConfigFinished(boolean success) {
-
-    }
-
-    @Override
-    public void onBarcodeScanned(String barcode) {
-
-    }
-
-
 }

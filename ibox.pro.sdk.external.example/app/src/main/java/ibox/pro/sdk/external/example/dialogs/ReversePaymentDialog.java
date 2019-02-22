@@ -11,6 +11,8 @@ import android.widget.EditText;
 
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,26 +122,45 @@ public class ReversePaymentDialog extends Dialog {
                     || allowedInputTypes.contains(PaymentController.PaymentInputType.PREPAID)
                     || allowedInputTypes.contains(PaymentController.PaymentInputType.CREDIT);
             if (!hasNonCardReverseInputTypes) {
+                boolean nfcAllowed = transaction.getCurrencyId().equals(String.valueOf(PaymentController.Currency.RUB.toString()))
+                        && PaymentController.NFC_LIMIT.compareTo(BigDecimal.valueOf(transaction.getAmount()).setScale(PaymentController.Currency.RUB.getE(), RoundingMode.HALF_UP)) > 0;
                 if (allowedInputTypes.size() == 1) {
                     switch (allowedInputTypes.get(0)) {
                         case CHIP:
                             readyStringID = R.string.reader_state_ready_emvonly;
                             break;
                         case NFC:
-                            readyStringID = R.string.reader_state_ready_nfconly;
-                            break;
+                            if (nfcAllowed) {
+                                readyStringID = R.string.reader_state_ready_nfconly;
+                                break;
+                            }
                         default:
                             readyStringID = R.string.reader_state_ready_swipeonly;
                     }
                 } else if (allowedInputTypes.size() == 2) {
                     // swipe + emv == swipe + tap + emv
-                    if (PaymentController.getInstance().getReaderType().isNfcSupported())
-                        readyStringID = R.string.reader_state_ready_emv_or_tap;
-                    else
-                        readyStringID = R.string.reader_state_ready_emvonly;
-                } else if (allowedInputTypes.size() == 3) {
-                    if (PaymentController.getInstance().getReaderType().isMultiInputSupported())
+                    boolean acceptSwipe = allowedInputTypes.contains(PaymentController.PaymentInputType.SWIPE);
+                    boolean acceptEMV = allowedInputTypes.contains(PaymentController.PaymentInputType.CHIP);
+                    boolean acceptNFC = nfcAllowed
+                            && PaymentController.getInstance().getReaderType().isNfcSupported()
+                            && allowedInputTypes.contains(PaymentController.PaymentInputType.NFC);
+                    if (acceptSwipe && acceptEMV && acceptNFC)
                         readyStringID = R.string.reader_state_ready_multiinput;
+                    else if (acceptSwipe && acceptEMV)
+                        readyStringID = R.string.reader_state_ready;
+                    else if (acceptEMV && acceptNFC)
+                        readyStringID = R.string.reader_state_ready_emv_or_tap;
+                    else if (acceptEMV)
+                        readyStringID = R.string.reader_state_ready_emvonly;
+                    else if (acceptSwipe)
+                        readyStringID = R.string.reader_state_ready_nfconly;
+                    else
+                        readyStringID = R.string.reader_state_ready_swipeonly;
+                } else if (allowedInputTypes.size() == 3) {
+                    if (PaymentController.getInstance().getReaderType().isMultiInputSupported() && nfcAllowed)
+                        readyStringID = R.string.reader_state_ready_multiinput;
+                    else
+                        readyStringID = R.string.reader_state_ready;
                 }
             }
         }

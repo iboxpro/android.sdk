@@ -221,6 +221,12 @@
 			android:text="@string/tr_details_btn_fiscal_status"
 			/>
 
+		<Button
+			android:id="@+id/tr_details_dlg_btn_fiscalize"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/tr_details_dlg_btn_fiscalize"
+			/>
 	</LinearLayout>
 
 </ScrollView>

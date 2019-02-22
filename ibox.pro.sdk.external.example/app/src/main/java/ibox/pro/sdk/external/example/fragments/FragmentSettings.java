@@ -30,12 +30,11 @@ import ibox.pro.sdk.external.example.Consts;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.Utils;
 import ibox.pro.sdk.external.example.dialogs.AutoconfigDialog;
-import ibox.pro.sdk.external.example.dialogs.GetKeysHostsDialog;
 
 public class FragmentSettings extends Fragment {
 	private ListView lvReaders;
 	private ReadersAdapter mAdapter;
-	private Button btnAutoconfig, btnKeys;
+	private Button btnAutoconfig;
 
 	private final String config = null;
 
@@ -143,17 +142,6 @@ public class FragmentSettings extends Fragment {
 					Toast.makeText(getActivity(), R.string.settings_lbl_title, Toast.LENGTH_LONG).show();
 			}
 		});
-		btnKeys = (Button)view.findViewById(R.id.settings_btn_keys);
-		btnKeys.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (PaymentController.getInstance().getReaderType() != null)
-					new GetKeysHostsDialog(getActivity()).show();
-				else
-					Toast.makeText(getActivity(), R.string.settings_lbl_title, Toast.LENGTH_LONG).show();
-			}
-		});
-
 		return view;
 	}
 

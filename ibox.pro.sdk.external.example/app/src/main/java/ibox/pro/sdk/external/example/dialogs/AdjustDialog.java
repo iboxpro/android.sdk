@@ -2,6 +2,7 @@ package ibox.pro.sdk.external.example.dialogs;
 
 import ibox.pro.sdk.external.entities.APIResult;
 import ibox.pro.sdk.external.PaymentController;
+import ibox.pro.sdk.external.example.CommonAsyncTask;
 import ibox.pro.sdk.external.ui.SignatureView;
 import ibox.pro.sdk.external.example.R;
 import android.app.Dialog;
@@ -63,27 +64,16 @@ public class AdjustDialog extends Dialog {
 		btnSend = (Button)findViewById(R.id.adjust_dlg_btn_send);
 	}
 	
-	private class AdjustTask extends AsyncTask<Boolean, Void, APIResult> {
+	private class AdjustTask extends CommonAsyncTask<Boolean, Void, APIResult> {
 		private ProgressDialog progressDialog = new ProgressDialog(getContext());
 		private final String email, phone;
 
 		public AdjustTask(String email, String phone) {
+			super(AdjustDialog.this.getContext());
 			this.email = email;
 			this.phone = phone;
 		}
 
-		@Override
-		protected void onPreExecute() {
-			progressDialog.setMessage(getContext().getString(R.string.progress));
-			progressDialog.setCancelable(false);
-			progressDialog.show();
-		}
-		
-		@Override
-		protected void onCancelled() {
-			progressDialog.dismiss();
-		}
-		
 		@Override
 		protected APIResult doInBackground(Boolean... params) {
 			boolean isRegular = params[0];
@@ -116,7 +106,7 @@ public class AdjustDialog extends Dialog {
 		
 		@Override
 		protected void onPostExecute(APIResult result) {
-			progressDialog.dismiss();
+			super.onPostExecute(result);
 			
 			if (result != null) {
 				if (result.isValid()) {

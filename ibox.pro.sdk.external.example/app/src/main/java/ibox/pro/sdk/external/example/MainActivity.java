@@ -23,12 +23,11 @@ import ibox.pro.sdk.external.PaymentController.ReaderType;
 import ibox.pro.sdk.external.entities.APIAuthResult;
 import ibox.pro.sdk.external.entities.Account;
 import ibox.pro.sdk.external.entities.LinkedCard;
+import ibox.pro.sdk.external.entities.PaymentProductItem;
 import ibox.pro.sdk.external.example.fragments.FragmentCards;
 import ibox.pro.sdk.external.example.fragments.FragmentHistory;
 import ibox.pro.sdk.external.example.fragments.FragmentMifare;
 import ibox.pro.sdk.external.example.fragments.FragmentPayment;
-import ibox.pro.sdk.external.example.fragments.FragmentPrinter;
-import ibox.pro.sdk.external.example.fragments.FragmentScanner;
 import ibox.pro.sdk.external.example.fragments.FragmentSettings;
 
 public class MainActivity extends FragmentActivity {
@@ -41,6 +40,7 @@ public class MainActivity extends FragmentActivity {
 	public String ClientWeb;
 	public HashMap<PaymentController.PaymentMethod, Map<String, String>> AcquirersByMethods;
 	public List<LinkedCard> LinkedCards;
+	public ArrayList<PaymentProductItem> Products;
 
 	private FragmentTabHost mTabHost;
 	
@@ -55,7 +55,6 @@ public class MainActivity extends FragmentActivity {
 		((TextView) findViewById(R.id.version)).setText(getString(R.string.app_name) + " " + PaymentController.VERSIONCODE);
 
 		mTabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
-		setupTabHost();
 
 		PaymentController.getInstance().onCreate(this, savedInstanceState);
 		String readerType = Utils.getString(this, Consts.SavedParams.READER_TYPE_KEY);
@@ -83,32 +82,16 @@ public class MainActivity extends FragmentActivity {
 				if (Account.getLinkedCards() != null)
 					LinkedCards.addAll(Account.getLinkedCards());
 			}
+			Products = (ArrayList<PaymentProductItem>) savedInstanceState.getSerializable(getClass().getCanonicalName() + ".Products");
 		}
-
-		if (Build.MANUFACTURER.equalsIgnoreCase("BBPOS"))
-			try {
-				PaymentController.getInstance().setReaderType(this, ReaderType.M17, null);
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			}
-		else if (Build.MANUFACTURER.equalsIgnoreCase("UBX") && Build.MODEL.equalsIgnoreCase("i9000S"))
-			try {
-				PaymentController.getInstance().setReaderType(this, ReaderType.UROVO, null);
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			}
-		else if (PaymentController.getInstance().getReaderType() == null)
-			try {
-				PaymentController.getInstance().setReaderType(this, ReaderType.P16, null);
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			}
 
 	 	PaymentController.getInstance().setSingleStepEMV(true);
 		PaymentController.getInstance().setRepeatOnError(false);
 		PaymentController.getInstance().setClientProductCode(getString(R.string.app_name));
 		if (Account == null)
 			showLoginDialog();
+		else
+			setupTabHost();
 	}
 	
 	@Override
@@ -116,6 +99,7 @@ public class MainActivity extends FragmentActivity {
 		PaymentController.getInstance().onSaveInstanceState(outState);
 
 		outState.putSerializable(getClass().getCanonicalName() + ".Account", Account);
+		outState.putSerializable(getClass().getCanonicalName() + ".Products", Products);
 		super.onSaveInstanceState(outState);
 	}
 	
@@ -134,15 +118,10 @@ public class MainActivity extends FragmentActivity {
 				FragmentHistory.class, null);
 		mTabHost.addTab(mTabHost.newTabSpec(getString(R.string.tab_cards)).setIndicator(getString(R.string.tab_cards)),
 				FragmentCards.class, null);
-		mTabHost.addTab(mTabHost.newTabSpec(getString(R.string.tab_print)).setIndicator(getString(R.string.tab_print)),
-				FragmentPrinter.class, null);
-		mTabHost.addTab(mTabHost.newTabSpec(getString(R.string.tab_scan)).setIndicator(getString(R.string.tab_scan)),
-				FragmentScanner.class, null);
 		mTabHost.addTab(mTabHost.newTabSpec(getString(R.string.tab_mifare)).setIndicator(getString(R.string.tab_mifare)),
 				FragmentMifare.class, null);
 		mTabHost.addTab(mTabHost.newTabSpec(getString(R.string.tab_settings)).setIndicator(getString(R.string.tab_settings)),
 				FragmentSettings.class, null);
-
 	}
 
 	private void showLoginDialog() {
@@ -151,18 +130,30 @@ public class MainActivity extends FragmentActivity {
 			.setCancelable(false)
 			.setPositiveButton(getString(R.string.login_dlg_btn_ok), new DialogInterface.OnClickListener() {				
 				@Override
-				public void onClick(DialogInterface dialog, int which) {
+				public void onClick(final DialogInterface dialog, int which) {
 					String login = ((EditText)((AlertDialog)dialog).findViewById(R.id.login_dlg_edt_login)).getText().toString();
 					String password = ((EditText)((AlertDialog)dialog).findViewById(R.id.login_dlg_edt_password)).getText().toString();
 					PaymentController.getInstance().setCredentials(login, password);
 
 					APIAuthResult result = PaymentController.getInstance().auth(MainActivity.this);
 					LinkedCards = new ArrayList<LinkedCard>();
-					if (result == null)
+					if (result == null) {
 						Toast.makeText(MainActivity.this, "Connection lost", Toast.LENGTH_LONG).show();
-					else if (!result.isValid())
+						mTabHost.postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								((AlertDialog) dialog).show();
+							}
+						}, 300);
+					} else if (!result.isValid()) {
 						Toast.makeText(MainActivity.this, "Invalid credentials", Toast.LENGTH_LONG).show();
-					else {
+						mTabHost.postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								((AlertDialog) dialog).show();
+							}
+						}, 300);
+					} else {
 						Account = result.getAccount();
 						BankName = result.getAccount().getBankName();
 						ClientName = result.getAccount().getClientName();
@@ -172,7 +163,9 @@ public class MainActivity extends FragmentActivity {
 						AcquirersByMethods = result.getAccount().getAcquirersByMethods();
 						if (result.getAccount().getLinkedCards() != null)
 							LinkedCards.addAll(result.getAccount().getLinkedCards());
+						Products = result.getProducts();
 						dialog.dismiss();
+                        setupTabHost();
 					}
 				}
 			})

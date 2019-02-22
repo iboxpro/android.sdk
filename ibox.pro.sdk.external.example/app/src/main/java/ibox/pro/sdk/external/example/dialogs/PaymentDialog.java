@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
@@ -112,7 +114,10 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	}
 
 	protected int getReadyStringID() {
-		return PaymentController.getInstance().getReaderType().isMultiInputSupported()
+		boolean nfcAllowed = mPaymentContext.getCurrency() == PaymentController.Currency.RUB
+				&& PaymentController.NFC_LIMIT.compareTo(BigDecimal.valueOf(mPaymentContext.getAmount()).setScale(PaymentController.Currency.RUB.getE(), RoundingMode.HALF_UP)) > 0;
+
+		return PaymentController.getInstance().getReaderType().isMultiInputSupported() && nfcAllowed
 					? R.string.reader_state_ready_multiinput
 					: mPaymentContext.getNFC() ? R.string.reader_state_ready_nfconly : R.string.reader_state_ready;
 	}
@@ -212,12 +217,8 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 
 	@Override
     public void onFinished(final PaymentResultContext paymentResultContext) {
-		if (paymentResultContext.getTransactionItem() != null && PaymentController.getInstance().getReaderType() == PaymentController.ReaderType.P16R || PaymentController.getInstance().getReaderType() == PaymentController.ReaderType.UROVO)
-			new PrintInvoiceTask(paymentResultContext).execute();
-		else {
-			dismiss();
-			new ResultDialog(mActivity, paymentResultContext, false).show();
-		}
+		dismiss();
+		new ResultDialog(mActivity, paymentResultContext, false).show();
 	}
 
 	@Override
@@ -635,26 +636,6 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	}
 
 	@Override
-	public void onInjectFinished(boolean success) {
-
-	}
-
-	@Override
-	public void onEmvConfigFinished(boolean success) {
-
-	}
-
-	@Override
-	public void onCapkConfigFinished(boolean success) {
-
-	}
-
-	@Override
-	public void onBarcodeScanned(String barcode) {
-
-	}
-
-	@Override
 	public void onSearchMifareCard(Hashtable<String, String> cardData) {
 
 	}
@@ -702,231 +683,5 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	@Override
 	public void onReturnPowerOffNFCResult(boolean result) {
 
-	}
-
-	private class PrintInvoiceTask extends AsyncTask<Void, Void, PaymentController.PrintResult> implements PaymentControllerListener {
-    	private final PaymentResultContext paymentResultContext;
-		private final Object initMonitor = new Object();
-		private volatile boolean waitForInit;
-		private StringBuilder slipBuilder;
-		private int tapeWidth = Utils.TAPE_WIDTH;
-
-		public PrintInvoiceTask(PaymentResultContext paymentResultContext) {
-			this.paymentResultContext = paymentResultContext;
-			slipBuilder = new StringBuilder(Utils.BuildInvoice(((MainActivity) mActivity).Account, paymentResultContext.getTransactionItem()));
-		}
-
-		private void appendKeyValue(String key, String value) {
-			slipBuilder.append("\n").append(key);
-			for (int i = key.length(); i < tapeWidth - value.length(); i++)
-				slipBuilder.append(' ');
-			slipBuilder.append(value);
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			waitForInit = true;
-			PaymentController.getInstance().enable();
-			appendKeyValue("Bank: ", ((MainActivity) mActivity).BankName);
-			appendKeyValue("Client: ", ((MainActivity) mActivity).ClientName);
-			appendKeyValue("Legal name: ", ((MainActivity) mActivity).ClientLegalName);
-			appendKeyValue("Phone: ", ((MainActivity) mActivity).ClientPhone);
-			appendKeyValue("Web: ", ((MainActivity) mActivity).ClientWeb);
-
-			appendKeyValue("Date and time: "
-					, new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.UK)
-							.format(paymentResultContext.getTransactionItem().getDate()));
-			appendKeyValue("Terminal: ", paymentResultContext.getTransactionItem().getTerminalName());
-			appendKeyValue("Receipt: ", paymentResultContext.getTransactionItem().getInvoice());
-			appendKeyValue("Approval code: ", paymentResultContext.getTransactionItem().getApprovalCode());
-			appendKeyValue("Card: ", paymentResultContext.getTransactionItem().getCard().getPanMasked().replace("*", " **** "));
-			if (paymentResultContext.getEmvData() != null) {
-				for (Map.Entry<String, String> tag : paymentResultContext.getEmvData().entrySet())
-					appendKeyValue(tag.getKey() + ": ", tag.getValue());
-			}
-			appendKeyValue("Card holder: ", paymentResultContext.getTransactionItem().getCardholderName());
-			appendKeyValue("Operation: ", paymentResultContext.getTransactionItem().getOperation());
-			appendKeyValue("Total: ", String.valueOf(paymentResultContext.getTransactionItem().getAmount()));
-
-			if (paymentResultContext.isRequiresSignature()) {
-				slipBuilder.append("\n\n");
-				slipBuilder.append("\nCustomer sign.____________________");
-			} else if (paymentResultContext.getTransactionItem().getInputType() == PaymentController.PaymentInputType.CHIP) {
-				slipBuilder.append("\nConfirmed by entering PIN");
-			}
-			slipBuilder.append("\n\n\n\n\n");
-			PaymentController.getInstance().setPaymentControllerListener(this);
-		}
-
-		@Override
-		protected PaymentController.PrintResult doInBackground(Void... params) {
-			synchronized (initMonitor) {
-				try {
-					if (waitForInit)
-						initMonitor.wait(10000);
-				} catch (Exception e) {}
-			}
-			return PaymentController.getInstance().printText(slipBuilder.toString(), Layout.Alignment.ALIGN_NORMAL);
-		}
-
-		@Override
-		protected void onPostExecute(PaymentController.PrintResult result) {
-			if (!usesReader())
-				PaymentController.getInstance().disable();
-			dismiss();
-			new ResultDialog(mActivity, paymentResultContext, false).show();
-			if (result != PaymentController.PrintResult.SUCCESS)
-				Toast.makeText(mActivity, "Printer error: " + result, Toast.LENGTH_LONG).show();
-		}
-
-		@Override
-		public void onTransactionStarted(String transactionID) {
-
-		}
-
-		@Override
-		public void onFinished(PaymentResultContext result) {
-
-		}
-
-		@Override
-		public void onError(PaymentError error, String errorMessage) {
-
-		}
-
-		@Override
-		public void onReaderEvent(ReaderEvent event) {
-			if (event == ReaderEvent.INIT_SUCCESSFULLY || event == ReaderEvent.INIT_FAILED || event == ReaderEvent.DISCONNECTED)
-				synchronized (initMonitor) {
-					waitForInit = false;
-					initMonitor.notifyAll();
-				}
-		}
-
-		@Override
-		public int onSelectApplication(List<String> apps) {
-			return 0;
-		}
-
-		@Override
-		public boolean onConfirmSchedule(List<Entry<Date, Double>> steps, double totalAmount) {
-			return false;
-		}
-
-		@Override
-		public boolean onScheduleCreationFailed(PaymentError error, String errorMessage) {
-			return false;
-		}
-
-		@Override
-		public boolean onCancellationTimeout() {
-			return false;
-		}
-
-		@Override
-		public void onPinRequest() {
-
-		}
-
-		@Override
-		public void onPinEntered() {
-
-		}
-
-		@Override
-		public void onAutoConfigUpdate(double percent) {
-
-		}
-
-		@Override
-		public void onAutoConfigFinished(boolean success, String config, boolean isDefault) {
-
-		}
-
-		@Override
-		public void onBatteryState(double percent) {
-
-		}
-
-		@Override
-		public PaymentController.PaymentInputType onSelectInputType(List<PaymentController.PaymentInputType> allowedInputTypes) {
-			return null;
-		}
-
-		@Override
-		public void onSwitchedToCNP() {
-
-		}
-
-		@Override
-		public void onInjectFinished(boolean success) {
-
-		}
-
-		@Override
-		public void onEmvConfigFinished(boolean success) {
-
-		}
-
-		@Override
-		public void onCapkConfigFinished(boolean success) {
-
-		}
-
-		@Override
-		public void onBarcodeScanned(String barcode) {
-
-		}
-
-		@Override
-		public void onSearchMifareCard(Hashtable<String, String> cardData) {
-
-		}
-
-		@Override
-		public void onVerifyMifareCard(boolean flag) {
-
-		}
-
-		@Override
-		public void onWriteMifareCard(boolean flag) {
-
-		}
-
-		@Override
-		public void onReadMifareCard(Hashtable<String, String> data) {
-
-		}
-
-		@Override
-		public void onOperateMifareCard(Hashtable<String, String> data) {
-
-		}
-
-		@Override
-		public void onTransferMifareData(String data) {
-
-		}
-
-		@Override
-		public void onFinishMifareCard(boolean flag) {
-
-		}
-
-		@Override
-		public void onReturnPowerOnNFCResult(boolean result) {
-
-		}
-
-		@Override
-		public void onReturnNFCApduResult(boolean result, String apdu, int apduLen) {
-
-		}
-
-		@Override
-		public void onReturnPowerOffNFCResult(boolean result) {
-
-		}
 	}
 }

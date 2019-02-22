@@ -38,10 +38,13 @@ import java.util.Locale;
 
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.entities.APIGetHistoryResult;
+import ibox.pro.sdk.external.entities.APITryGetPaymentStatusResult;
 import ibox.pro.sdk.external.entities.TransactionItem;
+import ibox.pro.sdk.external.example.CommonAsyncTask;
 import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.Utils;
+import ibox.pro.sdk.external.example.dialogs.ResultDialog;
 import ibox.pro.sdk.external.example.dialogs.ReversePaymentDialog;
 
 public class FragmentHistory extends Fragment implements ReversePaymentDialog.OnPaymentCancelledListener {
@@ -141,7 +144,7 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 		
 	private void showTransactionDetails(final TransactionItem trItem) {
 		View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_history_tr_details, null);
-		Dialog dlgTrInfo = new Dialog(getActivity(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+		final Dialog dlgTrInfo = new Dialog(getActivity(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 		dlgTrInfo.setContentView(dialogView);
 
 		String fiscalStatus = "";
@@ -223,6 +226,18 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 
 		dialogView.findViewById(R.id.history_tr_details_dlg_btn_cancel).setVisibility(trItem.canCancel() || trItem.canCancelPartial() ? View.VISIBLE : View.GONE);
 		dialogView.findViewById(R.id.history_tr_details_dlg_btn_return).setVisibility(trItem.canReturn() || trItem.canReturnPartial() ? View.VISIBLE : View.GONE);
+
+		TransactionItem.FiscalInfo fiscalInfo = trItem.getFiscalInfo();
+		boolean fiscalizeRequired = fiscalInfo != null
+				&& fiscalInfo.getFiscalStatus() != TransactionItem.FiscalInfo.FiscalStatus.CREATED
+				&& fiscalInfo.getFiscalStatus() != TransactionItem.FiscalInfo.FiscalStatus.SUCCESS;
+		dialogView.findViewById(R.id.histoty_tr_details_dlg_btn_fiscalize).setVisibility(fiscalizeRequired ? View.VISIBLE : View.GONE);
+		dialogView.findViewById(R.id.histoty_tr_details_dlg_btn_fiscalize).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				new FiscalizeTask(dlgTrInfo).execute(trItem.getID());
+			}
+		});
 
 		dlgTrInfo.show();
 	}
@@ -345,19 +360,16 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 		
 	}
 	
-	private class LoadHistoryTask extends AsyncTask<Integer, Void, APIGetHistoryResult> {
-		private ProgressDialog pDialog;
-		
+	private class LoadHistoryTask extends CommonAsyncTask<Integer, Void, APIGetHistoryResult> {
 		public LoadHistoryTask() {
-			pDialog = new ProgressDialog(getActivity());
-			pDialog.setCancelable(false);
+			super(getActivity());
 		}
 		
 		@Override
 		protected void onPreExecute() {
 			isRunning = true;
-			pDialog.show();
             updateOnScroll = true;
+            super.onPreExecute();
 		}
 		
 		@Override
@@ -367,6 +379,7 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 		
 		@Override
 		protected void onPostExecute(APIGetHistoryResult result) {
+			super.onPostExecute(result);
 			try {
 				if (result != null) {
 					if (result.isValid()) {
@@ -389,18 +402,14 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 					Toast.makeText(getActivity(), R.string.error_no_response, Toast.LENGTH_LONG).show();
 			} finally {
 				isRunning = false;
-				pDialog.dismiss();
 			}
 		}
 
 	}
 
-    private class FindTransactionByIDTask extends AsyncTask<String, Void, APIGetHistoryResult> {
-        private ProgressDialog pDialog;
-
+    private class FindTransactionByIDTask extends CommonAsyncTask<String, Void, APIGetHistoryResult> {
         public FindTransactionByIDTask() {
-            pDialog = new ProgressDialog(getActivity());
-            pDialog.setCancelable(false);
+            super(getActivity());
         }
 
         @Override
@@ -410,7 +419,7 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
             mAdapter.clear();
             mAdapter.notifyDataSetChanged();
             isRunning = true;
-            pDialog.show();
+            super.onPreExecute();
         }
 
         @Override
@@ -420,6 +429,8 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 
         @Override
         protected void onPostExecute(APIGetHistoryResult result) {
+        	super.onPostExecute(result);
+
             try {
                 if (result != null) {
                     if (result.isValid()) {
@@ -438,8 +449,36 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
             } finally {
                 isRunning = false;
                 isFinished = false;
-                pDialog.dismiss();
             }
         }
     }
+
+	private class FiscalizeTask extends CommonAsyncTask<String, Void, APITryGetPaymentStatusResult>{
+		private Dialog parent;
+
+		public FiscalizeTask(Dialog parent) {
+			super(parent.getContext());
+			this.parent = parent;
+		}
+
+		@Override
+		protected APITryGetPaymentStatusResult doInBackground(String... strings) {
+			return PaymentController.getInstance().fiscalize(getContext().getApplicationContext(), strings[0]);
+		}
+
+		@Override
+		protected void onPostExecute(APITryGetPaymentStatusResult result) {
+			super.onPostExecute(result);
+
+			if (result != null && result.isValid() && result.getTransaction() != null) {
+				Toast.makeText(parent.getContext(), R.string.success, Toast.LENGTH_LONG).show();
+				parent.dismiss();
+				showTransactionDetails(result.getTransaction());
+			} else
+				Toast.makeText(parent.getContext(), R.string.failed, Toast.LENGTH_LONG).show();
+
+			if (!parent.isShowing())
+				parent.show();
+		}
+	}
 }

@@ -20,9 +20,6 @@
     <string name="adjust_dlg_error">Please sign or set phone or email!</string>
     <string name="cancel">Cancel</string>
     <string name="common_error">Error occured</string>
-    <string name="def_product_code">PRODUCT_TEST</string>
-    <string name="def_product_field_1_code">FIELD_1</string>
-    <string name="def_product_field_2_code">FIELD_2</string>
     <string name="error_cancellation_timeout">Cancellation is not possible, do you want to perform a refund? </string>
     <string name="error_no_response">Server is not responding</string>
     <string name="error_no_such_transaction">Transaction is not found</string>
@@ -37,6 +34,7 @@
     <string name="history_tr_details_dlg_btn_invoice">Show invoice</string>
     <string name="history_tr_details_dlg_btn_cancel">Cancel payment</string>
     <string name="history_tr_details_dlg_btn_return">Perform a refund</string>
+    <string name="tr_details_dlg_btn_fiscalize">Fiscalize</string>
     <string name="history_tr_details_dlg_lbl_amount">Amount:</string>
     <string name="history_tr_details_dlg_lbl_amount_eff">Balance:</string>
     <string name="history_tr_details_dlg_lbl_date">Date:</string>
@@ -72,6 +70,9 @@
     <string name="payment_cb_product">Product payment</string>
     <string name="payment_cb_regular">Regular payment</string>
     <string name="payment_default_dates">01.01.2016;02.02.2016;03.03.2016;</string>
+    <string name="payment_dlg_product_btn_prepare">Prepare</string>
+    <string name="payment_toast_amount_prepared">Amount was changed according to product</string>
+    <string name="payment_toast_receipt_prepared">Receipt notification data was changed according to product</string>
     <string name="payment_lbl_amount">Amount:</string>
     <string name="payment_lbl_dates">Selected days:</string>
     <string name="payment_lbl_day">Day:</string>
@@ -116,10 +117,6 @@
     <string name="settings_lbl_title">Select reader</string>
     <string name="settings_btn_autoconfig">Autoconfig</string>
     <string name="settings_autoconfig_default">Default config</string>
-    <string name="settings_btn_keys">Inject keys</string>
-    <string name="printer_lbl_print_hint">Text to print</string>
-    <string name="printer_btn_print">Print</string>
-    <string name="scanner_lbl_hint">Aim scanner to barcode and press SCAN button on device</string>
     <string name="steps_dlg_lbl_title">Confirm schedule</string>
     <string name="steps_dlg_lbl_total">Total:</string>
     <string name="tab_history">History</string>
@@ -127,8 +124,6 @@
     <string name="tab_payment">Payment</string>
     <string name="tab_settings">Settings</string>
     <string name="tab_mifare">Mifare</string>
-    <string name="tab_scan">Scanner</string>
-    <string name="tab_print">Printer</string>
     <string name="tr_details_btn_adjust">Send receipt</string>
     <string name="tr_details_btn_fiscal_status">Check fiscal status</string>
     <string name="tr_details_dlg_lbl_appcode">Approval code:</string>
@@ -157,6 +152,7 @@
     <string name="payment_toast_pin_request">Enter PIN</string>
     <string name="payment_toast_pin_entered">PIN entered</string>
     <string name="payment_toast_battery_format">Charge level: %.0f%%</string>
+    <string name="payment_toast_error_field_format">Invalid input: %1$s</string>
     <string name="fiscal_dlg_title">Fiscal data</string>
     <string name="fiscal_dlg_lbl_trid">@string/tr_details_dlg_lbl_id</string>
     <string name="fiscal_dlg_lbl_printer">Printer ID</string>

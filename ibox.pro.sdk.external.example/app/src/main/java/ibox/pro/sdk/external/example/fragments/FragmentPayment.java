@@ -61,41 +61,58 @@ import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.RegularPaymentContext;
 import ibox.pro.sdk.external.ReversePaymentContext;
 import ibox.pro.sdk.external.entities.LinkedCard;
+import ibox.pro.sdk.external.entities.PaymentProductItem;
+import ibox.pro.sdk.external.entities.PaymentProductItemField;
 import ibox.pro.sdk.external.entities.Purchase;
 import ibox.pro.sdk.external.example.BitmapUtils;
+import ibox.pro.sdk.external.example.CommonAsyncTask;
 import ibox.pro.sdk.external.example.Consts;
 import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.dialogs.FiscalDialog;
 import ibox.pro.sdk.external.example.dialogs.LinkedCardsDialog;
 import ibox.pro.sdk.external.example.dialogs.PaymentDialog;
+import ibox.pro.sdk.external.example.dialogs.ProductDialog;
 
-public class FragmentPayment extends Fragment {
+public class FragmentPayment extends Fragment implements ProductDialog.Listener {
+	static final HashMap<Integer, Object> TEST_PRODUCT_TAGS = new HashMap<>();
 
 	static final Purchase TEST_PRODUCT = Purchase.Build(
 		"Тестовый продукт"	,
 		111.256d,
 			2d,
-			Arrays.asList(new String [] { Purchase.TaxCode.VAT_18})
+			Arrays.asList(new String [] { Purchase.TaxCode.VAT_20})
 	);
+	static final Purchase TEST_PRODUCT_BY_TAGS;
+	static {
+		TEST_PRODUCT_TAGS.put(1030, "Тестовый продукт");
+		TEST_PRODUCT_TAGS.put(1079, 111.256d);
+		TEST_PRODUCT_TAGS.put(1023, 2);
+		TEST_PRODUCT_TAGS.put(1197, "шт");
+		TEST_PRODUCT_TAGS.put(1199, 1);
+
+		TEST_PRODUCT_BY_TAGS = Purchase.Build(TEST_PRODUCT_TAGS);
+	}
 
 	private SimpleDateFormat mDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
 	
-	private ImageView imgPhoto, imgProductField_2;
+	private ImageView imgPhoto;
 	private EditText edtAmount, edtDescription, edtERN, edtPhone, edtEmail;
 	private Button btnPay, btnFiscal, btnPayNFC, btnPayBackground, btnCreditVoucher;
-	private byte [] photo, productPhoto;
+	private byte [] photo;
+	private String productImageFieldRequestCode;
 	private LinkedCard selectedLinkedCard = null;
 	
-	private LinearLayout llProduct, llRegular;
-	private CheckBox cbSuppressSignature, cbProduct, cbRegular, cbEndType, cbAuxData;
+	private LinearLayout llRegular;
+	private CheckBox cbSuppressSignature, cbRegular, cbEndType, cbAuxData, cbProduct;
 	private RadioGroup rgInput;
 	private DatePicker pkrStart, pkrEnd;
-	private EditText edtProductField_1, edtRepeatCount, edtHour, edtMinute, edtDates;
+	private EditText edtRepeatCount, edtHour, edtMinute, edtDates;
 	private Spinner spnRegularType, spnQuarterly, spnMonth, spnDay, spnDayOfWeek;
 	private TextView lblStart, lblEnd, lblQuarterly, lblMonth, lblDay, lblDayOfWeek, lblDates;	
 	
-	private AlertDialog dlgPhoto, dlgProductPhoto;
+	private AlertDialog dlgPhoto;
+	private ProductDialog dlgProduct;
 	private ArrayAdapter<Purchase> purchasesAdapter;
 
 	@Override
@@ -159,6 +176,58 @@ public class FragmentPayment extends Fragment {
 					purchasesAdapter.clear();
 			}
 		});
+
+		final List<PaymentProductItem> products = ((MainActivity) getActivity()).Products;
+		if (products != null && products.size() > 0) {
+			cbProduct.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+				    if (checked) {
+                        if (dlgProduct == null) {
+                            dlgProduct = new ProductDialog(getContext(), products);
+                            dlgProduct.setListener(FragmentPayment.this);
+                            dlgProduct.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialogInterface) {
+                                    cbProduct.setChecked(false);
+                                }
+                            });
+                            dlgProduct.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialogInterface) {
+                                    if (dlgProduct != null) {
+                                        if (dlgProduct.getPreparedAmount() != null) {
+                                            edtAmount.setText(String.valueOf(dlgProduct.getPreparedAmount()));
+                                            Toast.makeText(getContext(), R.string.payment_toast_amount_prepared, Toast.LENGTH_LONG).show();
+                                        }
+                                        if (dlgProduct.getSelectedProduct() != null) {
+                                            boolean receiptDataUpdated = false;
+                                            for (PaymentProductItemField field : dlgProduct.getSelectedProduct().getFields()) {
+                                                if (field.isReceiptEmail()) {
+                                                    edtEmail.setText(String.valueOf(dlgProduct.getTextFieldValue(field.getCode())));
+                                                    receiptDataUpdated = true;
+                                                } else if (field.isReceiptPhone()) {
+                                                    edtPhone.setText(String.valueOf(dlgProduct.getTextFieldValue(field.getCode())));
+                                                    receiptDataUpdated = true;
+                                                }
+                                            }
+                                            if (receiptDataUpdated)
+                                                Toast.makeText(getContext(), R.string.payment_toast_receipt_prepared, Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        dlgProduct.show();
+                    }
+				    else
+				        dlgProduct = null;
+				}
+			});
+			cbProduct.setVisibility(View.VISIBLE);
+		} else
+			cbProduct.setVisibility(View.GONE);
+
 	}
 
 	@Override
@@ -167,6 +236,7 @@ public class FragmentPayment extends Fragment {
 
 		rgInput.setOnCheckedChangeListener(null);
 		cbAuxData.setOnCheckedChangeListener(null);
+		cbProduct.setOnCheckedChangeListener(null);
 	}
 
 	@Override
@@ -183,7 +253,7 @@ public class FragmentPayment extends Fragment {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						getImageFromGallery(imgPhoto);
+						getImageFromGallery();
 						dialog.dismiss();
 					}
 				})
@@ -191,33 +261,18 @@ public class FragmentPayment extends Fragment {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						getImageFromCamera(imgPhoto);
+						getImageFromCamera();
 						dialog.dismiss();
 					}
-				});
+				})
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        productImageFieldRequestCode = null;
+                    }
+                });
 
 		dlgPhoto = builder.create();
-
-		builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle(getString(R.string.payment_photo_dlg_title))
-				.setMessage(getString(R.string.payment_photo_dlg_msg))
-				.setPositiveButton(getString(R.string.payment_photo_dlg_btn_gallery), new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						getImageFromGallery(imgProductField_2);
-						dialog.dismiss();
-					}
-				})
-				.setNegativeButton(getString(R.string.payment_photo_dlg_btn_camera), new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						getImageFromCamera(imgProductField_2);
-						dialog.dismiss();
-					}
-				});
-		dlgProductPhoto = builder.create();
 
 		imgPhoto.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -270,9 +325,6 @@ public class FragmentPayment extends Fragment {
 						paymentContext.setImage(photo);
 						paymentContext.setCurrency(PaymentController.Currency.RUB);
 						paymentContext.setExtID("TEST_APP");
-						if (isPaymentWithProduct()) {
-							setPaymentProductData(paymentContext);
-						}
 					}
 
 					@Override
@@ -314,12 +366,9 @@ public class FragmentPayment extends Fragment {
 
 		rgInput				= (RadioGroup)view.findViewById(R.id.payment_rg_input);
 		cbSuppressSignature = (CheckBox)view.findViewById(R.id.payment_cb_suppress_signature);
-		cbProduct			= (CheckBox)view.findViewById(R.id.payment_cb_product);
 		cbAuxData			= (CheckBox)view.findViewById(R.id.payment_cb_auxdata);
-		llProduct			= (LinearLayout)view.findViewById(R.id.payment_ll_product);
-		edtProductField_1 	= (EditText)view.findViewById(R.id.payment_edt_product_field_1); 
-		imgProductField_2 	= (ImageView)view.findViewById(R.id.payment_img_product_field_2); 
-		
+		cbProduct			= (CheckBox)view.findViewById(R.id.payment_cb_product);
+
 		llRegular 		= (LinearLayout)view.findViewById(R.id.payment_ll_regular);
 		cbRegular 		= (CheckBox)view.findViewById(R.id.payment_cb_regular);
 		cbEndType		= (CheckBox)view.findViewById(R.id.payment_cb_end_type);
@@ -349,24 +398,7 @@ public class FragmentPayment extends Fragment {
 		btnFiscal		= (Button)view.findViewById(R.id.payment_btn_fiscal);
 		btnPayBackground = (Button)view.findViewById(R.id.payment_btn_pay_background);
 		btnCreditVoucher = (Button)view.findViewById(R.id.payment_btn_credit_voucher);
-		
-		imgProductField_2.setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				dlgProductPhoto.show();
-			}
-		});
-		
-		cbProduct.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton paramCompoundButton, boolean checked) {
-				llProduct.setVisibility(checked ? View.VISIBLE : View.GONE);
-				edtDescription.setEnabled(!checked);
-				if (checked)
-					edtDescription.setText("");
-			}
-		});
-		
+
 		cbRegular.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {			
 			@Override
 			public void onCheckedChanged(CompoundButton paramCompoundButton, boolean checked) {
@@ -552,8 +584,19 @@ public class FragmentPayment extends Fragment {
 			for (int i = 0; i < purchasesAdapter.getCount(); i++)
 				context.putPurchase(purchasesAdapter.getItem(i));
 
-		if (isPaymentWithProduct())
-			setPaymentProductData(context);
+		if (cbProduct.isChecked() && dlgProduct != null) {
+            PaymentProductItem product = dlgProduct.getSelectedProduct();
+            if (product != null) {
+                if (product.getApply() == PaymentProductItem.PaymentType.PAYMENT || product.getApply() == PaymentProductItem.PaymentType.BOTH) {
+                    context.setPaymentProductCode(dlgProduct.getSelectedProductCode());
+                    context.setPaymentProductTextData(dlgProduct.getTextValues());
+                    context.setPaymentProductImageData(dlgProduct.getImageValues());
+                } else {
+                    Toast.makeText(getContext(), R.string.common_error, Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        }
 
 		HashMap<PaymentController.PaymentMethod, Map<String, String>> acquirersByMethods = ((MainActivity) getActivity()).AcquirersByMethods;
 		if (acquirersByMethods != null) {
@@ -600,49 +643,80 @@ public class FragmentPayment extends Fragment {
 		
 		context.setReceiptPhone(edtPhone.getText().toString());
 		context.setReceiptEmail(edtEmail.getText().toString());
-		context.setRepeatType(PaymentController.RegularRepeatType.values()[spnRegularType.getSelectedItemPosition()]);
-		
-		Calendar startDate = Calendar.getInstance();
-	    startDate.set(pkrStart.getYear(), pkrStart.getMonth(), pkrStart.getDayOfMonth());
-		context.setStartDate(startDate.getTime());
-		
-		context.setEndType(cbEndType.isChecked() ? RegularEndType.BY_QUANTITY : RegularEndType.AT_DAY);
-		
-		Calendar endDate = Calendar.getInstance();
-		endDate.set(pkrEnd.getYear(), pkrEnd.getMonth(), pkrEnd.getDayOfMonth());
-		context.setEndDate(endDate.getTime());
-		
-		if (edtRepeatCount.getText().toString().trim().length() > 0)
-			context.setRepeatCount(Integer.parseInt(edtRepeatCount.getText().toString()));
-		context.setMonth(context.getRepeatType() == RegularRepeatType.Quarterly 
-				? (spnQuarterly.getSelectedItemPosition() + 1) 
-				: (spnMonth.getSelectedItemPosition() + 1));
-		context.setDay(spnDay.getSelectedItemPosition() + 1);
-		
-		int firstDay = Calendar.getInstance().getFirstDayOfWeek();
-		int selectedLocalDay = spnDayOfWeek.getSelectedItemPosition();
-		
-		context.setDayOfWeek((selectedLocalDay - 1 + firstDay) % 7);
-		
-		if (edtHour.getText().toString().trim().length() > 0)
-			context.setHour(Integer.parseInt(edtHour.getText().toString()));
-		
-		if (edtMinute.getText().toString().trim().length() > 0)
-			context.setMinute(Integer.parseInt(edtMinute.getText().toString()));
-		
-		if (edtDates.getText().toString().trim().length() > 0) {
-			String [] dates = edtDates.getText().toString().split(";");
-			ArrayList<Date> arbitraryDays = new ArrayList<Date>(dates.length);
-			for (int i = 0; i < dates.length; i++) {
-				try {
-					arbitraryDays.add(mDateFormat.parse(dates[i].trim()));
-				} catch (ParseException e) {
-					
-				}
-			}
-			context.setArbitraryDays(arbitraryDays);
-		}
-		
+
+		boolean managedByProduct = false;
+        if (cbProduct.isChecked() && dlgProduct != null) {
+            PaymentProductItem product = dlgProduct.getSelectedProduct();
+            if (product != null) {
+                if (product.getApply() == PaymentProductItem.PaymentType.RECURRENT || product.getApply() == PaymentProductItem.PaymentType.BOTH) {
+                    context.setPaymentProductCode(dlgProduct.getSelectedProductCode());
+                    context.setPaymentProductTextData(dlgProduct.getTextValues());
+                    context.setPaymentProductImageData(dlgProduct.getImageValues());
+                    managedByProduct = product.getRecurrentMode() == PaymentProductItem.RecurrentMode.MANAGED;
+                } else {
+                    Toast.makeText(getContext(), R.string.common_error, Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        }
+
+        if (managedByProduct) {
+            context.setManaged(true);
+            context.setRepeatType(PaymentController.RegularRepeatType.Never);
+            context.setEndType(PaymentController.RegularEndType.BY_QUANTITY);
+            context.setDay(0);
+            context.setRepeatCount(1);
+            context.setStartDate(new Date());
+            context.setEndDate(new Date());
+            context.setArbitraryDays(null);
+            context.setDayOfWeek(0);
+            context.setHour(0);
+            context.setMinute(0);
+            context.setMonth(0);
+        } else {
+            context.setRepeatType(PaymentController.RegularRepeatType.values()[spnRegularType.getSelectedItemPosition()]);
+
+            Calendar startDate = Calendar.getInstance();
+            startDate.set(pkrStart.getYear(), pkrStart.getMonth(), pkrStart.getDayOfMonth());
+            context.setStartDate(startDate.getTime());
+
+            context.setEndType(cbEndType.isChecked() ? RegularEndType.BY_QUANTITY : RegularEndType.AT_DAY);
+
+            Calendar endDate = Calendar.getInstance();
+            endDate.set(pkrEnd.getYear(), pkrEnd.getMonth(), pkrEnd.getDayOfMonth());
+            context.setEndDate(endDate.getTime());
+
+            if (edtRepeatCount.getText().toString().trim().length() > 0)
+                context.setRepeatCount(Integer.parseInt(edtRepeatCount.getText().toString()));
+            context.setMonth(context.getRepeatType() == RegularRepeatType.Quarterly
+                    ? (spnQuarterly.getSelectedItemPosition() + 1)
+                    : (spnMonth.getSelectedItemPosition() + 1));
+            context.setDay(spnDay.getSelectedItemPosition() + 1);
+
+            int firstDay = Calendar.getInstance().getFirstDayOfWeek();
+            int selectedLocalDay = spnDayOfWeek.getSelectedItemPosition();
+
+            context.setDayOfWeek((selectedLocalDay - 1 + firstDay) % 7);
+
+            if (edtHour.getText().toString().trim().length() > 0)
+                context.setHour(Integer.parseInt(edtHour.getText().toString()));
+
+            if (edtMinute.getText().toString().trim().length() > 0)
+                context.setMinute(Integer.parseInt(edtMinute.getText().toString()));
+
+            if (edtDates.getText().toString().trim().length() > 0) {
+                String[] dates = edtDates.getText().toString().split(";");
+                ArrayList<Date> arbitraryDays = new ArrayList<Date>(dates.length);
+                for (int i = 0; i < dates.length; i++) {
+                    try {
+                        arbitraryDays.add(mDateFormat.parse(dates[i].trim()));
+                    } catch (ParseException e) {
+
+                    }
+                }
+                context.setArbitraryDays(arbitraryDays);
+            }
+        }
 		new PaymentDialog(getActivity(), context).show();
 	}
 
@@ -697,22 +771,6 @@ public class FragmentPayment extends Fragment {
 			new CreditVoucherDialog(getActivity(), context).show();
 	}
 
-	private void setPaymentProductData(PaymentContext context) {
-		context.setPaymentProductCode(getString(R.string.def_product_code));
-
-		HashMap<String, String> paymentProductTextData = new HashMap<String, String>(1);
-		paymentProductTextData.put(getString(R.string.def_product_field_1_code), edtProductField_1.getText().toString());
-		context.setPaymentProductTextData(paymentProductTextData);
-
-		HashMap<String, byte []> paymentProductImageData = new HashMap<String, byte[]>(1);
-		paymentProductImageData.put(getString(R.string.def_product_field_2_code), productPhoto);
-		context.setPaymentProductImageData(paymentProductImageData);
-	}
-	
-	private boolean isPaymentWithProduct() {
-		return cbProduct.isChecked();
-	}
-
 	private void showPurchasesDialog() {
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
 		dialogBuilder.setPositiveButton(R.string.cards_btn_add, new DialogInterface.OnClickListener() {
@@ -763,7 +821,7 @@ public class FragmentPayment extends Fragment {
 
 	private void showAddPurchaseDialog(final Dialog parent) {
 		final EditText edtPurchase = (EditText) getLayoutInflater().inflate(R.layout.dialog_purchase, null);
-		edtPurchase.setText(TEST_PRODUCT.toString());
+		edtPurchase.setText(TEST_PRODUCT_BY_TAGS.toString());
 		new AlertDialog.Builder(getContext())
 				.setView(edtPurchase)
 				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -792,28 +850,40 @@ public class FragmentPayment extends Fragment {
 				}).create().show();
 	}
 
-    @Override
+	@Override
+	public void onRequestSetImage(String fieldCode) {
+        productImageFieldRequestCode = fieldCode;
+		dlgPhoto.show();
+	}
+
+	@Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case Consts.RequestCodes.SELECT_PHOTO :
-            case Consts.RequestCodes.PRODUCT_SELECT_PHOTO :
                 if (resultCode == Activity.RESULT_OK) {
                 	System.gc();
                     String uri = getRealPathFromUri(data.getData());
-                    setPaymentContextImage(requestCode == Consts.RequestCodes.SELECT_PHOTO ? imgPhoto : imgProductField_2, uri);
+                    if (dlgProduct != null && dlgProduct.isShowing() && productImageFieldRequestCode != null)
+                        dlgProduct.setImage(productImageFieldRequestCode, uri);
+                    else
+                        setPaymentContextImage(imgPhoto, uri);
 
                 }
+                productImageFieldRequestCode = null;
                 break;
 
             case Consts.RequestCodes.PHOTO_CAPTURE :
-            case Consts.RequestCodes.PRODUCT_PHOTO_CAPTURE :
                 if (resultCode == Activity.RESULT_OK) {
                     if (new File(getCameraImagePath()).exists()) {
                     	System.gc();
-                    	setPaymentContextImage(requestCode == Consts.RequestCodes.PHOTO_CAPTURE ? imgPhoto : imgProductField_2, getCameraImagePath());
+                        if (dlgProduct != null && dlgProduct.isShowing() && productImageFieldRequestCode != null)
+                            dlgProduct.setImage(productImageFieldRequestCode, getCameraImagePath());
+                        else
+                    	    setPaymentContextImage(imgPhoto, getCameraImagePath());
                     }
                 }
+                productImageFieldRequestCode = null;
                 break;
 
             default:
@@ -821,20 +891,20 @@ public class FragmentPayment extends Fragment {
         }
     }
 
-    private void getImageFromGallery(ImageView target) {
+    private void getImageFromGallery() {
 	    Intent intent = new Intent(Intent.ACTION_PICK);
 	    intent.setType("image/*");
-	    startActivityForResult(intent, target == imgPhoto ? Consts.RequestCodes.SELECT_PHOTO : Consts.RequestCodes.PRODUCT_SELECT_PHOTO);
+	    startActivityForResult(intent, Consts.RequestCodes.SELECT_PHOTO);
 	}
 
-	private void getImageFromCamera(ImageView target) {
+	private void getImageFromCamera() {
         if (android.os.Environment.getExternalStorageState().equalsIgnoreCase(android.os.Environment.MEDIA_MOUNTED)) {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             File file = new File(getCameraImagePath());
             Uri outputFileUri = Uri.fromFile(file);
 
             intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-            startActivityForResult(intent, target == imgPhoto ? Consts.RequestCodes.PHOTO_CAPTURE : Consts.RequestCodes.PRODUCT_PHOTO_CAPTURE);
+            startActivityForResult(intent, Consts.RequestCodes.PHOTO_CAPTURE);
         } else {
             Toast.makeText(getActivity(), getString(R.string.sdcard_needed), Toast.LENGTH_LONG).show();
         }
@@ -860,8 +930,6 @@ public class FragmentPayment extends Fragment {
         if (path == null) {
         	if (target == imgPhoto)
         		photo = null;
-        	else
-        		productPhoto = null;
         	
         	target.setImageResource(android.R.color.white);
         }
@@ -884,25 +952,16 @@ public class FragmentPayment extends Fragment {
 		return result;
 	}
     
-    private class SetImageTask extends AsyncTask<String, Void, Void> {
+    private class SetImageTask extends CommonAsyncTask<String, Void, Void> {
     	private ImageView target;
     	private Bitmap bitmap = null;
-    	private ProgressDialog pDialog;
     	
     	public SetImageTask(ImageView target) {
+    	    super(getActivity());
     		this.target = target;
-    		pDialog = new ProgressDialog(getActivity());
-    		pDialog.setCancelable(false);
     	}
 
         protected Void doInBackground(String... params) {
-        	getActivity().runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					pDialog.show();
-				}
-			});
-        	
             String uri = params[0];
             try {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -910,8 +969,6 @@ public class FragmentPayment extends Fragment {
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
                 if (target == imgPhoto)
                 	photo = stream.toByteArray();
-                else
-                	productPhoto = stream.toByteArray();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -925,8 +982,6 @@ public class FragmentPayment extends Fragment {
             
             if (bitmap != null)
             	target.setImageBitmap(bitmap);
-            
-            pDialog.dismiss();
         }   
     }
 

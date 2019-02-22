@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import ibox.pro.sdk.external.entities.Account;
+import ibox.pro.sdk.external.entities.PaymentProductItemField;
 import ibox.pro.sdk.external.entities.Purchase;
 import ibox.pro.sdk.external.entities.Tax;
 import ibox.pro.sdk.external.entities.TaxContribution;
@@ -39,6 +40,7 @@ public class Utils {
         TAX_RATES.put(Purchase.TaxCode.VAT_0, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
         TAX_RATES.put(Purchase.TaxCode.VAT_10, BigDecimal.valueOf(0.1d).setScale(S_DECIMALS, RoundingMode.HALF_UP));
         TAX_RATES.put(Purchase.TaxCode.VAT_18, BigDecimal.valueOf(0.18d).setScale(S_DECIMALS, RoundingMode.HALF_UP));
+        TAX_RATES.put(Purchase.TaxCode.VAT_20, BigDecimal.valueOf(0.2d).setScale(S_DECIMALS, RoundingMode.HALF_UP));
     }
 
     private static HashMap<String, BigDecimal> CalculateTaxes(TransactionItem.TaxMode taxMode, BigDecimal total, List<String> appliedTaxes) {
@@ -120,16 +122,19 @@ public class Utils {
         BigDecimal cashGot = BigDecimal.valueOf(transaction.getAmountCashGot()).setScale(S_DECIMALS, RoundingMode.HALF_UP);
         TransactionItem.TaxMode taxMode = transaction.getTaxMode();
         List<Purchase> purchases = transaction.getPurchases();
+        List<TransactionItem.Product> products = transaction.getProducts();
 
         HashMap taxCalcs = new HashMap<String, BigDecimal>();
         taxCalcs.put(Purchase.TaxCode.VAT_NA, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
         taxCalcs.put(Purchase.TaxCode.VAT_0, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
         taxCalcs.put(Purchase.TaxCode.VAT_10, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
         taxCalcs.put(Purchase.TaxCode.VAT_18, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
+        taxCalcs.put(Purchase.TaxCode.VAT_20, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
 
         boolean hasPurchases = purchases != null && purchases.size() > 0;
+        boolean hasProducts = products != null && products.size() > 0;
 
-        if (hasPurchases && transaction.getDescription() != null && transaction.getDescription().trim().length() > 0)
+        if ((hasPurchases || hasProducts) && transaction.getDescription() != null && transaction.getDescription().trim().length() > 0)
             invoiceBuilder.append(transaction.getDescription()).append("\n");
         invoiceBuilder.append(divider);
 
@@ -155,12 +160,73 @@ public class Utils {
         else
         {
             String description = transaction.getDescription();
+            if (hasProducts) {
+                StringBuilder descriptionBuilder = new StringBuilder();
+                for (int i = 0; i < transaction.getProducts().size(); i++) {
+                    TransactionItem.Product nextProduct = transaction.getProducts().get(i);
+                    descriptionBuilder.append(nextProduct.getDescription().getTitleReceipt()).append("\n");
+                    ArrayList<String> fields = new ArrayList<>();
+                    for (TransactionItem.ProductField field : nextProduct.getFields()) {
+                        StringBuilder fieldBuilder = new StringBuilder();
+                        if (field.getDescription().printInReceipt() && field.getTextValue() != null) {
+                            fieldBuilder.delete(0, fieldBuilder.length());
+                            fieldBuilder.append(field.getDescription().getTitleReceipt());
+                            if (field.getTextValue().length() + field.getDescription().getTitleReceipt().length() < lineWidth && field.getTextValue().split("\n").length == 1) {
+                                char [] spaces = new char [lineWidth - (field.getTextValue().length() + field.getDescription().getTitleReceipt().length())];
+                                Arrays.fill(spaces, ' ');
+                                fieldBuilder.append(spaces);
+                                fieldBuilder.append(field.getTextValue());
+                                fields.add(fieldBuilder.toString());
+                            } else {
+                                fields.add(fieldBuilder.toString());
+                                fieldBuilder.delete(0, fieldBuilder.length());
+                                if (field.getTextValue().length() < lineWidth && field.getTextValue().split("\n").length == 1) {
+                                    char [] spaces = new char [lineWidth - field.getTextValue().length()];
+                                    Arrays.fill(spaces, ' ');
+                                    fieldBuilder.append(spaces);
+                                    fieldBuilder.append(field.getTextValue());
+                                    fields.add(fieldBuilder.toString());
+                                } else {
+                                    fields.add(fieldBuilder.toString());
+                                    String [] lines = field.getTextValue().split("\n");
+                                    for (String line : lines) {
+                                        fieldBuilder.delete(0, fieldBuilder.length());
+                                        if (line.length() < lineWidth) {
+                                            char [] spaces = new char [lineWidth - line.length()];
+                                            Arrays.fill(spaces, ' ');
+                                            fieldBuilder.append(spaces);
+                                            fieldBuilder.append(line);
+                                            fields.add(fieldBuilder.toString());
+                                        } else {
+                                            fields.add(line);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    for (String field : fields)
+                        descriptionBuilder.append(field).append("\n");
+                    description = descriptionBuilder.toString().trim();
+                }
+            }
 
             BigDecimal price = tranAmount;
             BigDecimal quantity = BigDecimal.ONE.setScale(Q_DECIMALS, RoundingMode.HALF_UP);
             BigDecimal total = price.multiply(quantity).setScale(S_DECIMALS, RoundingMode.HALF_UP);
             invoiceTotal = invoiceTotal.add(total);
-            AppendKeyValue(invoiceBuilder, lineWidth, description, String.format("%1$5.3fx%2$5.2f=%3$5.2f", quantity, price, total));
+            if (hasProducts) {
+                invoiceBuilder.append(description).append("\n");
+                String amount = String.format("%1$5.3fx%2$5.2f=%3$5.2f", quantity, price, total);
+                String spaces = "";
+                if (amount.length() < lineWidth - 1) {
+                    char[] c_spaces = new char[lineWidth - 1 - amount.length()];
+                    Arrays.fill(c_spaces, ' ');
+                    spaces = new String(c_spaces);
+                }
+                AppendKeyValue(invoiceBuilder, lineWidth, spaces, amount);
+            } else
+                AppendKeyValue(invoiceBuilder, lineWidth, description, String.format("%1$5.3fx%2$5.2f=%3$5.2f", quantity, price, total));
 
             List<String> appliedTaxes = null;
             if (transaction.getTaxes() != null) {
@@ -190,6 +256,7 @@ public class Utils {
         AppendKeyValue(invoiceBuilder, lineWidth, "Сумма по НДС 0%", String.format("%.2f", taxCalcs.containsKey(Purchase.TaxCode.VAT_0) ? taxCalcs.get(Purchase.TaxCode.VAT_0) : 0d));
         AppendKeyValue(invoiceBuilder, lineWidth, "Сумма НДС 10%", String.format("%.2f", taxCalcs.containsKey(Purchase.TaxCode.VAT_10) ? taxCalcs.get(Purchase.TaxCode.VAT_10) : 0d));
         AppendKeyValue(invoiceBuilder, lineWidth, "Сумма НДС 18%", String.format("%.2f", taxCalcs.containsKey(Purchase.TaxCode.VAT_18) ? taxCalcs.get(Purchase.TaxCode.VAT_18) : 0d));
+        AppendKeyValue(invoiceBuilder, lineWidth, "Сумма НДС 20%", String.format("%.2f", taxCalcs.containsKey(Purchase.TaxCode.VAT_20) ? taxCalcs.get(Purchase.TaxCode.VAT_20) : 0d));
 
         if (transaction.getFiscalInfo() != null)
         {

@@ -195,26 +195,6 @@ public abstract class ReaderServiceDialog extends Dialog implements PaymentContr
     }
 
     @Override
-    public void onInjectFinished(boolean success) {
-
-    }
-
-    @Override
-    public void onEmvConfigFinished(boolean success) {
-
-    }
-
-    @Override
-    public void onCapkConfigFinished(boolean success) {
-
-    }
-
-    @Override
-    public void onBarcodeScanned(String barcode) {
-
-    }
-
-    @Override
     public void onSearchMifareCard(Hashtable<String, String> cardData) {
 
     }
