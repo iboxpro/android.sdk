@@ -32,7 +32,7 @@ public class Utils {
         activity.getSharedPreferences(activity.getApplicationContext().getPackageName(), Context.MODE_PRIVATE).edit().putString(key, value).commit();
     }
 
-    private static final int S_DECIMALS = 2;
+    private static final int S_DECIMALS = MainActivity.CURRENCY.getE();
     private static final int Q_DECIMALS = 3;
     private static final HashMap<String, BigDecimal> TAX_RATES = new HashMap<String, BigDecimal>();
     static {
@@ -142,9 +142,15 @@ public class Utils {
             for (Purchase purchase : purchases) {
                 BigDecimal price = BigDecimal.valueOf(purchase.getPrice()).setScale(S_DECIMALS, RoundingMode.HALF_UP);
                 BigDecimal quantity = BigDecimal.valueOf(purchase.getQuantity()).setScale(Q_DECIMALS, RoundingMode.HALF_UP);
-                BigDecimal total = price.multiply(quantity).setScale(S_DECIMALS, RoundingMode.HALF_UP);
+                BigDecimal calcTotal = price.multiply(quantity).setScale(S_DECIMALS, RoundingMode.HALF_UP);
+                BigDecimal total = purchase.getTitleAmount() == null
+                        ? calcTotal
+                        : BigDecimal.valueOf(purchase.getTitleAmount()).setScale(S_DECIMALS, RoundingMode.HALF_UP);;
                 invoiceTotal = invoiceTotal.add(total);
                 AppendKeyValue(invoiceBuilder, lineWidth, purchase.getTitle(), String.format("%1$5.3fx%2$5.2f=%3$5.2f", quantity, price, total));
+                if (calcTotal.compareTo(total) != 0)
+                    AppendKeyValue(invoiceBuilder, lineWidth, "НАДБАВКА", String.format("=%1$.2f", total.subtract(calcTotal).setScale(S_DECIMALS, RoundingMode.HALF_UP).doubleValue()));
+
                 HashMap<String, BigDecimal> purchaseTaxes = CalculateTaxes(taxMode, total, purchase.getTaxCodes());
                 for (Map.Entry<String, BigDecimal> purchaseTax : purchaseTaxes.entrySet())
                 {

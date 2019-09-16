@@ -24,6 +24,7 @@
     <string name="error_invalid_input_type">Неправильный тип ввода</string>
     <string name="error_invalid_amount">Неправильная сумма</string>
     <string name="error_standalone_format">Ошибка устройства (%s)</string>
+    <string name="error_ext_app_format">Ошибка приложения (%s)</string>
 
     <string name="tab_payment">Платеж</string>
     <string name="tab_history">История</string>
@@ -82,12 +83,14 @@
     <string name="payment_rb_linked_card_format">Привязанной картой %s</string>
     <string name="payment_rb_outer">Внешней картой</string>
     <string name="payment_rb_prepay">Предоплатой</string>
+    <string name="payment_rb_other">Другое</string>
     <string name="payment_cb_suppress_signature">Подпись не будет отправлена</string>
     <string name="payment_cb_product">Оплатить продукт</string>
     <string name="payment_lbl_product_field_1">Поле 1 :</string>
     <string name="payment_lbl_product_field_2">Поле 2 :</string>
     <string name="payment_cb_regular">Регулярный платеж</string>
-    <string name="payment_cb_auxdata">Aux товары</string>
+    <string name="payment_cb_aux_purchases">Aux товары</string>
+    <string name="payment_cb_aux_tags">Aux теги на чек</string>
     <string name="payment_cb_end_type">Завершать по количеству повторов</string>
     <string name="payment_lbl_type">Тип платежа :</string>
     <string name="payment_lbl_start">Дата начала :</string>
@@ -190,12 +193,13 @@
     <string name="EMV_READER_ERROR">Ошибка ридера</string>
     <string name="EMV_CARD_NOT_SUPPORTED">Карта не поддерживается</string>
     <string name="EMV_TRANSACTION_TERMINATED">Транзакция прервана</string>
+    <string name="NFC_LIMIT_EXCEEDED">Превышен лимит терминала на бесконтактную оплату</string>
 
     <string-array name="input_types">
         <item>Наличными</item>
         <item>Магнитной лентой</item>
         <item>Чипом</item>
-        <item>Безконтактная оплата</item>
+        <item>Бесконтактная оплата</item>
         <item>Предоплата</item>
         <item>@string/payment_rb_credit</item>
     </string-array>

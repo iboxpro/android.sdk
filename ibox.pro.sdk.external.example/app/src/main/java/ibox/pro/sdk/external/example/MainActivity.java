@@ -5,10 +5,12 @@ import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.view.LayoutInflater;
 import android.widget.EditText;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +32,7 @@ import ibox.pro.sdk.external.example.fragments.FragmentMifare;
 import ibox.pro.sdk.external.example.fragments.FragmentPayment;
 import ibox.pro.sdk.external.example.fragments.FragmentSettings;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends PermissionsActivity implements TabHost.OnTabChangeListener {
 
 	public Account Account;
 	public String BankName;
@@ -41,6 +43,8 @@ public class MainActivity extends FragmentActivity {
 	public HashMap<PaymentController.PaymentMethod, Map<String, String>> AcquirersByMethods;
 	public List<LinkedCard> LinkedCards;
 	public ArrayList<PaymentProductItem> Products;
+
+	public static final PaymentController.Currency CURRENCY = PaymentController.Currency.RUB;
 
 	private FragmentTabHost mTabHost;
 	
@@ -55,16 +59,20 @@ public class MainActivity extends FragmentActivity {
 		((TextView) findViewById(R.id.version)).setText(getString(R.string.app_name) + " " + PaymentController.VERSIONCODE);
 
 		mTabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
+		mTabHost.setOnTabChangedListener(this);
 
 		PaymentController.getInstance().onCreate(this, savedInstanceState);
 		String readerType = Utils.getString(this, Consts.SavedParams.READER_TYPE_KEY);
 		String readerAddress = Utils.getString(this, Consts.SavedParams.READER_ADDRESS_KEY);
-		if (readerType != null && readerType.length() > 0) {
-			PaymentController.getInstance().setReaderType(this, ReaderType.valueOf(readerType), readerAddress);
-
-			Hashtable<String, Object> p = new Hashtable<>();
-			p.put("NOTUP", true);
-			PaymentController.getInstance().setCustomReaderParams(p);
+		if (!PaymentController.getInstance().isPaymentInProgress()) {
+			if (readerType != null && readerType.length() > 0) {
+				try {
+					PaymentController.getInstance().setReaderType(this, ReaderType.valueOf(readerType), readerAddress);
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+					PaymentController.getInstance().setReaderType(this, ReaderType.values()[0], readerAddress);
+				}
+			}
 		}
 
 		//PaymentController.setRequestType(PaymentController.RequestType.URLENCODED);
@@ -108,7 +116,13 @@ public class MainActivity extends FragmentActivity {
 		PaymentController.getInstance().onDestroy();
 		super.onDestroy();
 	}
-	
+
+	@Override
+	public void onTabChanged(String s) {
+		if (s.equalsIgnoreCase(getString(R.string.tab_payment)) && !PaymentController.getInstance().isPaymentInProgress())
+			PaymentController.getInstance().initPaymentSession();
+	}
+
 	private void setupTabHost() {
 		mTabHost.setup(this, getSupportFragmentManager(),android.R.id.tabcontent);
 		

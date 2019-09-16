@@ -67,6 +67,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setContentView(R.layout.dialog_payment);
         getWindow().getAttributes().gravity = Gravity.CENTER_VERTICAL;
+		setCanceledOnTouchOutside(false);
 
         lblState = (TextView) findViewById(R.id.payment_dlg_lbl_state);
         imgSpinner = (ImageView) findViewById(R.id.payment_dlg_spinner);
@@ -114,8 +115,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	}
 
 	protected int getReadyStringID() {
-		boolean nfcAllowed = mPaymentContext.getCurrency() == PaymentController.Currency.RUB
-				&& PaymentController.NFC_LIMIT.compareTo(BigDecimal.valueOf(mPaymentContext.getAmount()).setScale(PaymentController.Currency.RUB.getE(), RoundingMode.HALF_UP)) > 0;
+		boolean nfcAllowed = true;
 
 		return PaymentController.getInstance().getReaderType().isMultiInputSupported() && nfcAllowed
 					? R.string.reader_state_ready_multiinput
@@ -199,6 +199,12 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 					break;
 				case TTK_FAILED:
 					toastText = String.format(mActivity.getString(R.string.error_standalone_format), errorMessage);
+					break;
+				case EXT_APP_FAILED:
+					toastText = String.format(mActivity.getString(R.string.error_ext_app_format), errorMessage);
+					break;
+				case NFC_LIMIT_EXCEEDED:
+					toastText = mActivity.getString(R.string.NFC_LIMIT_EXCEEDED);
 					break;
                 default :
                     toastText = mActivity.getString(R.string.EMV_ERROR);

@@ -23,10 +23,9 @@ import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentControllerListener;
 import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.example.R;
-
 public class FragmentMifare extends Fragment  implements PaymentControllerListener {
 
-    Button btnPoll, btnVerifyPin, btnWriteCard, btnReadCard, btnFinish, btnStatus, btnPenetrate, btnPowerOnNfc, btnPowerOffNfc, btnSendApdu;
+    Button btnPoll, btnVerifyPin, btnWriteCard, btnReadCard, btnFinish, btnStatus, btnPenetrate, btnPowerOnNfc, btnPowerOffNfc, btnSendApdu, btnBeep;
     TextView txtLog, txtApdu;
 
     EditText txtBlockAddr, txtKeyValue, txtTimeout;
@@ -45,6 +44,7 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
         btnPowerOnNfc.setEnabled(state);
         btnSendApdu.setEnabled(state);
         btnPowerOffNfc.setEnabled(state);
+        btnBeep.setEnabled(state);
     }
 
     public void initControls(View view) {
@@ -65,12 +65,20 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
         btnPowerOffNfc = (Button)view.findViewById(R.id.mifare_btn_poweroffnfc);
         btnSendApdu = (Button)view.findViewById(R.id.mifare_btn_send_apdu);
 
+        btnBeep = (Button)view.findViewById(R.id.mifare_btn_beep);
+
         txtApdu = (EditText)view.findViewById(R.id.mifare_txt_apdu);
 
         txtBlockAddr = (EditText)view.findViewById(R.id.txtBlockAddr);
         txtKeyValue = (EditText)view.findViewById(R.id.txtKeyValue);
         txtTimeout = (EditText)view.findViewById(R.id.txtTimeout);
 
+        btnBeep.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PaymentController.getInstance().readerBeep(3);
+            }
+        });
 
         btnPoll.setOnClickListener(new View.OnClickListener() {
             @Override

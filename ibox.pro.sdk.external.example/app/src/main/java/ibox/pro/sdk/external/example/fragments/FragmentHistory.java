@@ -239,6 +239,7 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 			}
 		});
 
+		PaymentController.getInstance().initPaymentSession();
 		dlgTrInfo.show();
 	}
 

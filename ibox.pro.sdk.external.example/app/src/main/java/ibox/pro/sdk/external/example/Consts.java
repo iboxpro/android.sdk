@@ -2,6 +2,7 @@ package ibox.pro.sdk.external.example;
 
 public class Consts {
 	public static final class RequestCodes {
+        public static final int CODE_REQUEST_PERMISSIONS = 7008;
         public static final int SELECT_PHOTO = 100;
         public static final int PHOTO_CAPTURE = 101;
     }

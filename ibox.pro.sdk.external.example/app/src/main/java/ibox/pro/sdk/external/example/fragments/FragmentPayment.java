@@ -3,7 +3,6 @@ package ibox.pro.sdk.external.example.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -43,6 +43,7 @@ import java.math.RoundingMode;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -81,12 +82,14 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		"Тестовый продукт"	,
 		111.256d,
 			2d,
+			230d,
 			Arrays.asList(new String [] { Purchase.TaxCode.VAT_20})
 	);
 	static final Purchase TEST_PRODUCT_BY_TAGS;
 	static {
 		TEST_PRODUCT_TAGS.put(1030, "Тестовый продукт");
 		TEST_PRODUCT_TAGS.put(1079, 111.256d);
+		TEST_PRODUCT_TAGS.put(1043, 230d);
 		TEST_PRODUCT_TAGS.put(1023, 2);
 		TEST_PRODUCT_TAGS.put(1197, "шт");
 		TEST_PRODUCT_TAGS.put(1199, 1);
@@ -104,7 +107,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	private LinkedCard selectedLinkedCard = null;
 	
 	private LinearLayout llRegular;
-	private CheckBox cbSuppressSignature, cbRegular, cbEndType, cbAuxData, cbProduct;
+	private CheckBox cbSuppressSignature, cbRegular, cbEndType, cbAuxPurchases, cbAuxTags, cbProduct;
 	private RadioGroup rgInput;
 	private DatePicker pkrStart, pkrEnd;
 	private EditText edtRepeatCount, edtHour, edtMinute, edtDates;
@@ -113,12 +116,29 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	
 	private AlertDialog dlgPhoto;
 	private ProductDialog dlgProduct;
+	private PaymentDialog dlgPayment;
 	private ArrayAdapter<Purchase> purchasesAdapter;
+	private ArrayAdapter<Map.Entry<Integer, String>> tagsAdapter;
+
+	private PaymentContext paymentContext;
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		purchasesAdapter = new ArrayAdapter<Purchase>(getContext(), android.R.layout.test_list_item, new ArrayList<Purchase>());
+		if (savedInstanceState != null)
+			paymentContext = (PaymentContext) savedInstanceState.getSerializable("paymentContext");
+		purchasesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.test_list_item, new ArrayList<Purchase>());
+		tagsAdapter = new ArrayAdapter<>(getContext(), android.R.layout.test_list_item, new ArrayList<Map.Entry<Integer, String>>());
+
+		if (PaymentController.getInstance().isPaymentInProgress() && paymentContext != null) {
+			showPaymentDialog(paymentContext);
+		}
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putSerializable("paymentContext", paymentContext);
 	}
 
 	@Override
@@ -167,13 +187,22 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 				}
 			}
 		});
-		cbAuxData.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+		cbAuxPurchases.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
 				if (checked)
 					showPurchasesDialog();
 				else
 					purchasesAdapter.clear();
+			}
+		});
+		cbAuxTags.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+				if (checked)
+					showTagsDialog();
+				else
+					tagsAdapter.clear();
 			}
 		});
 
@@ -235,7 +264,8 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		super.onPause();
 
 		rgInput.setOnCheckedChangeListener(null);
-		cbAuxData.setOnCheckedChangeListener(null);
+		cbAuxPurchases.setOnCheckedChangeListener(null);
+		cbAuxTags.setOnCheckedChangeListener(null);
 		cbProduct.setOnCheckedChangeListener(null);
 	}
 
@@ -323,7 +353,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 						paymentContext.setAmount(edtAmount.getText().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
 						paymentContext.setDescription(edtDescription.getText().toString());
 						paymentContext.setImage(photo);
-						paymentContext.setCurrency(PaymentController.Currency.RUB);
+						paymentContext.setCurrency(MainActivity.CURRENCY);
 						paymentContext.setExtID("TEST_APP");
 					}
 
@@ -335,6 +365,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 					@Override
 					protected void onPostExecute(PaymentResultContext paymentResultContext) {
 						super.onPostExecute(paymentResultContext);
+
 
 						if (paymentResultContext != null) {
 							Toast.makeText(getActivity(), "Invoice: " + paymentResultContext.getTransactionItem().getInvoice(), Toast.LENGTH_LONG).show();
@@ -366,7 +397,8 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 
 		rgInput				= (RadioGroup)view.findViewById(R.id.payment_rg_input);
 		cbSuppressSignature = (CheckBox)view.findViewById(R.id.payment_cb_suppress_signature);
-		cbAuxData			= (CheckBox)view.findViewById(R.id.payment_cb_auxdata);
+		cbAuxPurchases		= (CheckBox)view.findViewById(R.id.payment_cb_aux_purchases);
+		cbAuxTags			= (CheckBox)view.findViewById(R.id.payment_cb_aux_tags);
 		cbProduct			= (CheckBox)view.findViewById(R.id.payment_cb_product);
 
 		llRegular 		= (LinearLayout)view.findViewById(R.id.payment_ll_regular);
@@ -538,6 +570,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 						selectedLinkedCard == null ? "" : selectedLinkedCard.getAlias()));
 	}
 
+	//region payment
 	private void doSinglePayment(boolean NFCOnly) {
 		final PaymentContext context = new PaymentContext();
 
@@ -570,7 +603,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 			context.setAmountCashGot(context.getAmount() + 1d);
 		context.setDescription(edtDescription.getText().toString());
 		context.setImage(photo);
-		context.setCurrency(PaymentController.Currency.RUB);
+		context.setCurrency(MainActivity.CURRENCY);
 		context.setNFC(NFCOnly);
 		context.setReceiptPhone(edtPhone.getText().toString());
 		context.setReceiptEmail(edtEmail.getText().toString());
@@ -580,9 +613,12 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		if (PaymentController.getInstance().getReaderType() != null && PaymentController.getInstance().getReaderType().isTTK())
 		    context.setErn(Integer.parseInt(edtERN.getText().toString()));
 
-		if (cbAuxData.isChecked())
+		if (cbAuxPurchases.isChecked())
 			for (int i = 0; i < purchasesAdapter.getCount(); i++)
 				context.putPurchase(purchasesAdapter.getItem(i));
+		if (cbAuxTags.isChecked())
+			for (int i = 0; i < tagsAdapter.getCount(); i++)
+				context.putInvoiceTag(tagsAdapter.getItem(i).getKey(), tagsAdapter.getItem(i).getValue());
 
 		if (cbProduct.isChecked() && dlgProduct != null) {
             PaymentProductItem product = dlgProduct.getSelectedProduct();
@@ -606,7 +642,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 				if (acquirers != null && acquirers.size() > 0) {
 					if (acquirers.size() == 1) {
 						context.setAcquirerCode(((Map.Entry<String, String>) acuirersArray[0]).getKey());
-						new PaymentDialog(getActivity(), context).show();
+						showPaymentDialog(context);
 					} else {
 						CharSequence [] items = new CharSequence[acquirers.size()];
 						int i = 0;
@@ -619,24 +655,24 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 								public void onClick(DialogInterface dialogInterface, int i) {
 									context.setAcquirerCode(((Map.Entry<String, String>) acuirersArray[i]).getKey());
 									dialogInterface.dismiss();
-									new PaymentDialog(getActivity(), context).show();
+									showPaymentDialog(context);
 								}
 							});
 						builder.create().show();
 					}
 				} else
-					new PaymentDialog(getActivity(), context).show();
+					showPaymentDialog(context);
 			} else
-				new PaymentDialog(getActivity(), context).show();
+				showPaymentDialog(context);
 		} else
-			new PaymentDialog(getActivity(), context).show();
+			showPaymentDialog(context);
 	}
 	
 	private void doRegularPayment() {
 		RegularPaymentContext context = new RegularPaymentContext();
 		
 		context.setAmount(edtAmount.getText().toString().trim().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
-		context.setCurrency(PaymentController.Currency.RUB);
+		context.setCurrency(MainActivity.CURRENCY);
 		context.setDescription(edtDescription.getText().toString());
 		context.setImage(photo);
 		context.setExtID("TEST_APP");
@@ -717,7 +753,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
                 context.setArbitraryDays(arbitraryDays);
             }
         }
-		new PaymentDialog(getActivity(), context).show();
+		showPaymentDialog(context);
 	}
 
 	private void doCreditVoucher() {
@@ -729,12 +765,15 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		context.setExtID("TEST_APP");
 		context.setErn(Integer.parseInt(edtERN.getText().toString()));
 		context.setSuppressSignatureWaiting(cbSuppressSignature.isChecked());
-		context.setCurrency(PaymentController.Currency.RUB);
+		context.setCurrency(MainActivity.CURRENCY);
 		context.setAction(PaymentController.ReverseAction.RETURN);
 
-		if (cbAuxData.isChecked())
+		if (cbAuxPurchases.isChecked())
 			for (int i = 0; i < purchasesAdapter.getCount(); i++)
 				context.putPurchase(purchasesAdapter.getItem(i));
+		if (cbAuxTags.isChecked())
+			for (int i = 0; i < tagsAdapter.getCount(); i++)
+				context.putInvoiceTag(tagsAdapter.getItem(i).getKey(), tagsAdapter.getItem(i).getValue());
 
 		final PaymentController.PaymentMethod creditVoucherMethod = PaymentController.PaymentMethod.CARD;
 		HashMap<PaymentController.PaymentMethod, Map<String, String>> acquirersByMethods = ((MainActivity) getActivity()).AcquirersByMethods;
@@ -770,7 +809,14 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		} else
 			new CreditVoucherDialog(getActivity(), context).show();
 	}
+	//endregion
 
+	//region AUX
+	private void showPaymentDialog(PaymentContext paymentContext) {
+		this.paymentContext = paymentContext;
+		new PaymentDialog(getActivity(), paymentContext).show();
+	}
+	
 	private void showPurchasesDialog() {
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
 		dialogBuilder.setPositiveButton(R.string.cards_btn_add, new DialogInterface.OnClickListener() {
@@ -849,6 +895,79 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 					}
 				}).create().show();
 	}
+
+	private void showTagsDialog() {
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
+		dialogBuilder.setPositiveButton(R.string.cards_btn_add, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+						showAddTagDialog((AlertDialog) dialogInterface);
+					}
+				})
+				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+						dialogInterface.dismiss();
+					}
+				})
+				.setAdapter(tagsAdapter, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface parent, final int i) {
+						new AlertDialog.Builder(getContext())
+								.setMessage(String.format(getString(R.string.purchases_dlg_remove_format),  String.valueOf(tagsAdapter.getItem(i).getKey())))
+								.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialogInterface, int j) {
+										dialogInterface.dismiss();
+										tagsAdapter.remove(tagsAdapter.getItem(i));
+										tagsAdapter.notifyDataSetChanged();
+										((AlertDialog) parent).show();
+									}
+								})
+								.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialogInterface, int j) {
+										dialogInterface.dismiss();
+										((AlertDialog) parent).show();
+									}
+								})
+								.create().show();
+					}
+				})
+				.create().show();
+	}
+
+	private void showAddTagDialog(final Dialog parent) {
+		LinearLayout llTag = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_tag, null);
+		final EditText edtTagNum = (EditText) llTag.getChildAt(0);
+		final EditText edtTagValue = (EditText) llTag.getChildAt(1);
+		new AlertDialog.Builder(getContext())
+				.setView(llTag)
+				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+						try {
+							int tag = Integer.parseInt(edtTagNum.getText().toString());
+							if (tag < 1000)
+								throw new IllegalArgumentException();
+							String value = edtTagValue.getText().toString();
+							tagsAdapter.add(new AbstractMap.SimpleEntry<>(tag, value));
+						} catch (Exception e) {
+							e.printStackTrace();
+							Toast.makeText(getContext(), R.string.common_error, Toast.LENGTH_LONG).show();
+						}
+						parent.show();
+					}
+				})
+				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+						dialogInterface.dismiss();
+						parent.show();
+					}
+				}).create().show();
+	}
+	//endregion
 
 	@Override
 	public void onRequestSetImage(String fieldCode) {
@@ -940,13 +1059,14 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
     }
 
     private BigDecimal getAuxPurchasesAmount() {
-		PaymentController.Currency currency = PaymentController.Currency.RUB;
+		PaymentController.Currency currency = MainActivity.CURRENCY;
 		BigDecimal result = BigDecimal.ZERO.setScale(currency.getE(), RoundingMode.HALF_UP);
 		for (int i = 0; i < purchasesAdapter.getCount(); i++) {
 			Purchase nextPurchase = purchasesAdapter.getItem(i);
-			result = result.add(
-					BigDecimal.valueOf(nextPurchase.getPrice()).setScale(currency.getE(), RoundingMode.HALF_UP)
+			result = result.add(nextPurchase.getTitleAmount() == null
+					? BigDecimal.valueOf(nextPurchase.getPrice()).setScale(currency.getE(), RoundingMode.HALF_UP)
 							.multiply(BigDecimal.valueOf(nextPurchase.getQuantity()).setScale(3, RoundingMode.HALF_UP))
+					: BigDecimal.valueOf(nextPurchase.getTitleAmount()).setScale(currency.getE(), RoundingMode.HALF_UP)
 			).setScale(currency.getE(), RoundingMode.HALF_UP);
 		}
 		return result;

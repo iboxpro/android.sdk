@@ -53,6 +53,7 @@ public class ReversePaymentDialog extends Dialog {
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_reverse);
         getWindow().getAttributes().gravity = Gravity.CENTER_VERTICAL;
+        setCanceledOnTouchOutside(false);
 
         edtAmount = (EditText)findViewById(R.id.reverse_dlg_edt_amount);
         edtERN = (EditText)findViewById(R.id.reverse_dlg_edt_ern);
@@ -114,7 +115,8 @@ public class ReversePaymentDialog extends Dialog {
         protected boolean usesReader() {
             return allowedInputTypes.contains(PaymentController.PaymentInputType.SWIPE)
                     || allowedInputTypes.contains(PaymentController.PaymentInputType.CHIP)
-                    || allowedInputTypes.contains(PaymentController.PaymentInputType.NFC);
+                    || allowedInputTypes.contains(PaymentController.PaymentInputType.NFC)
+                    || allowedInputTypes.contains(PaymentController.PaymentInputType.MANUAL);
         }
 
         private void configInputTypes() {
@@ -122,8 +124,8 @@ public class ReversePaymentDialog extends Dialog {
                     || allowedInputTypes.contains(PaymentController.PaymentInputType.PREPAID)
                     || allowedInputTypes.contains(PaymentController.PaymentInputType.CREDIT);
             if (!hasNonCardReverseInputTypes) {
-                boolean nfcAllowed = transaction.getCurrencyId().equals(String.valueOf(PaymentController.Currency.RUB.toString()))
-                        && PaymentController.NFC_LIMIT.compareTo(BigDecimal.valueOf(transaction.getAmount()).setScale(PaymentController.Currency.RUB.getE(), RoundingMode.HALF_UP)) > 0;
+                boolean nfcAllowed = true;
+
                 if (allowedInputTypes.size() == 1) {
                     switch (allowedInputTypes.get(0)) {
                         case CHIP:

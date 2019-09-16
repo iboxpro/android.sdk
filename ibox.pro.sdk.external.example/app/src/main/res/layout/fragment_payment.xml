@@ -140,6 +140,11 @@
 				android:layout_height="wrap_content"
 				android:text="@string/payment_rb_prepay"
 				/>
+			<RadioButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/payment_rb_prepay"
+				/>
 		</RadioGroup>
 		<CheckBox
 			android:id="@+id/payment_cb_suppress_signature"
@@ -166,13 +171,21 @@
 	        android:text="@string/payment_cb_regular"
 	        />
         <CheckBox
-            android:id="@+id/payment_cb_auxdata"
+            android:id="@+id/payment_cb_aux_purchases"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:checked="false"
             android:textSize="16sp"
-            android:text="@string/payment_cb_auxdata"
+            android:text="@string/payment_cb_aux_purchases"
             />
+		<CheckBox
+			android:id="@+id/payment_cb_aux_tags"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:checked="false"
+			android:textSize="16sp"
+			android:text="@string/payment_cb_aux_tags"
+			/>
         <LinearLayout
 	        android:id="@+id/payment_ll_regular"
 	        android:layout_height="wrap_content"

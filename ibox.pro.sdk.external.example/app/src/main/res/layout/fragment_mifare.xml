@@ -126,6 +126,14 @@
             android:layout_marginTop="3dp"
             />
 
+        <Button
+            android:id="@+id/mifare_btn_beep"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Beep"
+            android:layout_marginTop="3dp"
+            />
+
 
 
 

@@ -76,12 +76,6 @@ public class FragmentSettings extends Fragment {
 										: bondedDevices.get(which).getAddress();
 									PaymentController.getInstance().setReaderType(getActivity(), reader, address, config);
 
-									if (reader.equals(ReaderType.P17)) {
-										Hashtable<String, Object> p = new Hashtable<>();
-										p.put("NOTUP", true);
-										PaymentController.getInstance().setCustomReaderParams(p);
-									}
-
 									dialog.dismiss();
 									mAdapter.notifyDataSetChanged();
 									Utils.setString(getActivity(), Consts.SavedParams.READER_TYPE_KEY, reader.name());

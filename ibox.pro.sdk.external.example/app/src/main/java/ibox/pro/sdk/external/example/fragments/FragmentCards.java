@@ -210,7 +210,7 @@ public class FragmentCards extends Fragment {
 
         @Override
         protected void action() throws PaymentException {
-            PaymentController.getInstance().addLinkedCard(getContext(), PaymentController.Currency.RUB);
+            PaymentController.getInstance().addLinkedCard(getContext(), MainActivity.CURRENCY);
         }
 
         @Override
@@ -247,7 +247,7 @@ public class FragmentCards extends Fragment {
 
         @Override
         protected void action() throws PaymentException {
-            PaymentController.getInstance().balanceInquiry(getContext(), PaymentController.Currency.RUB);
+            PaymentController.getInstance().balanceInquiry(getContext(), MainActivity.CURRENCY);
         }
 
         @Override
