@@ -113,10 +113,12 @@ public class ReversePaymentDialog extends Dialog {
 
         @Override
         protected boolean usesReader() {
-            return allowedInputTypes.contains(PaymentController.PaymentInputType.SWIPE)
-                    || allowedInputTypes.contains(PaymentController.PaymentInputType.CHIP)
-                    || allowedInputTypes.contains(PaymentController.PaymentInputType.NFC)
-                    || allowedInputTypes.contains(PaymentController.PaymentInputType.MANUAL);
+            boolean partial = BigDecimal.valueOf(reverseAmount).setScale(getCurrency().getE(), RoundingMode.HALF_UP).compareTo(BigDecimal.ZERO) != 0;
+            return (allowedInputTypes.contains(PaymentController.PaymentInputType.SWIPE)
+                        || allowedInputTypes.contains(PaymentController.PaymentInputType.CHIP)
+                        || allowedInputTypes.contains(PaymentController.PaymentInputType.NFC)
+                        || allowedInputTypes.contains(PaymentController.PaymentInputType.MANUAL))
+                    && !(transaction.canCancelCNPPartial() || (transaction.canCancelCNP() && !partial));
         }
 
         private void configInputTypes() {

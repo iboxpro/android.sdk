@@ -41,6 +41,8 @@ public class Utils {
         TAX_RATES.put(Purchase.TaxCode.VAT_10, BigDecimal.valueOf(0.1d).setScale(S_DECIMALS, RoundingMode.HALF_UP));
         TAX_RATES.put(Purchase.TaxCode.VAT_18, BigDecimal.valueOf(0.18d).setScale(S_DECIMALS, RoundingMode.HALF_UP));
         TAX_RATES.put(Purchase.TaxCode.VAT_20, BigDecimal.valueOf(0.2d).setScale(S_DECIMALS, RoundingMode.HALF_UP));
+        TAX_RATES.put(Purchase.TaxCode.VAT_110, BigDecimal.valueOf(0.1d).setScale(S_DECIMALS, RoundingMode.HALF_UP));
+        TAX_RATES.put(Purchase.TaxCode.VAT_120, BigDecimal.valueOf(0.2d).setScale(S_DECIMALS, RoundingMode.HALF_UP));
     }
 
     private static HashMap<String, BigDecimal> CalculateTaxes(TransactionItem.TaxMode taxMode, BigDecimal total, List<String> appliedTaxes) {
@@ -130,6 +132,8 @@ public class Utils {
         taxCalcs.put(Purchase.TaxCode.VAT_10, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
         taxCalcs.put(Purchase.TaxCode.VAT_18, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
         taxCalcs.put(Purchase.TaxCode.VAT_20, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
+        taxCalcs.put(Purchase.TaxCode.VAT_110, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
+        taxCalcs.put(Purchase.TaxCode.VAT_120, BigDecimal.ZERO.setScale(S_DECIMALS, RoundingMode.HALF_UP));
 
         boolean hasPurchases = purchases != null && purchases.size() > 0;
         boolean hasProducts = products != null && products.size() > 0;
@@ -263,6 +267,8 @@ public class Utils {
         AppendKeyValue(invoiceBuilder, lineWidth, "Сумма НДС 10%", String.format("%.2f", taxCalcs.containsKey(Purchase.TaxCode.VAT_10) ? taxCalcs.get(Purchase.TaxCode.VAT_10) : 0d));
         AppendKeyValue(invoiceBuilder, lineWidth, "Сумма НДС 18%", String.format("%.2f", taxCalcs.containsKey(Purchase.TaxCode.VAT_18) ? taxCalcs.get(Purchase.TaxCode.VAT_18) : 0d));
         AppendKeyValue(invoiceBuilder, lineWidth, "Сумма НДС 20%", String.format("%.2f", taxCalcs.containsKey(Purchase.TaxCode.VAT_20) ? taxCalcs.get(Purchase.TaxCode.VAT_20) : 0d));
+        AppendKeyValue(invoiceBuilder, lineWidth, "Сумма НДС 10/110", String.format("%.2f", taxCalcs.containsKey(Purchase.TaxCode.VAT_110) ? taxCalcs.get(Purchase.TaxCode.VAT_110) : 0d));
+        AppendKeyValue(invoiceBuilder, lineWidth, "Сумма НДС 20/120", String.format("%.2f", taxCalcs.containsKey(Purchase.TaxCode.VAT_120) ? taxCalcs.get(Purchase.TaxCode.VAT_120) : 0d));
 
         if (transaction.getFiscalInfo() != null)
         {
