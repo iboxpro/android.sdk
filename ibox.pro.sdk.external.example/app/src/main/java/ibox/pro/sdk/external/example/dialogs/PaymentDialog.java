@@ -224,7 +224,10 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	@Override
     public void onFinished(final PaymentResultContext paymentResultContext) {
 		dismiss();
-		new ResultDialog(mActivity, paymentResultContext, false).show();
+		Dialog resultDialog = paymentResultContext.getDeferredData() == null
+				? new ResultDialog(mActivity, paymentResultContext, false)
+				: new DeferredResultDialog(mActivity, paymentResultContext);
+		resultDialog.show();
 	}
 
 	@Override

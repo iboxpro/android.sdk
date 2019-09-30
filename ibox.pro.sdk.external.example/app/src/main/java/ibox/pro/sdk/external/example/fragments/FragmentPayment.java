@@ -107,7 +107,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	private LinkedCard selectedLinkedCard = null;
 	
 	private LinearLayout llRegular;
-	private CheckBox cbSuppressSignature, cbRegular, cbEndType, cbAuxPurchases, cbAuxTags, cbProduct;
+	private CheckBox cbDeferred, cbSuppressSignature, cbRegular, cbEndType, cbAuxPurchases, cbAuxTags, cbProduct;
 	private RadioGroup rgInput;
 	private DatePicker pkrStart, pkrEnd;
 	private EditText edtRepeatCount, edtHour, edtMinute, edtDates;
@@ -359,7 +359,12 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 
 					@Override
 					protected PaymentResultContext doInBackground(Void... voids) {
-						return PaymentController.getInstance().submitCash(getActivity(), paymentContext);
+						try {
+							return PaymentController.getInstance().submitCash(getActivity(), paymentContext);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						return null;
 					}
 
 					@Override
@@ -396,6 +401,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
         edtEmail 		= (EditText)view.findViewById(R.id.payment_edt_email);
 
 		rgInput				= (RadioGroup)view.findViewById(R.id.payment_rg_input);
+		cbDeferred			= (CheckBox)view.findViewById(R.id.payment_cb_deferred);
 		cbSuppressSignature = (CheckBox)view.findViewById(R.id.payment_cb_suppress_signature);
 		cbAuxPurchases		= (CheckBox)view.findViewById(R.id.payment_cb_aux_purchases);
 		cbAuxTags			= (CheckBox)view.findViewById(R.id.payment_cb_aux_tags);
@@ -609,6 +615,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		context.setReceiptEmail(edtEmail.getText().toString());
 		context.setExtID("TEST_APP");
 		context.setSuppressSignatureWaiting(cbSuppressSignature.isChecked());
+		context.setDeferred(cbDeferred.isChecked());
 
 		if (PaymentController.getInstance().getReaderType() != null && PaymentController.getInstance().getReaderType().isTTK())
 		    context.setErn(Integer.parseInt(edtERN.getText().toString()));

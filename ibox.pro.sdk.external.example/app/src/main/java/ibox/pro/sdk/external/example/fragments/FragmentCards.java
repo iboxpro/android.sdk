@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import ibox.pro.sdk.external.AttachCardContext;
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentException;
 import ibox.pro.sdk.external.PaymentResultContext;
@@ -29,11 +30,12 @@ import ibox.pro.sdk.external.entities.LinkedCard;
 import ibox.pro.sdk.external.example.CommonAsyncTask;
 import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
+import ibox.pro.sdk.external.example.dialogs.DeferredResultDialog;
 import ibox.pro.sdk.external.example.dialogs.PaymentDialog;
 
 public class FragmentCards extends Fragment {
     private ListView lvCards;
-    private Button btnAdd, btnRefresh, btnBalance;
+    private Button btnAdd, btnAddDeferred, btnRefresh, btnBalance;
     private CardsAdapter cardsAdapter;
 
     @Nullable
@@ -80,6 +82,12 @@ public class FragmentCards extends Fragment {
                 checkBalance();
             }
         });
+        btnAddDeferred.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addDeferred();
+            }
+        });
 
         refresh();
         return view;
@@ -88,12 +96,17 @@ public class FragmentCards extends Fragment {
     private void initControls(View view) {
         lvCards = (ListView) view.findViewById(R.id.cards_lv_cards);
         btnAdd = (Button) view.findViewById(R.id.cards_btn_add);
+        btnAddDeferred = (Button) view.findViewById(R.id.cards_btn_add_deferred);
         btnRefresh = (Button) view.findViewById(R.id.cards_btn_refresh);
         btnBalance = (Button) view.findViewById(R.id.cards_btn_balance);
     }
 
     private void add() {
        new AttachCardDialog().show();
+    }
+
+    private void addDeferred() {
+        new AttachCardDialog().setDeferred(true).show();
     }
 
     private void remove(int cardID) {
@@ -107,8 +120,6 @@ public class FragmentCards extends Fragment {
     private void checkBalance() {
         new CheckBalanceDialog().show();
     }
-
-
 
     private class CardsAdapter extends ArrayAdapter<LinkedCard> {
         public CardsAdapter() {
@@ -199,8 +210,15 @@ public class FragmentCards extends Fragment {
     }
 
     public class AttachCardDialog extends PaymentDialog {
+        private boolean deferred;
+
         public AttachCardDialog() {
             super(getActivity(), null);
+        }
+
+        public AttachCardDialog setDeferred(boolean deferred) {
+            this.deferred = deferred;
+            return this;
         }
 
         @Override
@@ -210,7 +228,10 @@ public class FragmentCards extends Fragment {
 
         @Override
         protected void action() throws PaymentException {
-            PaymentController.getInstance().addLinkedCard(getContext(), MainActivity.CURRENCY);
+            AttachCardContext attachCardContext = new AttachCardContext()
+                    .setCurrency(MainActivity.CURRENCY)
+                    .setDeferred(deferred);
+            PaymentController.getInstance().addLinkedCard(getContext(), attachCardContext);
         }
 
         @Override
@@ -230,8 +251,12 @@ public class FragmentCards extends Fragment {
 
         @Override
         public void onFinished(PaymentResultContext paymentResultContext) {
+            if (deferred)
+                new DeferredResultDialog(getContext(), paymentResultContext).show();
+            else
+                refresh();
+
             dismiss();
-            refresh();
         }
     }
 

@@ -72,6 +72,24 @@ public class ReversePaymentDialog extends Dialog {
         edtERN.setEnabled(PaymentController.getInstance().getReaderType() != null && PaymentController.getInstance().getReaderType().isTTK());
     }
 
+    private PaymentController.Currency getCurrency() {
+        PaymentController.Currency curr = PaymentController.Currency.RUB;
+
+        if ("RUB".equals(ReversePaymentDialog.this.currency))
+            curr = PaymentController.Currency.RUB;
+
+        if ("VND".equals(ReversePaymentDialog.this.currency))
+            curr = PaymentController.Currency.VND;
+
+        if ("EUR".equals(ReversePaymentDialog.this.currency))
+            curr = PaymentController.Currency.EUR;
+
+        if ("CAD".equals(ReversePaymentDialog.this.currency))
+            curr = PaymentController.Currency.CAD;
+
+        return curr;
+    }
+
     private void startReverse() {
         String amt = edtAmount.getText().toString().replace(',', '.');
         Double reverseAmount = null;
@@ -171,19 +189,11 @@ public class ReversePaymentDialog extends Dialog {
 
         @Override
         protected void action() throws PaymentException {
-            PaymentController.Currency curr = PaymentController.Currency.RUB;
-
-            if ("RUB".equals(ReversePaymentDialog.this.currency))
-                curr = PaymentController.Currency.RUB;
-
-            if ("VND".equals(ReversePaymentDialog.this.currency))
-                curr = PaymentController.Currency.VND;
-
             ReversePaymentContext reversePaymentContext = new ReversePaymentContext();
             reversePaymentContext.setTransactionID(transaction.getID());
             reversePaymentContext.setAction(action);
             reversePaymentContext.setReturnAmount(reverseAmount);
-            reversePaymentContext.setCurrency(curr);
+            reversePaymentContext.setCurrency(getCurrency());
             reversePaymentContext.setAuxData(auxData);
             reversePaymentContext.setReceiptPhone(edtPhone.getText().toString());
             reversePaymentContext.setReceiptEmail(edtEmail.getText().toString());

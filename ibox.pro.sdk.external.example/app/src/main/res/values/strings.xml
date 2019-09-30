@@ -84,6 +84,7 @@
     <string name="payment_rb_outer">Внешней картой</string>
     <string name="payment_rb_prepay">Предоплатой</string>
     <string name="payment_rb_other">Другое</string>
+    <string name="payment_cb_deferred">Отложенный платеж (Только Р17)</string>
     <string name="payment_cb_suppress_signature">Подпись не будет отправлена</string>
     <string name="payment_cb_product">Оплатить продукт</string>
     <string name="payment_lbl_product_field_1">Поле 1 :</string>
@@ -158,6 +159,7 @@
     <string name="linked_dlg_empty">Нет привязанных карт</string>
 
     <string name="cards_btn_add">Добавить</string>
+    <string name="cards_btn_add_deferred">Добавить отложенно (Только Р17)</string>
     <string name="cards_btn_refresh">Обновить</string>
     <string name="cards_btn_balance">Баланс</string>
     <string name="cards_dlg_balance_result_format">Баланс составляет %.2f</string>
