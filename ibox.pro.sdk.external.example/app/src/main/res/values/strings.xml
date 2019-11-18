@@ -84,6 +84,8 @@
     <string name="payment_rb_outer">Внешней картой</string>
     <string name="payment_rb_prepay">Предоплатой</string>
     <string name="payment_rb_other">Другое</string>
+
+    <string name="payment_cb_autonfc">Auto NFC (Только Р17)</string>
     <string name="payment_cb_deferred">Отложенный платеж (Только Р17)</string>
     <string name="payment_cb_suppress_signature">Подпись не будет отправлена</string>
     <string name="payment_cb_product">Оплатить продукт</string>

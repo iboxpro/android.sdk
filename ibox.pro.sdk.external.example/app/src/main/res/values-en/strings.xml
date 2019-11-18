@@ -68,6 +68,7 @@
     <string name="payment_rb_linked_card_format">Linked card %s</string>
     <string name="payment_rb_outer">Outer card</string>
     <string name="payment_rb_prepay">Prepay</string>
+    <string name="payment_cb_autonfc">Auto NFC (Только Р17)</string>
     <string name="payment_cb_deferred">Deferred payment (P17 only)</string>
     <string name="payment_cb_suppress_signature">Signature will not be sent</string>
     <string name="payment_cb_product">Product payment</string>
@@ -175,7 +176,6 @@
     <string name="linked_dlg_title">Select card</string>
     <string name="linked_dlg_empty">No linked cards</string>
     <string name="payment_cb_auxdata">Aux products</string>
-    <string name="payment_cb_autonfc">P17 Auto NFC</string>
     <string name="payment_btn_pay_background">Pay (background)</string>
     <string name="cards_btn_add">Add</string>
     <string name="cards_btn_add_deferred">Add deferred (P17 only)</string>

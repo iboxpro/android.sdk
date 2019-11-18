@@ -147,6 +147,15 @@
 				/>
 		</RadioGroup>
 		<CheckBox
+			android:id="@+id/payment_cb_autonfc"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:checked="false"
+			android:textSize="16sp"
+			android:text="@string/payment_cb_autonfc"
+			/>
+
+		<CheckBox
 			android:id="@+id/payment_cb_deferred"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"

@@ -49,6 +49,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -107,7 +108,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	private LinkedCard selectedLinkedCard = null;
 	
 	private LinearLayout llRegular;
-	private CheckBox cbDeferred, cbSuppressSignature, cbRegular, cbEndType, cbAuxPurchases, cbAuxTags, cbProduct;
+	private CheckBox cbDeferred, cbSuppressSignature, cbRegular, cbEndType, cbAuxPurchases, cbAuxTags, cbProduct, cbAutoNFC;
 	private RadioGroup rgInput;
 	private DatePicker pkrStart, pkrEnd;
 	private EditText edtRepeatCount, edtHour, edtMinute, edtDates;
@@ -314,6 +315,11 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		btnPay.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+
+				Hashtable<String, Object> p = new Hashtable<>();
+				p.put("NOTUP", cbAutoNFC.isChecked());
+				PaymentController.getInstance().setCustomReaderParams(p);
+
 				if (cbRegular.isChecked())
 					doRegularPayment();
 				else
@@ -402,6 +408,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 
 		rgInput				= (RadioGroup)view.findViewById(R.id.payment_rg_input);
 		cbDeferred			= (CheckBox)view.findViewById(R.id.payment_cb_deferred);
+		cbAutoNFC 			= (CheckBox)view.findViewById(R.id.payment_cb_autonfc);
 		cbSuppressSignature = (CheckBox)view.findViewById(R.id.payment_cb_suppress_signature);
 		cbAuxPurchases		= (CheckBox)view.findViewById(R.id.payment_cb_aux_purchases);
 		cbAuxTags			= (CheckBox)view.findViewById(R.id.payment_cb_aux_tags);
@@ -677,7 +684,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	
 	private void doRegularPayment() {
 		RegularPaymentContext context = new RegularPaymentContext();
-		
+
 		context.setAmount(edtAmount.getText().toString().trim().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
 		context.setCurrency(MainActivity.CURRENCY);
 		context.setDescription(edtDescription.getText().toString());
