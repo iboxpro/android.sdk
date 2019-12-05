@@ -120,6 +120,7 @@
     <string name="sdcard_needed">Insert SD card</string>
     <string name="settings_lbl_title">Select reader</string>
     <string name="settings_btn_autoconfig">Autoconfig</string>
+    <string name="settings_btn_settlement">Settlement</string>
     <string name="settings_autoconfig_default">Default config</string>
     <string name="steps_dlg_lbl_title">Confirm schedule</string>
     <string name="steps_dlg_lbl_total">Total:</string>

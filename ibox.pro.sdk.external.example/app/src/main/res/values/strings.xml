@@ -169,6 +169,7 @@
 
     <string name="settings_lbl_title">Выберите ридер</string>
     <string name="settings_btn_autoconfig">Автонастройка</string>
+    <string name="settings_btn_settlement">Сверка</string>
     <string name="settings_autoconfig_default">Конфигурация по умолчанию</string>
 
     <string name="reader_state_disconnected">Ридер не подключен</string>

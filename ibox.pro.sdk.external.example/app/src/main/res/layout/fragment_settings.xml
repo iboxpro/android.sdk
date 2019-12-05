@@ -38,5 +38,13 @@
 			android:layout_gravity="center_horizontal"
 			android:text="@string/settings_btn_autoconfig"
 			/>
+
+		<Button
+			android:id="@+id/settings_btn_settlement"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal"
+			android:text="@string/settings_btn_settlement"
+			/>
 	</LinearLayout>
 </LinearLayout>

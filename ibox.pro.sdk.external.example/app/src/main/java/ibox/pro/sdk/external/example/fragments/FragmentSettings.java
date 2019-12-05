@@ -26,6 +26,7 @@ import java.util.Hashtable;
 
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentController.ReaderType;
+import ibox.pro.sdk.external.entities.SettlementResult;
 import ibox.pro.sdk.external.example.Consts;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.Utils;
@@ -34,7 +35,7 @@ import ibox.pro.sdk.external.example.dialogs.AutoconfigDialog;
 public class FragmentSettings extends Fragment {
 	private ListView lvReaders;
 	private ReadersAdapter mAdapter;
-	private Button btnAutoconfig;
+	private Button btnAutoconfig, btnSettlement;
 
 	private final String config = null;
 
@@ -134,6 +135,16 @@ public class FragmentSettings extends Fragment {
 					new AutoconfigDialog(getActivity()).show();
 				else
 					Toast.makeText(getActivity(), R.string.settings_lbl_title, Toast.LENGTH_LONG).show();
+			}
+		});
+
+		btnSettlement = (Button)view.findViewById(R.id.settings_btn_settlement);
+		btnSettlement.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				SettlementResult result = PaymentController.getInstance().settlement();
+				String message = result.isSuccess() ? "Успешно" : "Ошибка: " + result.getErrorMessage();
+				Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
 			}
 		});
 		return view;
