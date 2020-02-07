@@ -2,6 +2,8 @@ package ibox.pro.sdk.external.example.dialogs;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.view.Gravity;
 import android.view.View;
@@ -10,8 +12,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 import ibox.pro.sdk.external.PaymentController;
+import ibox.pro.sdk.external.PaymentException;
 import ibox.pro.sdk.external.PaymentResultContext;
+import ibox.pro.sdk.external.ProcessingException;
 import ibox.pro.sdk.external.example.CommonAsyncTask;
 import ibox.pro.sdk.external.example.R;
 
@@ -54,11 +60,22 @@ public class DeferredResultDialog extends Dialog {
 
         @Override
         protected PaymentResultContext doInBackground(PaymentResultContext... paymentResultContexts) {
+            String error = null;
             try {
                 return PaymentController.getInstance().submitDeferred(getContext(), paymentResultContexts[0].getDeferredData());
+            } catch (PaymentException | ProcessingException e) {
+                error = e.getMessage();
             } catch (Exception e) {
                 e.printStackTrace();
-                //Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+            if (error != null) {
+                final String fError = error;
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), fError, Toast.LENGTH_LONG).show();
+                    }
+                });
             }
             return null;
         }
