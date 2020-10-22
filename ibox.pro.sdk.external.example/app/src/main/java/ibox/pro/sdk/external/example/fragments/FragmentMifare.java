@@ -281,7 +281,7 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
     }
 
     @Override
-    public void onReaderEvent(PaymentController.ReaderEvent event) {
+    public void onReaderEvent(PaymentController.ReaderEvent event, Map<String, String> params) {
         switch (event) {
             case CONNECTED:
             case START_INIT:
@@ -291,6 +291,7 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
                 Toast.makeText(getContext(), R.string.reader_state_disconnected, Toast.LENGTH_LONG).show();
                 break;
             case INIT_SUCCESSFULLY:
+                Log.i("iboxSDK", "readerInfo: " + params);
                 setControlsEnabled(true);
                 break;
             case INIT_FAILED:

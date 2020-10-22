@@ -6,7 +6,6 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 
 public class BitmapUtils {
-
 	public static Bitmap decodeBitmap(String realUri, int width, int height) {
         Bitmap b = null;
         BitmapFactory.Options o = new BitmapFactory.Options();
@@ -47,7 +46,7 @@ public class BitmapUtils {
         return img;
     }
 
-    public static Bitmap compressedBitmap(String realUri, int width, int height) {
+    public static Bitmap loadBitmap(String realUri, int width, int height) {
         Bitmap bufferBitmap = null;
         try {
             bufferBitmap = decodeBitmap(realUri, width, height);

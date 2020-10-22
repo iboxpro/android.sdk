@@ -74,6 +74,8 @@
     <string name="history_tr_details_dlg_btn_cancel">Отмена платежа</string>
     <string name="history_tr_details_dlg_btn_return">Возврат платежа</string>
 
+
+    <string name="payment_lbl_client_product_code">Client product code:</string>
     <string name="payment_lbl_amount">Сумма :</string>
     <string name="payment_lbl_description">Описание :</string>
     <string name="payment_rb_card">Картой</string>
@@ -199,6 +201,7 @@
     <string name="EMV_CARD_NOT_SUPPORTED">Карта не поддерживается</string>
     <string name="EMV_TRANSACTION_TERMINATED">Транзакция прервана</string>
     <string name="NFC_LIMIT_EXCEEDED">Превышен лимит терминала на бесконтактную оплату</string>
+    <string name="RESUBMIT_FAILED">Ошибка подтверждения операции(%s)</string>
 
     <string-array name="input_types">
         <item>Наличными</item>

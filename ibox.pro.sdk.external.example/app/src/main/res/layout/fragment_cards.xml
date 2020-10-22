@@ -31,7 +31,6 @@
         android:layout_marginBottom="15dp"
         android:layout_above="@+id/cards_btn_refresh"
         android:text="@string/cards_btn_add_deferred"
-        android:visibility="gone"
         />
     <Button
         android:id="@+id/cards_btn_refresh"

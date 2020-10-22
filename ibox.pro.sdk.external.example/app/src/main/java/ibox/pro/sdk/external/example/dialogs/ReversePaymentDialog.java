@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ibox.pro.sdk.external.ReversePaymentContext;
 import ibox.pro.sdk.external.PaymentController;
@@ -228,11 +229,11 @@ public class ReversePaymentDialog extends Dialog {
         }
 
         @Override
-        public void onReaderEvent(PaymentController.ReaderEvent event) {
+        public void onReaderEvent(PaymentController.ReaderEvent event, Map<String, String> params) {
             if (event == PaymentController.ReaderEvent.EMV_TRANSACTION_STARTED || event == PaymentController.ReaderEvent.NFC_TRANSACTION_STARTED)
                 chipRetries++;
 
-            super.onReaderEvent(event);
+            super.onReaderEvent(event, params);
         }
 
         @Override

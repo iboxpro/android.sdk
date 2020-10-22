@@ -34,9 +34,7 @@ import ibox.pro.sdk.external.entities.APIPrepareResult;
 import ibox.pro.sdk.external.entities.PaymentProductItem;
 import ibox.pro.sdk.external.entities.PaymentProductItemField;
 import ibox.pro.sdk.external.entities.PreparedField;
-import ibox.pro.sdk.external.example.BitmapUtils;
 import ibox.pro.sdk.external.example.CommonAsyncTask;
-import ibox.pro.sdk.external.example.Consts;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.utils.WTReParser;
 
@@ -168,14 +166,14 @@ public class ProductDialog extends Dialog implements View.OnClickListener, Adapt
         return null;
     }
 
-    public HashMap<String, byte[]> getImageValues() {
+    public HashMap<String, String> getImageValues() {
         if (mCurrentProduct != null) {
-            HashMap<String, byte[]> result = new HashMap<>();
+            HashMap<String, String> result = new HashMap<>();
             for (int i = 0; i < llFields.getChildCount(); i++) {
                 View nextView = llFields.getChildAt(i);
                 if (nextView instanceof ProductImageFieldView) {
                     ProductImageFieldView productImageFieldView = (ProductImageFieldView) nextView;
-                    result.put(productImageFieldView.getField().getCode(), productImageFieldView.getValue());
+                    result.put(productImageFieldView.getField().getCode(), productImageFieldView.getImageFileName());
                 }
             }
             return result;
@@ -374,7 +372,6 @@ public class ProductDialog extends Dialog implements View.OnClickListener, Adapt
         private ImageView imgImage;
 
         private String mImageFileName;
-        private byte[] value;
 
         public ProductImageFieldView(Context context, @NonNull PaymentProductItemField field) {
             super(context, field);
@@ -397,7 +394,6 @@ public class ProductDialog extends Dialog implements View.OnClickListener, Adapt
 
         void setImageFromPath(String path) {
             mImageFileName = path;
-            value = null;
             Bitmap result = BitmapFactory.decodeFile(mImageFileName);
             imgImage.setImageBitmap(ThumbnailUtils.extractThumbnail(
                     result,
@@ -411,24 +407,8 @@ public class ProductDialog extends Dialog implements View.OnClickListener, Adapt
             return !getField().isRequired() || isImageAttached();
         }
 
-        byte[] getValue() {
-            if (value == null) {
-                if (mImageFileName != null) {
-                    Bitmap bitmap = null;
-                    try {
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        bitmap = BitmapUtils.compressedBitmap(mImageFileName, Consts.Parameters.ImageWidth, Consts.Parameters.ImageHeight);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
-                        value = stream.toByteArray();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (bitmap != null)
-                            bitmap.recycle();
-                    }
-                }
-            }
-            return value;
+        public String getImageFileName() {
+            return mImageFileName;
         }
     }
 

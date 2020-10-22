@@ -12,8 +12,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Locale;
-
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentException;
 import ibox.pro.sdk.external.PaymentResultContext;
@@ -88,6 +86,9 @@ public class DeferredResultDialog extends Dialog {
                     new ResultDialog(getContext(), resultContext, false).show();
                 else if (resultContext.getAttachedCard() != null)
                     Toast.makeText(getContext(), "Card '" + resultContext.getAttachedCard().getAlias() + "' was attached", Toast.LENGTH_LONG).show();
+                else {
+                    Toast.makeText(getContext(), R.string.history_item_inprocess, Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

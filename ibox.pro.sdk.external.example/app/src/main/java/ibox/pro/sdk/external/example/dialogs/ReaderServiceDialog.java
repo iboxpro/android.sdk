@@ -3,6 +3,7 @@ package ibox.pro.sdk.external.example.dialogs;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -93,7 +94,7 @@ public abstract class ReaderServiceDialog extends Dialog implements PaymentContr
     }
 
     @Override
-    public void onReaderEvent(PaymentController.ReaderEvent event) {
+    public void onReaderEvent(PaymentController.ReaderEvent event, Map<String, String> params) {
         switch (event) {
             case CONNECTED:
             case START_INIT:
@@ -104,6 +105,7 @@ public abstract class ReaderServiceDialog extends Dialog implements PaymentContr
                 lblState.setText(R.string.reader_state_disconnected);
                 break;
             case INIT_SUCCESSFULLY:
+                Log.i("iboxSDK", "readerInfo: " + params);
                 lblState.setText(R.string.progress);
                 startProgress();
                 try {

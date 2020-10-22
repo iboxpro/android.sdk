@@ -12,6 +12,8 @@
     <string name="EMV_TRANSACTION_DECLINED">Transaction declined</string>
     <string name="EMV_TRANSACTION_TERMINATED">Transaction terminated</string>
     <string name="NFC_LIMIT_EXCEEDED">NFC limit exceeded</string>
+    <string name="RESUBMIT_FAILED">Failed to confim transaction(%s)</string>
+
     <string name="action_settings">Settings</string>
     <string name="adjust_dlg_btn_send">Send receipt</string>
     <string name="adjust_dlg_lbl_email">Email :</string>

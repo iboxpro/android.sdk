@@ -68,6 +68,12 @@ public class MainActivity extends PermissionsActivity implements TabHost.OnTabCh
 			if (readerType != null && readerType.length() > 0) {
 				try {
 					PaymentController.getInstance().setReaderType(this, ReaderType.valueOf(readerType), readerAddress);
+					if (ReaderType.valueOf(readerType) == ReaderType.SOFTPOS) {
+						String accessCode = Utils.getString(this, Consts.SavedParams.READER_ACCESS_CODE);
+						Hashtable<String, Object> p = new Hashtable<>();
+						p.put("AccessCode", accessCode);
+						PaymentController.getInstance().setCustomReaderParams(p);
+					}
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 					PaymentController.getInstance().setReaderType(this, ReaderType.values()[0], readerAddress);

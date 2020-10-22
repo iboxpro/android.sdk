@@ -101,9 +101,9 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	private SimpleDateFormat mDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
 	
 	private ImageView imgPhoto;
-	private EditText edtAmount, edtDescription, edtERN, edtPhone, edtEmail;
+	private EditText edtAmount, edtDescription, edtERN, edtPhone, edtEmail, edtClientProductCode;
 	private Button btnPay, btnFiscal, btnPayNFC, btnPayBackground, btnCreditVoucher;
-	private byte [] photo;
+	private String photoPath;
 	private String productImageFieldRequestCode;
 	private LinkedCard selectedLinkedCard = null;
 	
@@ -315,10 +315,11 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		btnPay.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
-				Hashtable<String, Object> p = new Hashtable<>();
-				p.put("NOTUP", cbAutoNFC.isChecked());
-				PaymentController.getInstance().setCustomReaderParams(p);
+				if (PaymentController.getInstance().getReaderType() == PaymentController.ReaderType.P17) {
+					Hashtable<String, Object> p = new Hashtable<>();
+					p.put("NOTUP", cbAutoNFC.isChecked());
+					PaymentController.getInstance().setCustomReaderParams(p);
+				}
 
 				if (cbRegular.isChecked())
 					doRegularPayment();
@@ -358,7 +359,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 
 						paymentContext.setAmount(edtAmount.getText().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
 						paymentContext.setDescription(edtDescription.getText().toString());
-						paymentContext.setImage(photo);
+						paymentContext.setImagePath(photoPath);
 						paymentContext.setCurrency(MainActivity.CURRENCY);
 						paymentContext.setExtID("TEST_APP");
 					}
@@ -399,6 +400,9 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	}
 
 	private void initControls(View view) {
+
+		edtClientProductCode = (EditText)view.findViewById(R.id.payment_edt_client_product_code);
+
 		imgPhoto 		= (ImageView)view.findViewById(R.id.payment_img_photo);
 		edtAmount 		= (EditText)view.findViewById(R.id.payment_edt_amount);
 		edtDescription 	= (EditText)view.findViewById(R.id.payment_edt_description);
@@ -407,8 +411,8 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
         edtEmail 		= (EditText)view.findViewById(R.id.payment_edt_email);
 
 		rgInput				= (RadioGroup)view.findViewById(R.id.payment_rg_input);
-		cbDeferred			= (CheckBox)view.findViewById(R.id.payment_cb_deferred);
 		cbAutoNFC 			= (CheckBox)view.findViewById(R.id.payment_cb_autonfc);
+		cbDeferred            = (CheckBox)view.findViewById(R.id.payment_cb_deferred);
 		cbSuppressSignature = (CheckBox)view.findViewById(R.id.payment_cb_suppress_signature);
 		cbAuxPurchases		= (CheckBox)view.findViewById(R.id.payment_cb_aux_purchases);
 		cbAuxTags			= (CheckBox)view.findViewById(R.id.payment_cb_aux_tags);
@@ -585,6 +589,9 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 
 	//region payment
 	private void doSinglePayment(boolean NFCOnly) {
+
+		PaymentController.setClientProductCode(edtClientProductCode.getText().toString());
+
 		final PaymentContext context = new PaymentContext();
 
 		switch (rgInput.indexOfChild(rgInput.findViewById(rgInput.getCheckedRadioButtonId()))) {
@@ -615,14 +622,14 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		if (context.isCash())
 			context.setAmountCashGot(context.getAmount() + 1d);
 		context.setDescription(edtDescription.getText().toString());
-		context.setImage(photo);
+		context.setImagePath(photoPath);
 		context.setCurrency(MainActivity.CURRENCY);
 		context.setNFC(NFCOnly);
 		context.setReceiptPhone(edtPhone.getText().toString());
 		context.setReceiptEmail(edtEmail.getText().toString());
 		context.setExtID("TEST_APP");
-		context.setSuppressSignatureWaiting(cbSuppressSignature.isChecked());
 		context.setDeferred(cbDeferred.isChecked());
+		context.setSuppressSignatureWaiting(cbSuppressSignature.isChecked());
 
 		if (PaymentController.getInstance().getReaderType() != null && PaymentController.getInstance().getReaderType().isTTK())
 		    context.setErn(Integer.parseInt(edtERN.getText().toString()));
@@ -683,12 +690,14 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	}
 	
 	private void doRegularPayment() {
+		PaymentController.setClientProductCode(edtClientProductCode.getText().toString());
+
 		RegularPaymentContext context = new RegularPaymentContext();
 
 		context.setAmount(edtAmount.getText().toString().trim().length() > 0 ? Double.parseDouble(edtAmount.getText().toString()) : 0.0d);
 		context.setCurrency(MainActivity.CURRENCY);
 		context.setDescription(edtDescription.getText().toString());
-		context.setImage(photo);
+		context.setImagePath(photoPath);
 		context.setExtID("TEST_APP");
 		
 		context.setReceiptPhone(edtPhone.getText().toString());
@@ -1000,7 +1009,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
                     if (dlgProduct != null && dlgProduct.isShowing() && productImageFieldRequestCode != null)
                         dlgProduct.setImage(productImageFieldRequestCode, uri);
                     else
-                        setPaymentContextImage(imgPhoto, uri);
+                        setPaymentContextImage(uri);
 
                 }
                 productImageFieldRequestCode = null;
@@ -1013,7 +1022,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
                         if (dlgProduct != null && dlgProduct.isShowing() && productImageFieldRequestCode != null)
                             dlgProduct.setImage(productImageFieldRequestCode, getCameraImagePath());
                         else
-                    	    setPaymentContextImage(imgPhoto, getCameraImagePath());
+                    	    setPaymentContextImage(getCameraImagePath());
                     }
                 }
                 productImageFieldRequestCode = null;
@@ -1059,17 +1068,12 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
         return null;
     }
     
-    private void setPaymentContextImage(ImageView target, String path) {
-        if (path == null) {
-        	if (target == imgPhoto)
-        		photo = null;
-        	
-        	target.setImageResource(android.R.color.white);
-        }
-        else {
-            new SetImageTask(target).execute(path);
-        }
-        
+    private void setPaymentContextImage(String path) {
+		photoPath = path;
+		if (path == null)
+			imgPhoto.setImageResource(android.R.color.white);
+		else
+			new SetImageTask(imgPhoto).execute(path);
     }
 
     private BigDecimal getAuxPurchasesAmount() {
@@ -1085,41 +1089,49 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		}
 		return result;
 	}
-    
-    private class SetImageTask extends CommonAsyncTask<String, Void, Void> {
-    	private ImageView target;
-    	private Bitmap bitmap = null;
-    	
-    	public SetImageTask(ImageView target) {
-    	    super(getActivity());
-    		this.target = target;
-    	}
 
-        protected Void doInBackground(String... params) {
-            String uri = params[0];
-            try {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap = BitmapUtils.compressedBitmap(uri, Consts.Parameters.ImageWidth, Consts.Parameters.ImageHeight);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
-                if (target == imgPhoto)
-                	photo = stream.toByteArray();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
+	private class SetImageTask extends CommonAsyncTask<String, Void, Bitmap> {
+		private ImageView target;
+		int w, h;
 
-        }
+		public SetImageTask(ImageView target) {
+			super(getActivity());
+			this.target = target;
+		}
 
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            
-            if (bitmap != null)
-            	target.setImageBitmap(bitmap);
-        }   
-    }
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			w = target.getMeasuredWidth();
+			h = target.getMeasuredHeight();
+		}
 
-    private class CreditVoucherDialog extends PaymentDialog {
+		protected Bitmap doInBackground(String... params) {
+			String uri = params[0];
+			try {
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				Bitmap bitmap = BitmapUtils.loadBitmap(uri, w, h);
+				bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
+				return bitmap;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+
+		}
+
+		@Override
+		protected void onPostExecute(Bitmap result) {
+			super.onPostExecute(result);
+
+			if (result != null)
+				target.setImageBitmap(result);
+			else
+				target.setImageResource(android.R.color.white);
+		}
+	}
+
+	private class CreditVoucherDialog extends PaymentDialog {
 		private ReversePaymentContext reversePaymentContext;
 
 		public CreditVoucherDialog(Activity context, ReversePaymentContext reversePaymentContext) {

@@ -89,6 +89,7 @@ public class FragmentCards extends Fragment {
             }
         });
 
+
         refresh();
         return view;
     }
@@ -105,12 +106,12 @@ public class FragmentCards extends Fragment {
        new AttachCardDialog().show();
     }
 
-    private void addDeferred() {
-        new AttachCardDialog().setDeferred(true).show();
-    }
-
     private void remove(int cardID) {
         new RemoveTask().execute(cardID);
+    }
+
+    private void addDeferred() {
+        new AttachCardDialog().setDeferred(true).show();
     }
 
     private void refresh() {
@@ -229,8 +230,8 @@ public class FragmentCards extends Fragment {
         @Override
         protected void action() throws PaymentException {
             AttachCardContext attachCardContext = new AttachCardContext()
-                    .setCurrency(MainActivity.CURRENCY)
-                    .setDeferred(deferred);
+                    .setDeferred(deferred)
+                    .setCurrency(MainActivity.CURRENCY);
             PaymentController.getInstance().addLinkedCard(getContext(), attachCardContext);
         }
 
@@ -255,7 +256,6 @@ public class FragmentCards extends Fragment {
                 new DeferredResultDialog(getContext(), paymentResultContext).show();
             else
                 refresh();
-
             dismiss();
         }
     }

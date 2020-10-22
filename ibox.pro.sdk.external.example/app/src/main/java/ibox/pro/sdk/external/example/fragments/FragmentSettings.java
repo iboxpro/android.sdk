@@ -115,6 +115,38 @@ public class FragmentSettings extends Fragment {
 								}
 							})
 							.create().show();
+				} else if (reader == ReaderType.SOFTPOS) {
+					final EditText edtAccessCode = new EditText(getContext());
+					edtAccessCode.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+					edtAccessCode.setText("");
+					edtAccessCode.setInputType(InputType.TYPE_CLASS_NUMBER);
+					edtAccessCode.setSelection(edtAccessCode.getText().length());
+					new AlertDialog.Builder(getActivity())
+							.setCancelable(false)
+							.setTitle("Set access code")
+							.setNegativeButton(getActivity().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
+								}
+							})
+							.setView(edtAccessCode)
+							.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialogInterface, int i) {
+									PaymentController.getInstance().setReaderType(getActivity(), reader, null);
+
+									String accessCode = edtAccessCode.getText().toString();
+									Utils.setString(getActivity(), Consts.SavedParams.READER_ACCESS_CODE, accessCode);
+									Hashtable<String, Object> p = new Hashtable<>();
+									p.put("AccessCode", accessCode);
+									PaymentController.getInstance().setCustomReaderParams(p);
+
+									mAdapter.notifyDataSetChanged();
+									dialogInterface.dismiss();
+								}
+							})
+							.create().show();
 				} else {
 					PaymentController.getInstance().setReaderType(getActivity(), reader, null);
 					Utils.setString(getActivity(), Consts.SavedParams.READER_TYPE_KEY, reader.name());
@@ -131,7 +163,9 @@ public class FragmentSettings extends Fragment {
 		btnAutoconfig.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (PaymentController.getInstance().getReaderType() != null)
+				if (PaymentController.getInstance().getReaderType() == ReaderType.TTK)
+					PaymentController.getInstance().auth(getContext());
+				else if (PaymentController.getInstance().getReaderType() != null)
 					new AutoconfigDialog(getActivity()).show();
 				else
 					Toast.makeText(getActivity(), R.string.settings_lbl_title, Toast.LENGTH_LONG).show();

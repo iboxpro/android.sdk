@@ -206,6 +206,9 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 				case NFC_LIMIT_EXCEEDED:
 					toastText = mActivity.getString(R.string.NFC_LIMIT_EXCEEDED);
 					break;
+				case RESUBMIT_FAILED:
+					toastText = String.format(mActivity.getString(R.string.RESUBMIT_FAILED), errorMessage);
+					break;
                 default :
                     toastText = mActivity.getString(R.string.EMV_ERROR);
                     break;
@@ -231,7 +234,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	}
 
 	@Override
-	public void onReaderEvent(ReaderEvent event) {
+	public void onReaderEvent(ReaderEvent event, Map<String, String> params) {
 		Log.i("iboxSDK", "onReaderEvent: " + event.toString());
 		switch (event) {
 			case CONNECTED :
@@ -239,6 +242,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 				lblState.setText(R.string.reader_state_init);
 				break;
 			case INIT_SUCCESSFULLY:
+				Log.i("iboxSDK", "readerInfo: " + params);
 				lblState.setText(R.string.progress);
 				if (usesReader())
 					try {
@@ -289,9 +293,9 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 			default :
 				break;
 		}
-    }
-    
-    @Override
+	}
+
+	@Override
     public int onSelectApplication(List<String> apps) {
         mSelectedAppIndex = -1;
 

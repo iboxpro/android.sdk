@@ -64,6 +64,21 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:text="@string/payment_lbl_client_product_code"
+			/>
+		<EditText
+			android:id="@+id/payment_edt_client_product_code"
+			android:layout_height="35dp"
+			android:layout_width="match_parent"
+			android:textSize="16sp"
+			android:inputType="textEmailAddress"
+			android:text="IBOX_TEST_APP"
+			/>
+
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
 			android:text="ERN"
 			/>
 		<EditText
@@ -140,11 +155,6 @@
 				android:layout_height="wrap_content"
 				android:text="@string/payment_rb_prepay"
 				/>
-			<RadioButton
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/payment_rb_prepay"
-				/>
 		</RadioGroup>
 		<CheckBox
 			android:id="@+id/payment_cb_autonfc"
@@ -154,14 +164,12 @@
 			android:textSize="16sp"
 			android:text="@string/payment_cb_autonfc"
 			/>
-
 		<CheckBox
 			android:id="@+id/payment_cb_deferred"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:checked="false"
 			android:textSize="16sp"
-			android:visibility="gone"
 			android:text="@string/payment_cb_deferred"
 			/>
 		<CheckBox
