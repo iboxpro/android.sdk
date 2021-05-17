@@ -135,7 +135,29 @@
             />
 
 
+        <Button
+            android:id="@+id/mifare_btn_disable_sound"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Disable sound"
+            android:layout_marginTop="3dp"
+            />
 
+        <Button
+            android:id="@+id/mifare_btn_enable_sound"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enable sound"
+            android:layout_marginTop="3dp"
+            />
+
+        <Button
+            android:id="@+id/mifare_btn_read_card_pan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Read card pan"
+            android:layout_marginTop="3dp"
+            />
 
     <TextView
         android:id="@+id/mifare_txt_log"

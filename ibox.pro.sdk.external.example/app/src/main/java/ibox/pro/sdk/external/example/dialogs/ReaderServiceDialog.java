@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import ibox.pro.sdk.external.PaymentController;
+import ibox.pro.sdk.external.PaymentControllerException;
 import ibox.pro.sdk.external.PaymentControllerListener;
 import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.example.R;
@@ -77,7 +78,7 @@ public abstract class ReaderServiceDialog extends Dialog implements PaymentContr
         super.dismiss();
     }
 
-    protected abstract void startServiceAction() throws IllegalStateException;
+    protected abstract void startServiceAction() throws PaymentControllerException;
 
     protected void startProgress() {
         imgSpinner.setVisibility(View.VISIBLE);
@@ -110,7 +111,7 @@ public abstract class ReaderServiceDialog extends Dialog implements PaymentContr
                 startProgress();
                 try {
                     startServiceAction();
-                } catch (IllegalStateException e) {
+                } catch (PaymentControllerException e) {
                     Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                     dismiss();
                 }

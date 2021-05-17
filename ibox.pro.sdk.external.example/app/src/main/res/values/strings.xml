@@ -30,7 +30,7 @@
     <string name="tab_history">История</string>
     <string name="tab_settings">Настройки</string>
     <string name="tab_cards">Карты</string>
-    <string name="tab_mifare">Mifare</string>
+    <string name="tab_mifare">Разное</string>
 
     <string name="login_dlg_title">Авторизация</string>
     <string name="login_dlg_btn_ok">Вход</string>
@@ -41,13 +41,17 @@
     <string name="tr_details_dlg_lbl_state">Состояние:</string>
     <string name="tr_details_dlg_lbl_id">ID транзакции:</string>
     <string name="tr_details_dlg_lbl_invoice">Номер чека:</string>
+    <string name="tr_details_dlg_lbl_extid">ExtID:</string>
     <string name="tr_details_dlg_lbl_appcode">Код подтверждения:</string>
     <string name="tr_details_dlg_lbl_terminal">Терминал:</string>
     <string name="tr_details_dlg_lbl_iin">IIN карты:</string>
     <string name="tr_details_dlg_lbl_pan">Номер карты:</string>
+    <string name="tr_details_dlg_lbl_pan_full">Номер карты(полный):</string>
+    <string name="tr_details_dlg_lbl_track2">Track2:</string>
     <string name="tr_details_dlg_lbl_link">Ссылка для оплаты:</string>
     <string name="tr_details_dlg_lbl_emv">Данные EMV:</string>
     <string name="tr_details_dlg_lbl_signature">Необходима подпись:</string>
+    <string name="tr_details_dlg_lbl_auxdata">Позиции:</string>
     <string name="tr_details_btn_adjust">Отправить чек</string>
     <string name="tr_details_btn_fiscal_status">Проверить фискальный статус</string>
     <string name="tr_details_dlg_btn_fiscalize">Дофискализировать</string>
@@ -67,6 +71,7 @@
     <string name="history_tr_details_dlg_lbl_state">Статус:</string>
     <string name="history_tr_details_dlg_lbl_fiscal_status">Фискальный статус:</string>
     <string name="history_tr_details_dlg_lbl_invoice">Номер чека:</string>
+    <string name="history_tr_details_dlg_lbl_extid">ExtID:</string>
     <string name="history_tr_details_dlg_lbl_geodata">Координаты:</string>
     <string name="history_tr_details_dlg_lbl_signature_url">Подпись:</string>
     <string name="history_tr_details_dlg_lbl_photo_url">Приложенное изображение:</string>
@@ -76,6 +81,7 @@
 
 
     <string name="payment_lbl_client_product_code">Client product code:</string>
+    <string name="payment_lbl_ext_id">ExtId:</string>
     <string name="payment_lbl_amount">Сумма :</string>
     <string name="payment_lbl_description">Описание :</string>
     <string name="payment_rb_card">Картой</string>
@@ -90,6 +96,7 @@
     <string name="payment_cb_autonfc">Auto NFC (Только Р17)</string>
     <string name="payment_cb_deferred">Отложенный платеж (Только Р17)</string>
     <string name="payment_cb_suppress_signature">Подпись не будет отправлена</string>
+    <string name="payment_cb_skip_fiscalization">Не фискализировать</string>
     <string name="payment_cb_product">Оплатить продукт</string>
     <string name="payment_lbl_product_field_1">Поле 1 :</string>
     <string name="payment_lbl_product_field_2">Поле 2 :</string>
@@ -167,11 +174,15 @@
     <string name="cards_btn_refresh">Обновить</string>
     <string name="cards_btn_balance">Баланс</string>
     <string name="cards_dlg_balance_result_format">Баланс составляет %.2f</string>
+    <string name="cards_btn_activate">Активировать подарочную карту</string>
+    <string name="cards_btn_deactivate">Деактивировать подарочную карту</string>
     <string name="cards_dlg_remove_format">Удалить карту %s?</string>
 
     <string name="settings_lbl_title">Выберите ридер</string>
     <string name="settings_btn_autoconfig">Автонастройка</string>
     <string name="settings_btn_settlement">Сверка</string>
+    <string name="settings_btn_unattended">Автономный режим</string>
+    <string name="settings_btn_softpos_reg">Регистрация SOFTPOS</string>
     <string name="settings_autoconfig_default">Конфигурация по умолчанию</string>
 
     <string name="reader_state_disconnected">Ридер не подключен</string>
@@ -202,6 +213,8 @@
     <string name="EMV_TRANSACTION_TERMINATED">Транзакция прервана</string>
     <string name="NFC_LIMIT_EXCEEDED">Превышен лимит терминала на бесконтактную оплату</string>
     <string name="RESUBMIT_FAILED">Ошибка подтверждения операции(%s)</string>
+    <string name="DEFERRED_FAILED">Ошибка создания платежа</string>
+    <string name="INTERNAL_ERROR">Ошибка операции(%s)</string>
 
     <string-array name="input_types">
         <item>Наличными</item>

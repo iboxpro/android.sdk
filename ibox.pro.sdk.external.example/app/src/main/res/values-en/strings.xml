@@ -13,6 +13,8 @@
     <string name="EMV_TRANSACTION_TERMINATED">Transaction terminated</string>
     <string name="NFC_LIMIT_EXCEEDED">NFC limit exceeded</string>
     <string name="RESUBMIT_FAILED">Failed to confim transaction(%s)</string>
+    <string name="DEFERRED_FAILED">Failed to create payment</string>
+    <string name="INTERNAL_ERROR">Internal error(%s)</string>
 
     <string name="action_settings">Settings</string>
     <string name="adjust_dlg_btn_send">Send receipt</string>
@@ -45,6 +47,7 @@
     <string name="history_tr_details_dlg_lbl_id">ID:</string>
     <string name="history_tr_details_dlg_lbl_geodata">Coordinates:</string>
     <string name="history_tr_details_dlg_lbl_invoice">Invoice:</string>
+    <string name="history_tr_details_dlg_lbl_extid">ExtID:</string>
     <string name="history_tr_details_dlg_lbl_pan">Card number:</string>
     <string name="history_tr_details_dlg_lbl_paytype">Payment type:</string>
     <string name="history_tr_details_dlg_lbl_photo_url">Attached image:</string>
@@ -73,6 +76,7 @@
     <string name="payment_cb_autonfc">Auto NFC (Только Р17)</string>
     <string name="payment_cb_deferred">Deferred payment (P17 only)</string>
     <string name="payment_cb_suppress_signature">Signature will not be sent</string>
+    <string name="payment_cb_skip_fiscalization">Skip fiscalization</string>
     <string name="payment_cb_product">Product payment</string>
     <string name="payment_cb_regular">Regular payment</string>
     <string name="payment_default_dates">01.01.2016;02.02.2016;03.03.2016;</string>
@@ -123,6 +127,8 @@
     <string name="settings_lbl_title">Select reader</string>
     <string name="settings_btn_autoconfig">Autoconfig</string>
     <string name="settings_btn_settlement">Settlement</string>
+    <string name="settings_btn_unattended">Unattended mode</string>
+    <string name="settings_btn_softpos_reg">SOFTPOS registration</string>
     <string name="settings_autoconfig_default">Default config</string>
     <string name="steps_dlg_lbl_title">Confirm schedule</string>
     <string name="steps_dlg_lbl_total">Total:</string>
@@ -130,7 +136,7 @@
     <string name="tab_cards">Cards</string>
     <string name="tab_payment">Payment</string>
     <string name="tab_settings">Settings</string>
-    <string name="tab_mifare">Mifare</string>
+    <string name="tab_mifare">Stuff</string>
     <string name="tab_scan">Scanner</string>
     <string name="tab_print">Printer</string>
     <string name="tr_details_btn_adjust">Send receipt</string>
@@ -140,10 +146,14 @@
     <string name="tr_details_dlg_lbl_id">Transaction ID:</string>
     <string name="tr_details_dlg_lbl_iin">Card IIN:</string>
     <string name="tr_details_dlg_lbl_invoice">Invoice:</string>
+    <string name="tr_details_dlg_lbl_extid">ExtID:</string>
     <string name="tr_details_dlg_lbl_operation">Operation:</string>
     <string name="tr_details_dlg_lbl_pan">Card number:</string>
+    <string name="tr_details_dlg_lbl_pan_full">Card number(full):</string>
+    <string name="tr_details_dlg_lbl_track2">Track2:</string>
     <string name="tr_details_dlg_lbl_link">Link to pay:</string>
     <string name="tr_details_dlg_lbl_signature">Signature required:</string>
+    <string name="tr_details_dlg_lbl_auxdata">Purchases:</string>
     <string name="tr_details_dlg_lbl_state">State:</string>
     <string name="tr_details_dlg_lbl_terminal">Terminal:</string>
     <string name="writing_error">Write error</string>
@@ -185,6 +195,8 @@
     <string name="cards_btn_refresh">Refresh</string>
     <string name="cards_btn_balance">Balance</string>
     <string name="cards_dlg_balance_result_format">Balance is %.2f</string>
+    <string name="cards_btn_activate">Activate gift card</string>
+    <string name="cards_btn_deactivate">Deactivate gift card</string>
     <string name="cards_dlg_remove_format">Remove card %s?</string>
 
     <string name="purchases_dlg_remove_format">Remove aux-product %s?</string>

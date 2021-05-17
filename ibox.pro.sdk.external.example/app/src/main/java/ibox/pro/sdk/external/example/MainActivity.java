@@ -22,6 +22,7 @@ import java.util.Map;
 
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentController.ReaderType;
+import ibox.pro.sdk.external.PaymentControllerException;
 import ibox.pro.sdk.external.entities.APIAuthResult;
 import ibox.pro.sdk.external.entities.Account;
 import ibox.pro.sdk.external.entities.LinkedCard;
@@ -74,9 +75,8 @@ public class MainActivity extends PermissionsActivity implements TabHost.OnTabCh
 						p.put("AccessCode", accessCode);
 						PaymentController.getInstance().setCustomReaderParams(p);
 					}
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-					PaymentController.getInstance().setReaderType(this, ReaderType.values()[0], readerAddress);
+				} catch (PaymentControllerException e) {
+					Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
 				}
 			}
 		}
@@ -99,7 +99,7 @@ public class MainActivity extends PermissionsActivity implements TabHost.OnTabCh
 			Products = (ArrayList<PaymentProductItem>) savedInstanceState.getSerializable(getClass().getCanonicalName() + ".Products");
 		}
 
-	 	PaymentController.getInstance().setSingleStepEMV(true);
+	 	PaymentController.getInstance().setSingleStepEMV(false);
 		PaymentController.getInstance().setRepeatOnError(false);
 		PaymentController.getInstance().setClientProductCode(getString(R.string.app_name));
 		if (Account == null)
@@ -125,8 +125,13 @@ public class MainActivity extends PermissionsActivity implements TabHost.OnTabCh
 
 	@Override
 	public void onTabChanged(String s) {
-		if (s.equalsIgnoreCase(getString(R.string.tab_payment)) && !PaymentController.getInstance().isPaymentInProgress())
-			PaymentController.getInstance().initPaymentSession();
+		if (s.equalsIgnoreCase(getString(R.string.tab_payment)) && !PaymentController.getInstance().isPaymentInProgress()) {
+			try {
+				PaymentController.getInstance().initPaymentSession();
+			} catch (PaymentControllerException e) {
+				Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+		}
 	}
 
 	private void setupTabHost() {
@@ -153,39 +158,42 @@ public class MainActivity extends PermissionsActivity implements TabHost.OnTabCh
 				public void onClick(final DialogInterface dialog, int which) {
 					String login = ((EditText)((AlertDialog)dialog).findViewById(R.id.login_dlg_edt_login)).getText().toString();
 					String password = ((EditText)((AlertDialog)dialog).findViewById(R.id.login_dlg_edt_password)).getText().toString();
-					PaymentController.getInstance().setCredentials(login, password);
-
-					APIAuthResult result = PaymentController.getInstance().auth(MainActivity.this);
-					LinkedCards = new ArrayList<LinkedCard>();
-					if (result == null) {
-						Toast.makeText(MainActivity.this, "Connection lost", Toast.LENGTH_LONG).show();
-						mTabHost.postDelayed(new Runnable() {
-							@Override
-							public void run() {
-								((AlertDialog) dialog).show();
-							}
-						}, 300);
-					} else if (!result.isValid()) {
-						Toast.makeText(MainActivity.this, "Invalid credentials", Toast.LENGTH_LONG).show();
-						mTabHost.postDelayed(new Runnable() {
-							@Override
-							public void run() {
-								((AlertDialog) dialog).show();
-							}
-						}, 300);
-					} else {
-						Account = result.getAccount();
-						BankName = result.getAccount().getBankName();
-						ClientName = result.getAccount().getClientName();
-						ClientLegalName = result.getAccount().getClientLegalName();
-						ClientPhone = result.getAccount().getClientPhone();
-						ClientWeb = result.getAccount().getClientWeb();
-						AcquirersByMethods = result.getAccount().getAcquirersByMethods();
-						if (result.getAccount().getLinkedCards() != null)
-							LinkedCards.addAll(result.getAccount().getLinkedCards());
-						Products = result.getProducts();
-						dialog.dismiss();
-                        setupTabHost();
+					try {
+						PaymentController.getInstance().setCredentials(login, password);
+						APIAuthResult result = PaymentController.getInstance().auth(MainActivity.this);
+						LinkedCards = new ArrayList<LinkedCard>();
+						if (result == null) {
+							Toast.makeText(MainActivity.this, "Connection lost", Toast.LENGTH_LONG).show();
+							mTabHost.postDelayed(new Runnable() {
+								@Override
+								public void run() {
+									((AlertDialog) dialog).show();
+								}
+							}, 300);
+						} else if (!result.isValid()) {
+							Toast.makeText(MainActivity.this, "Invalid credentials", Toast.LENGTH_LONG).show();
+							mTabHost.postDelayed(new Runnable() {
+								@Override
+								public void run() {
+									((AlertDialog) dialog).show();
+								}
+							}, 300);
+						} else {
+							Account = result.getAccount();
+							BankName = result.getAccount().getBankName();
+							ClientName = result.getAccount().getClientName();
+							ClientLegalName = result.getAccount().getClientLegalName();
+							ClientPhone = result.getAccount().getClientPhone();
+							ClientWeb = result.getAccount().getClientWeb();
+							AcquirersByMethods = result.getAccount().getAcquirersByMethods();
+							if (result.getAccount().getLinkedCards() != null)
+								LinkedCards.addAll(result.getAccount().getLinkedCards());
+							Products = result.getProducts();
+							dialog.dismiss();
+							setupTabHost();
+						}
+					} catch (PaymentControllerException e) {
+						Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
 					}
 				}
 			})

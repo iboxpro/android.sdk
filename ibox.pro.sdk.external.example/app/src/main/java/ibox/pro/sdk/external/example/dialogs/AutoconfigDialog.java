@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import ibox.pro.sdk.external.PaymentController;
+import ibox.pro.sdk.external.PaymentControllerException;
 import ibox.pro.sdk.external.example.R;
 
 public class AutoconfigDialog extends ReaderServiceDialog {
@@ -12,7 +13,7 @@ public class AutoconfigDialog extends ReaderServiceDialog {
     }
 
     @Override
-    protected void startServiceAction() throws IllegalStateException {
+    protected void startServiceAction() throws PaymentControllerException {
         PaymentController.getInstance().startAutoConfig();
     }
 
@@ -33,4 +34,5 @@ public class AutoconfigDialog extends ReaderServiceDialog {
         Toast.makeText(getContext(), result.toString(),Toast.LENGTH_LONG).show();
         dismiss();
     }
+
 }

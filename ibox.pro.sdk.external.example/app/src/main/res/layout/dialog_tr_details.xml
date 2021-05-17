@@ -81,6 +81,21 @@
 			android:layout_width="wrap_content"
 			android:layout_marginTop="10dp"
 			android:textColor="#ffffff"
+			android:text="@string/tr_details_dlg_lbl_extid"
+			/>
+
+		<TextView
+			android:id="@+id/tr_details_dlg_lbl_extid"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:textColor="#aaaaaa"
+			/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_marginTop="10dp"
+			android:textColor="#ffffff"
 			android:text="@string/tr_details_dlg_lbl_appcode"
 			/>
 
@@ -141,6 +156,36 @@
 			android:layout_width="wrap_content"
 			android:layout_marginTop="10dp"
 			android:textColor="#ffffff"
+			android:text="@string/tr_details_dlg_lbl_pan_full"
+			/>
+
+		<TextView
+			android:id="@+id/tr_details_dlg_lbl_pan_full"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:textColor="#aaaaaa"
+			/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_marginTop="10dp"
+			android:textColor="#ffffff"
+			android:text="@string/tr_details_dlg_lbl_track2"
+			/>
+
+		<TextView
+			android:id="@+id/tr_details_dlg_lbl_track2"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:textColor="#aaaaaa"
+			/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_marginTop="10dp"
+			android:textColor="#ffffff"
 			android:text="@string/tr_details_dlg_lbl_link"
 			/>
 
@@ -178,6 +223,21 @@
 
 		<TextView
 			android:id="@+id/tr_details_dlg_lbl_signature"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:textColor="#aaaaaa"
+			/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_marginTop="10dp"
+			android:textColor="#ffffff"
+			android:text="@string/tr_details_dlg_lbl_auxdata"
+			/>
+
+		<TextView
+			android:id="@+id/tr_details_dlg_lbl_auxdata"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"

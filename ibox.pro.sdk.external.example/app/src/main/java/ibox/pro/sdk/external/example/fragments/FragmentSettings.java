@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,9 +27,12 @@ import java.util.Hashtable;
 
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentController.ReaderType;
+import ibox.pro.sdk.external.PaymentControllerException;
 import ibox.pro.sdk.external.entities.SettlementResult;
+import ibox.pro.sdk.external.RegistrationCallback;
 import ibox.pro.sdk.external.example.Consts;
 import ibox.pro.sdk.external.example.R;
+import ibox.pro.sdk.external.example.UnattendedActivity;
 import ibox.pro.sdk.external.example.Utils;
 import ibox.pro.sdk.external.example.dialogs.AutoconfigDialog;
 
@@ -36,6 +40,7 @@ public class FragmentSettings extends Fragment {
 	private ListView lvReaders;
 	private ReadersAdapter mAdapter;
 	private Button btnAutoconfig, btnSettlement;
+	private Button btnSoftposReg;
 
 	private final String config = null;
 
@@ -72,15 +77,19 @@ public class FragmentSettings extends Fragment {
 							.setSingleChoiceItems(devices, -1, new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
-									String address = usbSupported
-										? (which > 0 ? bondedDevices.get(which - 1).getAddress() : PaymentController.USB_MODE_KEY)
-										: bondedDevices.get(which).getAddress();
-									PaymentController.getInstance().setReaderType(getActivity(), reader, address, config);
+									try {
+										String address = usbSupported
+												? (which > 0 ? bondedDevices.get(which - 1).getAddress() : PaymentController.USB_MODE_KEY)
+												: bondedDevices.get(which).getAddress();
+										PaymentController.getInstance().setReaderType(getActivity(), reader, address, config);
 
-									dialog.dismiss();
-									mAdapter.notifyDataSetChanged();
-									Utils.setString(getActivity(), Consts.SavedParams.READER_TYPE_KEY, reader.name());
-									Utils.setString(getActivity(), Consts.SavedParams.READER_ADDRESS_KEY, address);
+										dialog.dismiss();
+										mAdapter.notifyDataSetChanged();
+										Utils.setString(getActivity(), Consts.SavedParams.READER_TYPE_KEY, reader.name());
+										Utils.setString(getActivity(), Consts.SavedParams.READER_ADDRESS_KEY, address);
+									} catch (PaymentControllerException e) {
+										Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_LONG).show();
+									}
 								}
 							})
 							.create().show();
@@ -107,7 +116,7 @@ public class FragmentSettings extends Fragment {
 										PaymentController.getInstance().setReaderType(getActivity(), reader, address, config);
 										Utils.setString(getActivity(), Consts.SavedParams.READER_TYPE_KEY, reader.name());
 										Utils.setString(getActivity(), Consts.SavedParams.READER_ADDRESS_KEY, address);
-									} catch (IllegalArgumentException e) {
+									} catch (PaymentControllerException e) {
 										Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
 									}
 									mAdapter.notifyDataSetChanged();
@@ -134,25 +143,35 @@ public class FragmentSettings extends Fragment {
 							.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialogInterface, int i) {
-									PaymentController.getInstance().setReaderType(getActivity(), reader, null);
+									try {
+										PaymentController.getInstance().setReaderType(getActivity(), reader, null);
 
-									String accessCode = edtAccessCode.getText().toString();
-									Utils.setString(getActivity(), Consts.SavedParams.READER_ACCESS_CODE, accessCode);
-									Hashtable<String, Object> p = new Hashtable<>();
-									p.put("AccessCode", accessCode);
-									PaymentController.getInstance().setCustomReaderParams(p);
+										String accessCode = edtAccessCode.getText().toString();
+										Utils.setString(getActivity(), Consts.SavedParams.READER_ACCESS_CODE, accessCode);
+										Hashtable<String, Object> p = new Hashtable<>();
+										p.put("AccessCode", accessCode);
+										PaymentController.getInstance().setCustomReaderParams(p);
 
-									mAdapter.notifyDataSetChanged();
-									dialogInterface.dismiss();
+										mAdapter.notifyDataSetChanged();
+										dialogInterface.dismiss();
+									} catch (PaymentControllerException e) {
+										Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+									}
 								}
 							})
 							.create().show();
 				} else {
-					PaymentController.getInstance().setReaderType(getActivity(), reader, null);
-					Utils.setString(getActivity(), Consts.SavedParams.READER_TYPE_KEY, reader.name());
-					Utils.setString(getActivity(), Consts.SavedParams.READER_ADDRESS_KEY, null);
-					mAdapter.notifyDataSetChanged();
+					try {
+						PaymentController.getInstance().setReaderType(getActivity(), reader, null);
+						Utils.setString(getActivity(), Consts.SavedParams.READER_TYPE_KEY, reader.name());
+						Utils.setString(getActivity(), Consts.SavedParams.READER_ADDRESS_KEY, null);
+						mAdapter.notifyDataSetChanged();
+					} catch (PaymentControllerException e) {
+						Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+					}
 				}
+
+				btnSoftposReg.setVisibility(reader == ReaderType.SOFTPOS ? View.VISIBLE : View.GONE);
 			}
 		});
 
@@ -163,9 +182,13 @@ public class FragmentSettings extends Fragment {
 		btnAutoconfig.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (PaymentController.getInstance().getReaderType() == ReaderType.TTK)
-					PaymentController.getInstance().auth(getContext());
-				else if (PaymentController.getInstance().getReaderType() != null)
+				if (PaymentController.getInstance().getReaderType() == ReaderType.TTK) {
+					try {
+						PaymentController.getInstance().auth(getContext());
+					} catch (PaymentControllerException e) {
+						Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+					}
+				} else if (PaymentController.getInstance().getReaderType() != null)
 					new AutoconfigDialog(getActivity()).show();
 				else
 					Toast.makeText(getActivity(), R.string.settings_lbl_title, Toast.LENGTH_LONG).show();
@@ -176,9 +199,45 @@ public class FragmentSettings extends Fragment {
 		btnSettlement.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				SettlementResult result = PaymentController.getInstance().settlement();
-				String message = result.isSuccess() ? "Успешно" : "Ошибка: " + result.getErrorMessage();
-				Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+				try {
+					SettlementResult result = PaymentController.getInstance().settlement();
+					String message = result.isSuccess() ? getString(R.string.success) : (getString(R.string.failed) + " : " + result.getErrorMessage());
+					Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+				} catch (PaymentControllerException e) {
+					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+				}
+			}
+		});
+
+		btnSoftposReg = (Button)view.findViewById(R.id.settings_btn_softpos_reg);
+		btnSoftposReg.setVisibility(PaymentController.getInstance().getReaderType() == ReaderType.SOFTPOS ? View.VISIBLE : View.GONE);
+		btnSoftposReg.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (PaymentController.getInstance().getReaderType() == ReaderType.SOFTPOS) {
+					try {
+						PaymentController.getInstance().startSoftposRegistration(new RegistrationCallback() {
+							@Override
+							public void onFinished(String accessCode) {
+								Toast.makeText(getActivity(), "SUCCESS " + accessCode, Toast.LENGTH_LONG).show();
+							}
+
+							@Override
+							public void onFailed(String error) {
+								Toast.makeText(getActivity(), "FAILED: " + error, Toast.LENGTH_LONG).show();
+							}
+						});
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+
+		view.findViewById(R.id.settings_btn_unattended).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(getContext(), UnattendedActivity.class));
 			}
 		});
 		return view;

@@ -22,8 +22,7 @@ public abstract class PermissionsActivity extends FragmentActivity {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M
                 || (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                    && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
     }
 
     private void requestPermissions() {
@@ -36,8 +35,6 @@ public abstract class PermissionsActivity extends FragmentActivity {
                     permissions2request.add(Manifest.permission.ACCESS_COARSE_LOCATION);
                 if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                     permissions2request.add(Manifest.permission.ACCESS_FINE_LOCATION);
-                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                    permissions2request.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
                 if (permissions2request.size() > 0)
                     requestPermissions(permissions2request.toArray(new String[]{}), Consts.RequestCodes.CODE_REQUEST_PERMISSIONS);

@@ -1,26 +1,26 @@
 package ibox.pro.sdk.external.example.fragments;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.view.Gravity;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.math.BigDecimal;
+
 import ibox.pro.sdk.external.AttachCardContext;
+import ibox.pro.sdk.external.GiftCardActivationContext;
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentException;
 import ibox.pro.sdk.external.PaymentResultContext;
@@ -32,10 +32,11 @@ import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.dialogs.DeferredResultDialog;
 import ibox.pro.sdk.external.example.dialogs.PaymentDialog;
+import ibox.pro.sdk.external.example.dialogs.ResultDialog;
 
 public class FragmentCards extends Fragment {
     private ListView lvCards;
-    private Button btnAdd, btnAddDeferred, btnRefresh, btnBalance;
+    private Button btnAdd, btnAddDeferred, btnRefresh, btnBalance, btnActivateGiftCard, btnDeactivateGiftCard;
     private CardsAdapter cardsAdapter;
 
     @Nullable
@@ -82,6 +83,39 @@ public class FragmentCards extends Fragment {
                 checkBalance();
             }
         });
+        btnActivateGiftCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText edtAmount = new EditText(getContext());
+                edtAmount.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                edtAmount.setLayoutParams(lp);
+
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.cards_btn_activate)
+                        .setView(edtAmount)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                try {
+                                    activateGiftCard(new BigDecimal(edtAmount.getText().toString()));
+                                } catch (Exception e) {
+                                    Toast.makeText(getContext(), R.string.common_error, Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+            }
+        });
+        btnDeactivateGiftCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deactivateGiftCard();
+            }
+        });
         btnAddDeferred.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,6 +134,8 @@ public class FragmentCards extends Fragment {
         btnAddDeferred = (Button) view.findViewById(R.id.cards_btn_add_deferred);
         btnRefresh = (Button) view.findViewById(R.id.cards_btn_refresh);
         btnBalance = (Button) view.findViewById(R.id.cards_btn_balance);
+        btnActivateGiftCard = (Button) view.findViewById(R.id.cards_btn_activate);
+        btnDeactivateGiftCard = (Button) view.findViewById(R.id.cards_btn_deactivate);
     }
 
     private void add() {
@@ -120,6 +156,23 @@ public class FragmentCards extends Fragment {
 
     private void checkBalance() {
         new CheckBalanceDialog().show();
+    }
+
+    private void activateGiftCard(BigDecimal amount) {
+        GiftCardActivationContext activationContext = new GiftCardActivationContext(true)
+            .setAcquirerCode("MVideo")
+            .setAmount(amount)
+            .setCurrency(MainActivity.CURRENCY);
+
+        new ActivateGiftCardDialog(activationContext).show();
+    }
+
+    private void deactivateGiftCard() {
+        GiftCardActivationContext deactivationContext = new GiftCardActivationContext(false)
+            .setAcquirerCode("MVideo")
+            .setCurrency(MainActivity.CURRENCY);
+
+        new ActivateGiftCardDialog(deactivationContext).show();
     }
 
     private class CardsAdapter extends ArrayAdapter<LinkedCard> {
@@ -272,7 +325,7 @@ public class FragmentCards extends Fragment {
 
         @Override
         protected void action() throws PaymentException {
-            PaymentController.getInstance().balanceInquiry(getContext(), MainActivity.CURRENCY);
+            PaymentController.getInstance().balanceInquiry(getContext(), MainActivity.CURRENCY, "MVideo");
         }
 
         @Override
@@ -296,6 +349,27 @@ public class FragmentCards extends Fragment {
                     getString(R.string.cards_dlg_balance_result_format),
                     paymentResultContext.getTransactionItem().getBalance()
             ), Toast.LENGTH_LONG).show();
+            dismiss();
+        }
+    }
+
+    public class ActivateGiftCardDialog extends CheckBalanceDialog {
+        private final GiftCardActivationContext giftCardActivationContext;
+
+        public ActivateGiftCardDialog(GiftCardActivationContext giftCardActivationContext) {
+            this.giftCardActivationContext = giftCardActivationContext;
+        }
+
+        @Override
+        protected void action() throws PaymentException {
+            PaymentController.getInstance().giftCardActivate(getContext(), giftCardActivationContext);
+        }
+
+        @Override
+        public void onFinished(PaymentResultContext paymentResultContext) {
+            Toast.makeText(getContext(), R.string.success, Toast.LENGTH_LONG).show();
+            if (paymentResultContext.getTransactionItem() != null)
+                new ResultDialog(getActivity(), paymentResultContext, false).show();
             dismiss();
         }
     }

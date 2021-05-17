@@ -58,6 +58,7 @@ import ibox.pro.sdk.external.PaymentContext;
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentController.RegularEndType;
 import ibox.pro.sdk.external.PaymentController.RegularRepeatType;
+import ibox.pro.sdk.external.PaymentControllerException;
 import ibox.pro.sdk.external.PaymentException;
 import ibox.pro.sdk.external.PaymentResultContext;
 import ibox.pro.sdk.external.RegularPaymentContext;
@@ -84,31 +85,32 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		111.256d,
 			2d,
 			230d,
-			Arrays.asList(new String [] { Purchase.TaxCode.VAT_20})
+			Arrays.asList(new String [] { Purchase.TaxCode.VAT_20}),
+			"TESTSKU"
 	);
 	static final Purchase TEST_PRODUCT_BY_TAGS;
 	static {
-		TEST_PRODUCT_TAGS.put(1030, "Тестовый продукт");
-		TEST_PRODUCT_TAGS.put(1079, 111.256d);
-		TEST_PRODUCT_TAGS.put(1043, 230d);
-		TEST_PRODUCT_TAGS.put(1023, 2);
+		TEST_PRODUCT_TAGS.put(Purchase.Tags.Title, "Тестовый продукт");
+		TEST_PRODUCT_TAGS.put(Purchase.Tags.Price, 111.256d);
+		TEST_PRODUCT_TAGS.put(Purchase.Tags.TitleAmount, 230d);
+		TEST_PRODUCT_TAGS.put(Purchase.Tags.Quantity, 2);
+		TEST_PRODUCT_TAGS.put(Purchase.Tags.VAT, 1);
+		TEST_PRODUCT_TAGS.put(Purchase.Tags.SKU, "TESTSKU");
 		TEST_PRODUCT_TAGS.put(1197, "шт");
-		TEST_PRODUCT_TAGS.put(1199, 1);
-
 		TEST_PRODUCT_BY_TAGS = Purchase.Build(TEST_PRODUCT_TAGS);
 	}
 
 	private SimpleDateFormat mDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
 	
 	private ImageView imgPhoto;
-	private EditText edtAmount, edtDescription, edtERN, edtPhone, edtEmail, edtClientProductCode;
+	private EditText edtAmount, edtDescription, edtERN, edtPhone, edtEmail, edtClientProductCode, edtExtId;
 	private Button btnPay, btnFiscal, btnPayNFC, btnPayBackground, btnCreditVoucher;
 	private String photoPath;
 	private String productImageFieldRequestCode;
 	private LinkedCard selectedLinkedCard = null;
 	
 	private LinearLayout llRegular;
-	private CheckBox cbDeferred, cbSuppressSignature, cbRegular, cbEndType, cbAuxPurchases, cbAuxTags, cbProduct, cbAutoNFC;
+	private CheckBox cbDeferred, cbSuppressSignature, cbSkipFiscalization, cbRegular, cbEndType, cbAuxPurchases, cbAuxTags, cbProduct, cbAutoNFC;
 	private RadioGroup rgInput;
 	private DatePicker pkrStart, pkrEnd;
 	private EditText edtRepeatCount, edtHour, edtMinute, edtDates;
@@ -152,7 +154,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 
 			@Override
 			public void onCheckedChanged(final RadioGroup group, int checkedId) {
-				if (checkedId > 0 && ((RadioButton) group.findViewById(checkedId)).isChecked()) {
+				if (((RadioButton) group.findViewById(checkedId)).isChecked()) {
 					if (group.indexOfChild(group.findViewById(checkedId)) == 4) {
 						List<LinkedCard> linkedCards = ((MainActivity) getActivity()).LinkedCards;
 
@@ -315,7 +317,8 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		btnPay.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (PaymentController.getInstance().getReaderType() == PaymentController.ReaderType.P17) {
+				try {
+					if (PaymentController.getInstance().getReaderType() == PaymentController.ReaderType.P17) {
 					Hashtable<String, Object> p = new Hashtable<>();
 					p.put("NOTUP", cbAutoNFC.isChecked());
 					PaymentController.getInstance().setCustomReaderParams(p);
@@ -325,6 +328,9 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 					doRegularPayment();
 				else
 					doSinglePayment(false);
+				} catch (PaymentControllerException e) {
+					Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_LONG).show();
+				}
 			}
 		});
 
@@ -361,7 +367,8 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 						paymentContext.setDescription(edtDescription.getText().toString());
 						paymentContext.setImagePath(photoPath);
 						paymentContext.setCurrency(MainActivity.CURRENCY);
-						paymentContext.setExtID("TEST_APP");
+						paymentContext.setExtID(edtExtId.getText().toString());
+
 					}
 
 					@Override
@@ -402,7 +409,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	private void initControls(View view) {
 
 		edtClientProductCode = (EditText)view.findViewById(R.id.payment_edt_client_product_code);
-
+		edtExtId = (EditText)view.findViewById(R.id.payment_edt_extid);
 		imgPhoto 		= (ImageView)view.findViewById(R.id.payment_img_photo);
 		edtAmount 		= (EditText)view.findViewById(R.id.payment_edt_amount);
 		edtDescription 	= (EditText)view.findViewById(R.id.payment_edt_description);
@@ -414,6 +421,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		cbAutoNFC 			= (CheckBox)view.findViewById(R.id.payment_cb_autonfc);
 		cbDeferred            = (CheckBox)view.findViewById(R.id.payment_cb_deferred);
 		cbSuppressSignature = (CheckBox)view.findViewById(R.id.payment_cb_suppress_signature);
+		cbSkipFiscalization = (CheckBox)view.findViewById(R.id.payment_cb_skip_fiscalization);
 		cbAuxPurchases		= (CheckBox)view.findViewById(R.id.payment_cb_aux_purchases);
 		cbAuxTags			= (CheckBox)view.findViewById(R.id.payment_cb_aux_tags);
 		cbProduct			= (CheckBox)view.findViewById(R.id.payment_cb_product);
@@ -627,9 +635,10 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		context.setNFC(NFCOnly);
 		context.setReceiptPhone(edtPhone.getText().toString());
 		context.setReceiptEmail(edtEmail.getText().toString());
-		context.setExtID("TEST_APP");
+		context.setExtID(edtExtId.getText().toString());
 		context.setDeferred(cbDeferred.isChecked());
 		context.setSuppressSignatureWaiting(cbSuppressSignature.isChecked());
+		context.setSkipFiscalization(cbSkipFiscalization.isChecked());
 
 		if (PaymentController.getInstance().getReaderType() != null && PaymentController.getInstance().getReaderType().isTTK())
 		    context.setErn(Integer.parseInt(edtERN.getText().toString()));
@@ -659,22 +668,22 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		if (acquirersByMethods != null) {
 			if (acquirersByMethods.containsKey(context.getMethod())) {
 				final Map<String, String> acquirers = acquirersByMethods.get(context.getMethod());
-				final Object [] acuirersArray =  acquirers.entrySet().toArray();
+				final Object [] acquirersArray =  acquirers.entrySet().toArray();
 				if (acquirers != null && acquirers.size() > 0) {
 					if (acquirers.size() == 1) {
-						context.setAcquirerCode(((Map.Entry<String, String>) acuirersArray[0]).getKey());
+						context.setAcquirerCode(((Map.Entry<String, String>) acquirersArray[0]).getKey());
 						showPaymentDialog(context);
 					} else {
 						CharSequence [] items = new CharSequence[acquirers.size()];
 						int i = 0;
-						for (Object acquirer : acuirersArray)
+						for (Object acquirer : acquirersArray)
 							items [i++] = ((Map.Entry<String, String>) acquirer).getValue();
 
 						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 							.setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialogInterface, int i) {
-									context.setAcquirerCode(((Map.Entry<String, String>) acuirersArray[i]).getKey());
+									context.setAcquirerCode(((Map.Entry<String, String>) acquirersArray[i]).getKey());
 									dialogInterface.dismiss();
 									showPaymentDialog(context);
 								}
@@ -698,7 +707,6 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		context.setCurrency(MainActivity.CURRENCY);
 		context.setDescription(edtDescription.getText().toString());
 		context.setImagePath(photoPath);
-		context.setExtID("TEST_APP");
 		
 		context.setReceiptPhone(edtPhone.getText().toString());
 		context.setReceiptEmail(edtEmail.getText().toString());
@@ -785,9 +793,10 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		context.setNFC(false);
 		context.setReceiptPhone(edtPhone.getText().toString());
 		context.setReceiptEmail(edtEmail.getText().toString());
-		context.setExtID("TEST_APP");
+		context.setExtID(edtExtId.getText().toString());
 		context.setErn(Integer.parseInt(edtERN.getText().toString()));
 		context.setSuppressSignatureWaiting(cbSuppressSignature.isChecked());
+		context.setSkipFiscalization(cbSkipFiscalization.isChecked());
 		context.setCurrency(MainActivity.CURRENCY);
 		context.setAction(PaymentController.ReverseAction.RETURN);
 

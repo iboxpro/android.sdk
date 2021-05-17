@@ -36,7 +36,6 @@
         android:id="@+id/cards_btn_refresh"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_alignParentBottom="true"
         android:layout_above="@+id/cards_btn_balance"
         android:text="@string/cards_btn_refresh"
         />
@@ -44,7 +43,23 @@
         android:id="@+id/cards_btn_balance"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/cards_btn_activate"
         android:text="@string/cards_btn_balance"
+        />
+    <Button
+        android:id="@+id/cards_btn_activate"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_above="@+id/cards_btn_deactivate"
+        android:text="@string/cards_btn_activate"
+        android:visibility="gone"
+        />
+    <Button
+        android:id="@+id/cards_btn_deactivate"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:text="@string/cards_btn_deactivate"
+        android:visibility="gone"
         />
 </RelativeLayout>

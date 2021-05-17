@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
@@ -141,7 +143,15 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
     public void dismiss() {
     	PaymentController.getInstance().disable();
     	stopProgress();
-    	super.dismiss();
+    	if (isShowing())
+			super.dismiss();
+    	else
+    		new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					PaymentDialog.super.dismiss();
+				}
+			}, 200);
     }
     
     @Override
@@ -208,6 +218,12 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 					break;
 				case RESUBMIT_FAILED:
 					toastText = String.format(mActivity.getString(R.string.RESUBMIT_FAILED), errorMessage);
+					break;
+				case DEFERRED_FAILED:
+					toastText = mActivity.getString(R.string.DEFERRED_FAILED);
+					break;
+				case INTERNAL_ERROR:
+					toastText = String.format(mActivity.getString(R.string.INTERNAL_ERROR), errorMessage);
 					break;
                 default :
                     toastText = mActivity.getString(R.string.EMV_ERROR);
@@ -289,6 +305,9 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 			case PIN_TIMEOUT:
 				Toast.makeText(mActivity, R.string.reader_pin_timeout, Toast.LENGTH_LONG).show();
 				dismiss();
+				break;
+			case CARD_INFO_RECEIVED:
+				Toast.makeText(this.mActivity, "Card info: " + params, Toast.LENGTH_LONG).show();
 				break;
 			default :
 				break;

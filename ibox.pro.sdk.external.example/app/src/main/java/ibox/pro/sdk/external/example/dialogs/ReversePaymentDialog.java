@@ -34,7 +34,7 @@ public class ReversePaymentDialog extends Dialog {
     private JSONObject auxData;
     private Activity mActivity;
     private EditText edtAmount, edtERN, edtPhone, edtEmail;
-    private CheckBox cbSuppressSignature;
+    private CheckBox cbSuppressSignature, cbSkipFiscalization;
     private Button btnConfirm;
 
 
@@ -61,6 +61,7 @@ public class ReversePaymentDialog extends Dialog {
         edtPhone = (EditText)findViewById(R.id.reverse_dlg_edt_phone);
         edtEmail = (EditText)findViewById(R.id.reverse_dlg_edt_email);
         cbSuppressSignature = (CheckBox)findViewById(R.id.reverse_dlg_cb_suppress_signature);
+        cbSkipFiscalization = (CheckBox)findViewById(R.id.reverse_dlg_cb_skip_fiscalization);
         btnConfirm = (Button)findViewById(R.id.reverse_btn_confirm);
 
         edtAmount.setText(this.amount.toString());
@@ -133,11 +134,15 @@ public class ReversePaymentDialog extends Dialog {
         @Override
         protected boolean usesReader() {
             boolean partial = BigDecimal.valueOf(reverseAmount).setScale(getCurrency().getE(), RoundingMode.HALF_UP).compareTo(BigDecimal.ZERO) != 0;
+            boolean cnp = action == PaymentController.ReverseAction.RETURN
+                    ? (transaction.canReturnCNPPartial() || (transaction.canReturnCNP() && !partial))
+                    : (transaction.canCancelCNPPartial() || (transaction.canCancelCNP() && !partial));
+
             return (allowedInputTypes.contains(PaymentController.PaymentInputType.SWIPE)
                         || allowedInputTypes.contains(PaymentController.PaymentInputType.CHIP)
                         || allowedInputTypes.contains(PaymentController.PaymentInputType.NFC)
                         || allowedInputTypes.contains(PaymentController.PaymentInputType.MANUAL))
-                    && !(transaction.canCancelCNPPartial() || (transaction.canCancelCNP() && !partial));
+                    && !cnp;
         }
 
         private void configInputTypes() {
@@ -200,6 +205,7 @@ public class ReversePaymentDialog extends Dialog {
             reversePaymentContext.setReceiptEmail(edtEmail.getText().toString());
             reversePaymentContext.setExtID("TEST_APP");
             reversePaymentContext.setSuppressSignatureWaiting(cbSuppressSignature.isChecked());
+            reversePaymentContext.setSkipFiscalization(cbSkipFiscalization.isChecked());
             if (PaymentController.getInstance().getReaderType() != null && PaymentController.getInstance().getReaderType().isTTK())
                 reversePaymentContext.setErn(Integer.parseInt(edtERN.getText().toString()));
             PaymentController.getInstance().reversePayment(getContext(), reversePaymentContext);

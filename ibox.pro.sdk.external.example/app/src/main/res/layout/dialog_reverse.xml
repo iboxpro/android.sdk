@@ -82,6 +82,14 @@
             android:textSize="16sp"
             android:text="@string/payment_cb_suppress_signature"
             />
+        <CheckBox
+            android:id="@+id/reverse_dlg_cb_skip_fiscalization"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:checked="false"
+            android:textSize="16sp"
+            android:text="@string/payment_cb_skip_fiscalization"
+            />
     </LinearLayout>
 
     <Button

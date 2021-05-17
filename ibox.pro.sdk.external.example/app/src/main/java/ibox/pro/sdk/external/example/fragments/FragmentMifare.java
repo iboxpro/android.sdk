@@ -12,8 +12,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -21,11 +19,14 @@ import java.util.Map;
 
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentControllerListener;
+import ibox.pro.sdk.external.PaymentException;
 import ibox.pro.sdk.external.PaymentResultContext;
+import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 public class FragmentMifare extends Fragment  implements PaymentControllerListener {
 
-    Button btnPoll, btnVerifyPin, btnWriteCard, btnReadCard, btnFinish, btnStatus, btnPenetrate, btnPowerOnNfc, btnPowerOffNfc, btnSendApdu, btnBeep;
+    Button btnPoll, btnVerifyPin, btnWriteCard, btnReadCard, btnFinish, btnStatus, btnPenetrate, btnPowerOnNfc, btnPowerOffNfc
+            , btnSendApdu, btnBeep, btnEnableSound, btnDisableSound, btnReadCardPan;
     TextView txtLog, txtApdu;
 
     EditText txtBlockAddr, txtKeyValue, txtTimeout;
@@ -45,33 +46,40 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
         btnSendApdu.setEnabled(state);
         btnPowerOffNfc.setEnabled(state);
         btnBeep.setEnabled(state);
+        btnDisableSound.setEnabled(state);
+        btnEnableSound.setEnabled(state);
+        btnReadCardPan.setEnabled(state);
     }
 
     public void initControls(View view) {
 
-        txtLog = (TextView)view.findViewById(R.id.mifare_txt_log);
+        txtLog = (TextView) view.findViewById(R.id.mifare_txt_log);
         txtLog.setMovementMethod(new ScrollingMovementMethod());
 
-        btnPoll = (Button)view.findViewById(R.id.mifare_btn_poll);
+        btnPoll = (Button) view.findViewById(R.id.mifare_btn_poll);
 
         btnVerifyPin = (Button) view.findViewById(R.id.mifare_btn_verify_pin);
         btnWriteCard = (Button) view.findViewById(R.id.mifare_btn_write_card);
         btnReadCard = (Button) view.findViewById(R.id.mifare_btn_read_card);
         btnFinish = (Button) view.findViewById(R.id.mifare_btn_finish);
-        btnStatus = (Button)view.findViewById(R.id.mifare_btn_status);
-        btnPenetrate= (Button)view.findViewById(R.id.mifare_btn_penetrate);
+        btnStatus = (Button) view.findViewById(R.id.mifare_btn_status);
+        btnPenetrate = (Button) view.findViewById(R.id.mifare_btn_penetrate);
 
         btnPowerOnNfc = (Button) view.findViewById(R.id.mifare_btn_poweronnfc);
-        btnPowerOffNfc = (Button)view.findViewById(R.id.mifare_btn_poweroffnfc);
-        btnSendApdu = (Button)view.findViewById(R.id.mifare_btn_send_apdu);
+        btnPowerOffNfc = (Button) view.findViewById(R.id.mifare_btn_poweroffnfc);
+        btnSendApdu = (Button) view.findViewById(R.id.mifare_btn_send_apdu);
 
-        btnBeep = (Button)view.findViewById(R.id.mifare_btn_beep);
+        btnBeep = (Button) view.findViewById(R.id.mifare_btn_beep);
+        btnEnableSound = (Button) view.findViewById(R.id.mifare_btn_enable_sound);
+        btnDisableSound = (Button) view.findViewById(R.id.mifare_btn_disable_sound);
 
-        txtApdu = (EditText)view.findViewById(R.id.mifare_txt_apdu);
+        btnReadCardPan = (Button) view.findViewById(R.id.mifare_btn_read_card_pan);
 
-        txtBlockAddr = (EditText)view.findViewById(R.id.txtBlockAddr);
-        txtKeyValue = (EditText)view.findViewById(R.id.txtKeyValue);
-        txtTimeout = (EditText)view.findViewById(R.id.txtTimeout);
+        txtApdu = (EditText) view.findViewById(R.id.mifare_txt_apdu);
+
+        txtBlockAddr = (EditText) view.findViewById(R.id.txtBlockAddr);
+        txtKeyValue = (EditText) view.findViewById(R.id.txtKeyValue);
+        txtTimeout = (EditText) view.findViewById(R.id.txtTimeout);
 
         btnBeep.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,7 +91,7 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
         btnPoll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PaymentController.getInstance().doMifareCard("01",20);
+                PaymentController.getInstance().doMifareCard("01", 20);
             }
         });
 
@@ -92,7 +100,7 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
             public void onClick(View view) {
                 PaymentController.getInstance().setMifareBlockaddr(txtBlockAddr.getText().toString());
                 PaymentController.getInstance().setMifareKeyValue(txtKeyValue.getText().toString());
-                PaymentController.getInstance().doMifareCard("02Key A",Integer.parseInt(txtTimeout.getText().toString()));
+                PaymentController.getInstance().doMifareCard("02Key A", Integer.parseInt(txtTimeout.getText().toString()));
 
             }
         });
@@ -102,7 +110,7 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
             public void onClick(View view) {
                 PaymentController.getInstance().setMifareBlockaddr("0A");
                 PaymentController.getInstance().setMifareKeyValue("ffffffffffff");
-                PaymentController.getInstance().doMifareCard("04",20);
+                PaymentController.getInstance().doMifareCard("04", 20);
             }
         });
 
@@ -110,14 +118,14 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
             @Override
             public void onClick(View view) {
                 PaymentController.getInstance().setMifareBlockaddr("0A");
-                PaymentController.getInstance().doMifareCard("03",20);
+                PaymentController.getInstance().doMifareCard("03", 20);
             }
         });
 
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PaymentController.getInstance().doMifareCard("0E",20);
+                PaymentController.getInstance().doMifareCard("0E", 20);
             }
         });
 
@@ -126,7 +134,7 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
             public void onClick(View view) {
                 String str = PaymentController.getInstance().getMifareStatusMsg();
                 if (str == null) str = "null";
-                Log( str);
+                Log(str);
             }
         });
 
@@ -135,7 +143,7 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
             public void onClick(View view) {
                 PaymentController.getInstance().setMifareKeyValue("90 6a 00 00 00");
                 PaymentController.getInstance().setMifareLen(5);
-                PaymentController.getInstance().doMifareCard("0F",500);
+                PaymentController.getInstance().doMifareCard("0F", 500);
             }
         });
 
@@ -157,6 +165,31 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
             @Override
             public void onClick(View view) {
                 PaymentController.getInstance().sendApduByNFC(txtApdu.getText().toString(), 500);
+            }
+        });
+
+        btnEnableSound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PaymentController.getInstance().setSoundEnabled(true);
+            }
+        });
+
+        btnDisableSound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PaymentController.getInstance().setSoundEnabled(false);
+            }
+        });
+
+        btnReadCardPan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    PaymentController.getInstance().readCardPan(MainActivity.CURRENCY);
+                } catch (PaymentException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -297,6 +330,9 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
             case INIT_FAILED:
                 setControlsEnabled(false);
                 Toast.makeText(getContext(), R.string.reader_state_init_error, Toast.LENGTH_LONG).show();
+                break;
+            case CARD_INFO_RECEIVED:
+                Toast.makeText(getContext(), "Card info: " + params, Toast.LENGTH_LONG).show();
                 break;
             default:
                 break;

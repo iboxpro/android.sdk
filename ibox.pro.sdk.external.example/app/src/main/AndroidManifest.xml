@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
@@ -27,23 +26,6 @@
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-
-    <!-- smartpeak p1000-->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
-    <uses-permission android:name="com.pos.permission.ACCESSORY_DATETIME" />
-    <uses-permission android:name="com.pos.permission.ACCESSORY_LED" />
-    <uses-permission android:name="com.pos.permission.ACCESSORY_BEEP" />
-    <uses-permission android:name="com.pos.permission.ACCESSORY_RFREGISTER" />
-    <uses-permission android:name="com.pos.permission.CARD_READER_ICC" />
-    <uses-permission android:name="com.pos.permission.CARD_READER_PICC" />
-    <uses-permission android:name="com.pos.permission.CARD_READER_MAG" />
-    <uses-permission android:name="com.pos.permission.COMMUNICATION" />
-    <uses-permission android:name="com.pos.permission.PRINTER" />
-    <uses-permission android:name="com.pos.permission.SECURITY" />
-    <uses-permission android:name="com.pos.permission.ACCESSORY_RFREGISTER" />
-    <uses-permission android:name="com.pos.permission.EMVCORE" />
-    <uses-permission android:name="com.pos.permission.ACCESSORY_SCANNER_LED" />
 
     <application
         android:allowBackup="true"
@@ -66,10 +48,26 @@
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Unattended mode example
+        <activity
+            android:name="ibox.pro.sdk.external.example.UnattendedActivity"
+            android:label="@string/app_name"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:launchMode="singleInstance"
+            >
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" android:resource="@xml/usb_device_filter" />
+        </activity>
+        -->
     </application>
 
+    <queries>
+        <package android:name="com.tap2go.softpos" />
+    </queries>
 </manifest>

@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import ibox.pro.sdk.external.PaymentController;
+import ibox.pro.sdk.external.PaymentControllerException;
 import ibox.pro.sdk.external.entities.APIGetHistoryResult;
 import ibox.pro.sdk.external.entities.APITryGetPaymentStatusResult;
 import ibox.pro.sdk.external.entities.TransactionItem;
@@ -163,6 +164,7 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_state)).setText(new StringBuilder(trItem.getStateDisplay()).append(" (").append(trItem.getSubStateDisplay()).append(")"));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_fiscal_status)).setText(fiscalStatus);
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_invoice)).setText(trItem.getInvoice());
+		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_extid)).setText(trItem.getExtID());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_geodata)).setText(String.valueOf(trItem.getLatitude()).concat(" , ").concat(String.valueOf(trItem.getLongitude())));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_signature_url)).setText(trItem.getSignatureUrl());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_photo_url)).setText(trItem.getPhotoUrl());
@@ -224,8 +226,8 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 			}
 		});
 
-		dialogView.findViewById(R.id.history_tr_details_dlg_btn_cancel).setVisibility(trItem.canCancel() || trItem.canCancelPartial() ? View.VISIBLE : View.GONE);
-		dialogView.findViewById(R.id.history_tr_details_dlg_btn_return).setVisibility(trItem.canReturn() || trItem.canReturnPartial() ? View.VISIBLE : View.GONE);
+		dialogView.findViewById(R.id.history_tr_details_dlg_btn_cancel).setVisibility(trItem.canCancel() || trItem.canCancelPartial() || trItem.canCancelCNP() || trItem.canCancelCNPPartial() ? View.VISIBLE : View.GONE);
+		dialogView.findViewById(R.id.history_tr_details_dlg_btn_return).setVisibility(trItem.canReturn() || trItem.canReturnPartial() || trItem.canReturnCNP() || trItem.canReturnCNPPartial() ? View.VISIBLE : View.GONE);
 
 		TransactionItem.FiscalInfo fiscalInfo = trItem.getFiscalInfo();
 		boolean fiscalizeRequired = fiscalInfo != null
@@ -239,8 +241,12 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 			}
 		});
 
-		PaymentController.getInstance().initPaymentSession();
-		dlgTrInfo.show();
+		try {
+			PaymentController.getInstance().initPaymentSession();
+			dlgTrInfo.show();
+		} catch (PaymentControllerException e) {
+			Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+		}
 	}
 
 	@Override
