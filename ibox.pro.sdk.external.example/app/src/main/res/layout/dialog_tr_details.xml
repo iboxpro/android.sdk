@@ -24,11 +24,13 @@
 			android:text="@string/tr_details_dlg_lbl_operation"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_operation"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -39,14 +41,17 @@
 			android:text="@string/tr_details_dlg_lbl_state"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_state"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
+			android:id="@+id/tr_details_dlg_lbl_id_desc"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:layout_marginTop="10dp"
@@ -54,11 +59,13 @@
 			android:text="@string/tr_details_dlg_lbl_id"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_id"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -69,11 +76,13 @@
 			android:text="@string/tr_details_dlg_lbl_invoice"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_invoice"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -84,12 +93,32 @@
 			android:text="@string/tr_details_dlg_lbl_extid"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_extid"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_marginTop="10dp"
+			android:textColor="#ffffff"
+			android:text="@string/tr_details_dlg_lbl_exttrandata"
+			/>
+
+		<EditText
+			android:id="@+id/tr_details_dlg_lbl_exttrandata"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
+			/>
+
 
 		<TextView
 			android:layout_height="wrap_content"
@@ -99,11 +128,13 @@
 			android:text="@string/tr_details_dlg_lbl_appcode"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_appcode"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -114,11 +145,13 @@
 			android:text="@string/tr_details_dlg_lbl_terminal"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_terminal"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -129,11 +162,13 @@
 			android:text="@string/tr_details_dlg_lbl_iin"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_iin"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -144,11 +179,13 @@
 			android:text="@string/tr_details_dlg_lbl_pan"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_pan"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -159,11 +196,13 @@
 			android:text="@string/tr_details_dlg_lbl_pan_full"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_pan_full"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -174,11 +213,13 @@
 			android:text="@string/tr_details_dlg_lbl_track2"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_track2"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -189,12 +230,14 @@
 			android:text="@string/tr_details_dlg_lbl_link"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_link"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
 			android:autoLink="web"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -205,12 +248,14 @@
 			android:text="@string/tr_details_dlg_lbl_emv"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_emv"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
 			android:singleLine="false"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -221,11 +266,13 @@
 			android:text="@string/tr_details_dlg_lbl_signature"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_signature"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
 		<TextView
@@ -236,11 +283,13 @@
 			android:text="@string/tr_details_dlg_lbl_auxdata"
 			/>
 
-		<TextView
+		<EditText
 			android:id="@+id/tr_details_dlg_lbl_auxdata"
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
 			/>
 
         <TextView
@@ -251,11 +300,13 @@
             android:text="@string/history_tr_details_dlg_lbl_fiscal_status"
             />
 
-        <TextView
+        <EditText
             android:id="@+id/tr_details_dlg_lbl_fiscal_status"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textColor="#aaaaaa"
+			android:inputType="none"
+			android:background="@null"
             />
 
         <Button

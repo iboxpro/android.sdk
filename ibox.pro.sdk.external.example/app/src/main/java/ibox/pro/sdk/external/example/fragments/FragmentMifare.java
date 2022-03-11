@@ -309,7 +309,7 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
     }
 
     @Override
-    public void onError(PaymentController.PaymentError error, String errorMessage) {
+    public void onError(PaymentController.PaymentError error, String errorMessage, int extErrorCode) {
 
     }
 
@@ -350,7 +350,7 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
     }
 
     @Override
-    public boolean onScheduleCreationFailed(PaymentController.PaymentError error, String errorMessage) {
+    public boolean onScheduleCreationFailed(PaymentController.PaymentError error, String errorMessage, int extErrorCode) {
         return false;
     }
 

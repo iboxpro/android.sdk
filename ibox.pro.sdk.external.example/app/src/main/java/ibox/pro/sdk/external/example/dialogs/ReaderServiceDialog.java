@@ -146,7 +146,7 @@ public abstract class ReaderServiceDialog extends Dialog implements PaymentContr
     }
 
     @Override
-    public void onError(PaymentController.PaymentError error, String errorMessage) {
+    public void onError(PaymentController.PaymentError error, String errorMessage, int extErrorCode) {
 
     }
 
@@ -161,7 +161,7 @@ public abstract class ReaderServiceDialog extends Dialog implements PaymentContr
     }
 
     @Override
-    public boolean onScheduleCreationFailed(PaymentController.PaymentError error, String errorMessage) {
+    public boolean onScheduleCreationFailed(PaymentController.PaymentError error, String errorMessage, int extErrorCode) {
         return false;
     }
 

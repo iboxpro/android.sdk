@@ -103,7 +103,7 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	private SimpleDateFormat mDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
 	
 	private ImageView imgPhoto;
-	private EditText edtAmount, edtDescription, edtERN, edtPhone, edtEmail, edtClientProductCode, edtExtId;
+	private EditText edtAmount, edtDescription, edtERN, edtPhone, edtEmail, edtClientProductCode, edtExtId, edtExtTranData, edtFiscalRoute;
 	private Button btnPay, btnFiscal, btnPayNFC, btnPayBackground, btnCreditVoucher;
 	private String photoPath;
 	private String productImageFieldRequestCode;
@@ -409,7 +409,9 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 	private void initControls(View view) {
 
 		edtClientProductCode = (EditText)view.findViewById(R.id.payment_edt_client_product_code);
-		edtExtId = (EditText)view.findViewById(R.id.payment_edt_extid);
+		edtExtId		= (EditText)view.findViewById(R.id.payment_edt_extid);
+		edtExtTranData  = (EditText)view.findViewById(R.id.payment_edt_exttrandata);
+		edtFiscalRoute  = (EditText)view.findViewById(R.id.payment_edt_fiscalroute);
 		imgPhoto 		= (ImageView)view.findViewById(R.id.payment_img_photo);
 		edtAmount 		= (EditText)view.findViewById(R.id.payment_edt_amount);
 		edtDescription 	= (EditText)view.findViewById(R.id.payment_edt_description);
@@ -636,6 +638,8 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		context.setReceiptPhone(edtPhone.getText().toString());
 		context.setReceiptEmail(edtEmail.getText().toString());
 		context.setExtID(edtExtId.getText().toString());
+		context.setExtTranData(edtExtTranData.getText().toString());
+		context.setFiscalRouteProfile(edtFiscalRoute.getText().toString());
 		context.setDeferred(cbDeferred.isChecked());
 		context.setSuppressSignatureWaiting(cbSuppressSignature.isChecked());
 		context.setSkipFiscalization(cbSkipFiscalization.isChecked());
@@ -794,6 +798,8 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 		context.setReceiptPhone(edtPhone.getText().toString());
 		context.setReceiptEmail(edtEmail.getText().toString());
 		context.setExtID(edtExtId.getText().toString());
+		context.setExtTranData(edtExtTranData.getText().toString());
+		context.setFiscalRouteProfile(edtFiscalRoute.getText().toString());
 		context.setErn(Integer.parseInt(edtERN.getText().toString()));
 		context.setSuppressSignatureWaiting(cbSuppressSignature.isChecked());
 		context.setSkipFiscalization(cbSkipFiscalization.isChecked());

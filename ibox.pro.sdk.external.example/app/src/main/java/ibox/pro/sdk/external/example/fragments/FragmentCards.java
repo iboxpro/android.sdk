@@ -87,6 +87,7 @@ public class FragmentCards extends Fragment {
             @Override
             public void onClick(View v) {
                 final EditText edtAmount = new EditText(getContext());
+                edtAmount.setHint(getString(R.string.history_tr_details_dlg_lbl_amount).replace(":", ""));
                 edtAmount.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
                 ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -96,7 +97,7 @@ public class FragmentCards extends Fragment {
                 new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.cards_btn_activate)
                         .setView(edtAmount)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.common_continue, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
@@ -113,7 +114,28 @@ public class FragmentCards extends Fragment {
         btnDeactivateGiftCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deactivateGiftCard();
+                final EditText edtActivateId = new EditText(getContext());
+                edtActivateId.setHint("Activation Id");
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                edtActivateId.setLayoutParams(lp);
+
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.cards_btn_deactivate)
+                        .setView(edtActivateId)
+                        .setPositiveButton(R.string.common_continue, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                try {
+                                    deactivateGiftCard(edtActivateId.getText().toString());
+                                } catch (Exception e) {
+                                    Toast.makeText(getContext(), R.string.common_error, Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
             }
         });
         btnAddDeferred.setOnClickListener(new View.OnClickListener() {
@@ -167,10 +189,11 @@ public class FragmentCards extends Fragment {
         new ActivateGiftCardDialog(activationContext).show();
     }
 
-    private void deactivateGiftCard() {
+    private void deactivateGiftCard(String activationId) {
         GiftCardActivationContext deactivationContext = new GiftCardActivationContext(false)
             .setAcquirerCode("MVideo")
-            .setCurrency(MainActivity.CURRENCY);
+            .setCurrency(MainActivity.CURRENCY)
+            .setActivationId(activationId);
 
         new ActivateGiftCardDialog(deactivationContext).show();
     }
@@ -238,7 +261,6 @@ public class FragmentCards extends Fragment {
     }
 
     private class RemoveTask extends CommonAsyncTask<Integer, Void, APIResult> {
-
         public RemoveTask() {
             super(getActivity());
         }
@@ -368,8 +390,13 @@ public class FragmentCards extends Fragment {
         @Override
         public void onFinished(PaymentResultContext paymentResultContext) {
             Toast.makeText(getContext(), R.string.success, Toast.LENGTH_LONG).show();
-            if (paymentResultContext.getTransactionItem() != null)
-                new ResultDialog(getActivity(), paymentResultContext, false).show();
+            if (paymentResultContext.getTransactionItem() != null) {
+                ResultDialog dialog = new ResultDialog(getActivity(), paymentResultContext, false);
+                if (giftCardActivationContext.active()) {
+                    ((TextView) dialog.findViewById(R.id.tr_details_dlg_lbl_id_desc)).setText("Activation ID:");
+                }
+                dialog.show();
+            }
             dismiss();
         }
     }

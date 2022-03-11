@@ -12,6 +12,7 @@
     <string name="EMV_TRANSACTION_DECLINED">Transaction declined</string>
     <string name="EMV_TRANSACTION_TERMINATED">Transaction terminated</string>
     <string name="NFC_LIMIT_EXCEEDED">NFC limit exceeded</string>
+    <string name="BLOCKLISTED">Card blocklisted</string>
     <string name="RESUBMIT_FAILED">Failed to confim transaction(%s)</string>
     <string name="DEFERRED_FAILED">Failed to create payment</string>
     <string name="INTERNAL_ERROR">Internal error(%s)</string>
@@ -48,6 +49,8 @@
     <string name="history_tr_details_dlg_lbl_geodata">Coordinates:</string>
     <string name="history_tr_details_dlg_lbl_invoice">Invoice:</string>
     <string name="history_tr_details_dlg_lbl_extid">ExtID:</string>
+    <string name="history_tr_details_dlg_lbl_exttrandata">ExtTranData:</string>
+
     <string name="history_tr_details_dlg_lbl_pan">Card number:</string>
     <string name="history_tr_details_dlg_lbl_paytype">Payment type:</string>
     <string name="history_tr_details_dlg_lbl_photo_url">Attached image:</string>
@@ -147,6 +150,7 @@
     <string name="tr_details_dlg_lbl_iin">Card IIN:</string>
     <string name="tr_details_dlg_lbl_invoice">Invoice:</string>
     <string name="tr_details_dlg_lbl_extid">ExtID:</string>
+    <string name="tr_details_dlg_lbl_exttrandata">ExtTranData:</string>
     <string name="tr_details_dlg_lbl_operation">Operation:</string>
     <string name="tr_details_dlg_lbl_pan">Card number:</string>
     <string name="tr_details_dlg_lbl_pan_full">Card number(full):</string>
@@ -160,6 +164,7 @@
     <string name="yes">Yes</string>
     <string name="success">Success!</string>
     <string name="failed">Failed!</string>
+    <string name="common_continue">Continue</string>
     <string-array name="regular_payment_types">
         <item>One time</item>
         <item>Weekly</item>

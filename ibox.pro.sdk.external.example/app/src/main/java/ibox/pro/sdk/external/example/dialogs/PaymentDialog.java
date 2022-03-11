@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CountDownLatch;
 
 import ibox.pro.sdk.external.PaymentContext;
 import ibox.pro.sdk.external.PaymentController;
@@ -85,8 +86,6 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
         spinRotation.setInterpolator(new LinearInterpolator());
         spinRotation.setRepeatMode(Animation.RESTART);
         spinRotation.setRepeatCount(Animation.INFINITE);
-        
-        PaymentController.getInstance().setPaymentControllerListener(this);
     }
 
     protected boolean usesReader() {
@@ -103,13 +102,22 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	@Override
 	protected void onStart() {
 		super.onStart();
+
+		PaymentController.getInstance().setPaymentControllerListener(this);
+
 		if (!usesReader())
 			try {
 				action();
 			} catch (PaymentException e) {
 				e.printStackTrace();
-				onError(null, e.getMessage());
+				onError(null, e.getMessage(), 0);
 			}
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		PaymentController.getInstance().setPaymentControllerListener(null);
 	}
 
 	protected void action() throws PaymentException {
@@ -143,6 +151,8 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
     public void dismiss() {
     	PaymentController.getInstance().disable();
     	stopProgress();
+    	if (dlgSelectApp != null)
+			dlgSelectApp.dismiss();
     	if (isShowing())
 			super.dismiss();
     	else
@@ -155,7 +165,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
     }
     
     @Override
-    public void onError(final PaymentController.PaymentError error, final String errorMessage) {
+    public void onError(final PaymentController.PaymentError error, final String errorMessage, int extErrorCode) {
     	stopProgress();
     	String toastText = "";
         if (error == null)
@@ -216,6 +226,9 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 				case NFC_LIMIT_EXCEEDED:
 					toastText = mActivity.getString(R.string.NFC_LIMIT_EXCEEDED);
 					break;
+				case BLOCKLISTED:
+					toastText = mActivity.getString(R.string.BLOCKLISTED);
+					break;
 				case RESUBMIT_FAILED:
 					toastText = String.format(mActivity.getString(R.string.RESUBMIT_FAILED), errorMessage);
 					break;
@@ -230,7 +243,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
                     break;
             }
 		dismiss();
-		Toast.makeText(mActivity, String.format("%s (%s)", toastText, (error == null ? "null" : error.toString())), Toast.LENGTH_LONG).show();
+		Toast.makeText(mActivity, String.format("%s (%s[%d])", toastText, (error == null ? "null" : error.toString()), extErrorCode), Toast.LENGTH_LONG).show();
     }
 
 	@Override
@@ -265,7 +278,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 						action();
 					} catch (PaymentException e) {
 						e.printStackTrace();
-						onError(null, e.getMessage());
+						onError(null, e.getMessage(), 0);
 					}
 				break;
 			case DISCONNECTED :
@@ -318,7 +331,7 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
     public int onSelectApplication(List<String> apps) {
         mSelectedAppIndex = -1;
 
-        final Object lock = new Object();
+        final CountDownLatch selectAppLatch = new CountDownLatch(1);
         final String[] array = apps.toArray(new String[apps.size()]);
         final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         builder.setCancelable(false)
@@ -332,10 +345,8 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
                 .setSingleChoiceItems(array, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        synchronized (lock) {
-							mSelectedAppIndex = which;
-							lock.notifyAll();
-                        }
+						mSelectedAppIndex = which;
+						selectAppLatch.countDown();
                     }
                 });
 
@@ -346,33 +357,27 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
                 dlgSelectApp.setOnDismissListener(new OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialogInterface) {
-                        synchronized (lock) {
-                            lock.notifyAll();
-                        }
+						selectAppLatch.countDown();
                     }
                 });
                 dlgSelectApp.show();
             }
         });
 
-        synchronized (lock) {
-            try {
-                lock.wait(30000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        try {
+        	selectAppLatch.await();
+		} catch (InterruptedException e) {
+        	e.printStackTrace();
+		}
 
 		mActivity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
 				dlgSelectApp.dismiss();
-				if (mSelectedAppIndex < 0)
-					PaymentDialog.this.dismiss();
 			}
 		});
 
-        return Math.max(mSelectedAppIndex, 0);
+        return mSelectedAppIndex;
     }
       
     @Override
@@ -429,12 +434,12 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
     }
 
 	@Override
-	public boolean onScheduleCreationFailed(final PaymentError error, final String errorMsg) {
+	public boolean onScheduleCreationFailed(final PaymentError error, final String errorMsg, int extErrorCode) {
 		mStepsRetry = null;
 
 		final Object lock = new Object();
 		final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-		String message = String.format(getContext().getString(R.string.error_schedule_creation), error == PaymentError.CONNECTION_ERROR ? getContext().getString(R.string.error_no_response) : String.valueOf(errorMsg));
+		String message = String.format(getContext().getString(R.string.error_schedule_creation), error == PaymentError.CONNECTION_ERROR ? getContext().getString(R.string.error_no_response) : String.format("%s [%d]", errorMsg, extErrorCode));
 		builder.setMessage(message);
 		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 			@Override

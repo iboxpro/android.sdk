@@ -119,8 +119,8 @@ public class UnattendedActivity extends PermissionsActivity implements PaymentCo
     }
 
     @Override
-    public void onError(PaymentController.PaymentError error, String errorMessage) {
-        log("onError: " + error + " | " + errorMessage);
+    public void onError(PaymentController.PaymentError error, String errorMessage, int extErrorCode) {
+        log("onError: " + error + " | " + errorMessage + " | " + extErrorCode);
         pay();
     }
 
@@ -183,7 +183,7 @@ public class UnattendedActivity extends PermissionsActivity implements PaymentCo
     }
 
     @Override
-    public boolean onScheduleCreationFailed(PaymentController.PaymentError error, String errorMessage) {
+    public boolean onScheduleCreationFailed(PaymentController.PaymentError error, String errorMessage, int extErrorCode) {
         return false;
     }
 

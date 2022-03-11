@@ -85,7 +85,30 @@
 			android:layout_height="35dp"
 			android:layout_width="match_parent"
 			android:textSize="16sp"
-			android:inputType="textEmailAddress"
+			android:text=""
+			/>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/payment_lbl_ext_trandata"
+			/>
+		<EditText
+			android:id="@+id/payment_edt_exttrandata"
+			android:layout_height="35dp"
+			android:layout_width="match_parent"
+			android:textSize="16sp"
+			android:text=""
+			/>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/payment_lbl_fiscal_route"
+			/>
+		<EditText
+			android:id="@+id/payment_edt_fiscalroute"
+			android:layout_height="35dp"
+			android:layout_width="match_parent"
+			android:textSize="16sp"
 			android:text=""
 			/>
 

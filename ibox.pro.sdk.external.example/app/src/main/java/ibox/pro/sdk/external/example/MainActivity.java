@@ -99,7 +99,7 @@ public class MainActivity extends PermissionsActivity implements TabHost.OnTabCh
 			Products = (ArrayList<PaymentProductItem>) savedInstanceState.getSerializable(getClass().getCanonicalName() + ".Products");
 		}
 
-	 	PaymentController.getInstance().setSingleStepEMV(false);
+	 	PaymentController.getInstance().setSingleStepEMV(true);
 		PaymentController.getInstance().setRepeatOnError(false);
 		PaymentController.getInstance().setClientProductCode(getString(R.string.app_name));
 		if (Account == null)

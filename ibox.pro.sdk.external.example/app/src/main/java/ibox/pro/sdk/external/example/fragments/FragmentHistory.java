@@ -165,6 +165,7 @@ public class FragmentHistory extends Fragment implements ReversePaymentDialog.On
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_fiscal_status)).setText(fiscalStatus);
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_invoice)).setText(trItem.getInvoice());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_extid)).setText(trItem.getExtID());
+		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_exttrandata)).setText(trItem.getExtTranData());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_geodata)).setText(String.valueOf(trItem.getLatitude()).concat(" , ").concat(String.valueOf(trItem.getLongitude())));
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_signature_url)).setText(trItem.getSignatureUrl());
 		((TextView)dialogView.findViewById(R.id.history_tr_details_dlg_lbl_photo_url)).setText(trItem.getPhotoUrl());

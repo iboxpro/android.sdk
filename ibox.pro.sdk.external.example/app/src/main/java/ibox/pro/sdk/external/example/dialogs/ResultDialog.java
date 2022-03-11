@@ -31,12 +31,12 @@ import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.Utils;
 
 public class ResultDialog extends Dialog {
-
 	private TextView lblOperation, lblState, lblID, lblInvoice, lblExtID, lblAppcode, lblTerminal,
                 lblIIN, lblPAN, lblPANFull, lblTrack2, lblLink,
-                lblEMV, lblSignature, lblFiscalStatus, lblAuxData;
+                lblEMV, lblSignature, lblFiscalStatus, lblAuxData, lblExtTranData;
 	private Button btnAdjust, btnFiscalStatus, btnInvoice, btnFiscalize;
 
+	private PaymentResultContext mPaymentResultContext;
 	public ResultDialog(final Context context, final PaymentResultContext paymentResultContext, final boolean isReverse) {
 		super(context, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 		
@@ -45,7 +45,7 @@ public class ResultDialog extends Dialog {
         setContentView(R.layout.dialog_tr_details);
 
         initControls();
-
+        mPaymentResultContext = paymentResultContext;
         final TransactionItem transactionItem = paymentResultContext.getTransactionItem();
         final ScheduleItem scheduleItem = paymentResultContext.getScheduleItem();
         final boolean isRegular = scheduleItem != null;
@@ -157,6 +157,7 @@ public class ResultDialog extends Dialog {
 		lblID 			= (TextView)findViewById(R.id.tr_details_dlg_lbl_id);
 		lblInvoice 		= (TextView)findViewById(R.id.tr_details_dlg_lbl_invoice);
 		lblExtID 		= (TextView)findViewById(R.id.tr_details_dlg_lbl_extid);
+		lblExtTranData  = (TextView)findViewById(R.id.tr_details_dlg_lbl_exttrandata);
         lblAppcode 		= (TextView)findViewById(R.id.tr_details_dlg_lbl_appcode);
         lblTerminal 	= (TextView)findViewById(R.id.tr_details_dlg_lbl_terminal);
         lblIIN  		= (TextView)findViewById(R.id.tr_details_dlg_lbl_iin);
@@ -180,10 +181,11 @@ public class ResultDialog extends Dialog {
         lblID.setText(transactionItem.getID());
         lblInvoice.setText(transactionItem.getInvoice());
         lblExtID.setText(transactionItem.getExtID());
+        lblExtTranData.setText(transactionItem.getExtTranData());
         lblAppcode.setText(transactionItem.getApprovalCode());
 
         lblIIN.setText(transactionItem.getCard().getIin());
-        lblPAN.setText(transactionItem.getCard().getPanMasked().replace("*", " **** "));
+        lblPAN.setText(transactionItem.getCard().getPanMasked().replace("*", " **** ") + "\nHash: " + mPaymentResultContext.getCardHash());
         lblPANFull.setText(transactionItem.getCard().getPANFull());
         lblTrack2.setText(transactionItem.getCard().getTrack2());
 

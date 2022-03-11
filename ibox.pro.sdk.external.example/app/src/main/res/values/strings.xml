@@ -14,6 +14,7 @@
     <string name="cancel">Отмена</string>
     <string name="success">Успешно!</string>
     <string name="failed">Неудачно!</string>
+    <string name="common_continue">Продолжить</string>
     <string name="common_error">Произошла ошибка</string>
     <string name="writing_error">Ошибка записи</string>
     <string name="error_no_response">Сервер не отвечает</string>
@@ -42,6 +43,7 @@
     <string name="tr_details_dlg_lbl_id">ID транзакции:</string>
     <string name="tr_details_dlg_lbl_invoice">Номер чека:</string>
     <string name="tr_details_dlg_lbl_extid">ExtID:</string>
+    <string name="tr_details_dlg_lbl_exttrandata">ExtTranData:</string>
     <string name="tr_details_dlg_lbl_appcode">Код подтверждения:</string>
     <string name="tr_details_dlg_lbl_terminal">Терминал:</string>
     <string name="tr_details_dlg_lbl_iin">IIN карты:</string>
@@ -72,6 +74,7 @@
     <string name="history_tr_details_dlg_lbl_fiscal_status">Фискальный статус:</string>
     <string name="history_tr_details_dlg_lbl_invoice">Номер чека:</string>
     <string name="history_tr_details_dlg_lbl_extid">ExtID:</string>
+    <string name="history_tr_details_dlg_lbl_exttrandata">ExtTranData:</string>
     <string name="history_tr_details_dlg_lbl_geodata">Координаты:</string>
     <string name="history_tr_details_dlg_lbl_signature_url">Подпись:</string>
     <string name="history_tr_details_dlg_lbl_photo_url">Приложенное изображение:</string>
@@ -82,6 +85,8 @@
 
     <string name="payment_lbl_client_product_code">Client product code:</string>
     <string name="payment_lbl_ext_id">ExtId:</string>
+    <string name="payment_lbl_ext_trandata">ExtTranData:</string>
+    <string name="payment_lbl_fiscal_route">Fiscal route:</string>
     <string name="payment_lbl_amount">Сумма :</string>
     <string name="payment_lbl_description">Описание :</string>
     <string name="payment_rb_card">Картой</string>
@@ -212,6 +217,7 @@
     <string name="EMV_CARD_NOT_SUPPORTED">Карта не поддерживается</string>
     <string name="EMV_TRANSACTION_TERMINATED">Транзакция прервана</string>
     <string name="NFC_LIMIT_EXCEEDED">Превышен лимит терминала на бесконтактную оплату</string>
+    <string name="BLOCKLISTED">Карта в черном списке</string>
     <string name="RESUBMIT_FAILED">Ошибка подтверждения операции(%s)</string>
     <string name="DEFERRED_FAILED">Ошибка создания платежа</string>
     <string name="INTERNAL_ERROR">Ошибка операции(%s)</string>

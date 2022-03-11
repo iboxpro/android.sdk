@@ -52,7 +52,6 @@
         android:layout_width="match_parent"
         android:layout_above="@+id/cards_btn_deactivate"
         android:text="@string/cards_btn_activate"
-        android:visibility="gone"
         />
     <Button
         android:id="@+id/cards_btn_deactivate"
@@ -60,6 +59,5 @@
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
         android:text="@string/cards_btn_deactivate"
-        android:visibility="gone"
         />
 </RelativeLayout>
