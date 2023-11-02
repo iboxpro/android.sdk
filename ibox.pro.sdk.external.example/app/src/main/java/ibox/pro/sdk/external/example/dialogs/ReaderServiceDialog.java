@@ -136,6 +136,11 @@ public abstract class ReaderServiceDialog extends Dialog implements PaymentContr
     }
 
     @Override
+    public void onReaderConfigFinished(boolean success) {
+
+    }
+
+    @Override
     public void onTransactionStarted(String transactionID) {
 
     }
@@ -244,6 +249,41 @@ public abstract class ReaderServiceDialog extends Dialog implements PaymentContr
 
     @Override
     public void onReturnPowerOffNFCResult(boolean result) {
+
+    }
+
+    @Override
+    public void onBatchReadMifareCardResult(String msg, Hashtable<String, List<String>> cardData) {
+
+    }
+
+    @Override
+    public void onBatchWriteMifareCardResult(String msg, Hashtable<String, List<String>> cardData) {
+
+    }
+
+    @Override
+    public void onVerifyMifareULData(Hashtable<String, String> data) {
+
+    }
+
+    @Override
+    public void onGetMifareCardVersion(Hashtable<String, String> hashtable) {
+
+    }
+
+    @Override
+    public void onGetMifareReadData(Hashtable<String, String> hashtable) {
+
+    }
+
+    @Override
+    public void onGetMifareFastReadData(Hashtable<String, String> hashtable) {
+
+    }
+
+    @Override
+    public void onWriteMifareULData(String s) {
 
     }
 }

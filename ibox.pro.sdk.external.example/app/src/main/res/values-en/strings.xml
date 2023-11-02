@@ -131,7 +131,10 @@
     <string name="settings_btn_autoconfig">Autoconfig</string>
     <string name="settings_btn_settlement">Settlement</string>
     <string name="settings_btn_unattended">Unattended mode</string>
+    <string name="settings_btn_softpos_reg_check">Check SOFTPOS registration</string>
     <string name="settings_btn_softpos_reg">SOFTPOS registration</string>
+    <string name="settings_cb_softpos_reg_force">Forced</string>
+    <string name="settings_btn_softpos_remove_acc">Remove SOFTPOS account</string>
     <string name="settings_autoconfig_default">Default config</string>
     <string name="steps_dlg_lbl_title">Confirm schedule</string>
     <string name="steps_dlg_lbl_total">Total:</string>

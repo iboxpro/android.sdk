@@ -90,6 +90,9 @@ public class ReversePaymentDialog extends Dialog {
         if ("CAD".equals(ReversePaymentDialog.this.currency))
             curr = PaymentController.Currency.CAD;
 
+        if ("KZT".equals(ReversePaymentDialog.this.currency))
+            curr = PaymentController.Currency.KZT;
+
         return curr;
     }
 

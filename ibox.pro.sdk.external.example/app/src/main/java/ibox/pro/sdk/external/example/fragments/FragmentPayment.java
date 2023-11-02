@@ -1,11 +1,14 @@
 package ibox.pro.sdk.external.example.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -16,6 +19,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +42,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormatSymbols;
@@ -70,6 +75,7 @@ import ibox.pro.sdk.external.entities.Purchase;
 import ibox.pro.sdk.external.example.BitmapUtils;
 import ibox.pro.sdk.external.example.CommonAsyncTask;
 import ibox.pro.sdk.external.example.Consts;
+import ibox.pro.sdk.external.example.ImageFileProvider;
 import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.dialogs.FiscalDialog;
@@ -1032,12 +1038,12 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
 
             case Consts.RequestCodes.PHOTO_CAPTURE :
                 if (resultCode == Activity.RESULT_OK) {
-                    if (new File(getCameraImagePath()).exists()) {
+                    if (new File(getCameraImagePath(getActivity())).exists()) {
                     	System.gc();
                         if (dlgProduct != null && dlgProduct.isShowing() && productImageFieldRequestCode != null)
-                            dlgProduct.setImage(productImageFieldRequestCode, getCameraImagePath());
+                            dlgProduct.setImage(productImageFieldRequestCode, getCameraImagePath(getActivity()));
                         else
-                    	    setPaymentContextImage(getCameraImagePath());
+                    	    setPaymentContextImage(getCameraImagePath(getActivity()));
                     }
                 }
                 productImageFieldRequestCode = null;
@@ -1048,27 +1054,54 @@ public class FragmentPayment extends Fragment implements ProductDialog.Listener 
         }
     }
 
-    private void getImageFromGallery() {
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+		if (requestCode == Consts.RequestCodes.PHOTO_CAPTURE && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+			startCameraActivity();
+	}
+
+	private void getImageFromGallery() {
 	    Intent intent = new Intent(Intent.ACTION_PICK);
 	    intent.setType("image/*");
 	    startActivityForResult(intent, Consts.RequestCodes.SELECT_PHOTO);
 	}
 
 	private void getImageFromCamera() {
-        if (android.os.Environment.getExternalStorageState().equalsIgnoreCase(android.os.Environment.MEDIA_MOUNTED)) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            File file = new File(getCameraImagePath());
-            Uri outputFileUri = Uri.fromFile(file);
-
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-            startActivityForResult(intent, Consts.RequestCodes.PHOTO_CAPTURE);
-        } else {
-            Toast.makeText(getActivity(), getString(R.string.sdcard_needed), Toast.LENGTH_LONG).show();
-        }
+		if (android.os.Environment.getExternalStorageState().equalsIgnoreCase(android.os.Environment.MEDIA_MOUNTED)) {
+			if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+				requestPermissions(new String[] {Manifest.permission.CAMERA}, Consts.RequestCodes.PHOTO_CAPTURE);
+			else
+				startCameraActivity();
+		} else
+			Toast.makeText(getActivity(), getString(R.string.sdcard_needed), Toast.LENGTH_LONG).show();
     }
-    
-    private String getCameraImagePath() {
-        return android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/image.tmp";
+
+	private void startCameraActivity() {
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		File file = new File(getCameraImagePath(getActivity()));
+		boolean exists = file.exists();
+		if (!exists)
+			try {
+				exists = file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		if (exists) {
+			Uri outputFileUri = Build.VERSION.SDK_INT >= 24
+				? ImageFileProvider.getUriForFile(getContext(), ImageFileProvider.class.getCanonicalName(), file)
+				: Uri.fromFile(file);
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+
+			startActivityForResult(intent, Consts.RequestCodes.PHOTO_CAPTURE);
+		} else
+			Toast.makeText(getActivity(), getString(R.string.common_error), Toast.LENGTH_LONG).show();
+	}
+
+    private String getCameraImagePath(Context context) {
+		return context.getExternalCacheDir()+ "/image.tmp";
     }
 	
     private String getRealPathFromUri(final Uri contentUri) {

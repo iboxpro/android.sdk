@@ -187,7 +187,10 @@
     <string name="settings_btn_autoconfig">Автонастройка</string>
     <string name="settings_btn_settlement">Сверка</string>
     <string name="settings_btn_unattended">Автономный режим</string>
+    <string name="settings_btn_softpos_reg_check">Проверить регистрацию SOFTPOS</string>
     <string name="settings_btn_softpos_reg">Регистрация SOFTPOS</string>
+    <string name="settings_cb_softpos_reg_force">Принудительно</string>
+    <string name="settings_btn_softpos_remove_acc">Удалить аккаунт SOFTPOS</string>
     <string name="settings_autoconfig_default">Конфигурация по умолчанию</string>
 
     <string name="reader_state_disconnected">Ридер не подключен</string>

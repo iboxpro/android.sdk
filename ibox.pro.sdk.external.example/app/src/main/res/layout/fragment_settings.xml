@@ -57,11 +57,25 @@
 			android:text="@string/settings_btn_unattended"
 			/>
 		<Button
+			android:id="@+id/settings_btn_softpos_reg_check"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal"
+			android:text="@string/settings_btn_softpos_reg_check"
+			/>
+		<Button
 			android:id="@+id/settings_btn_softpos_reg"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_horizontal"
 			android:text="@string/settings_btn_softpos_reg"
+			/>
+		<Button
+			android:id="@+id/settings_btn_softpos_remove_acc"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal"
+			android:text="@string/settings_btn_softpos_remove_acc"
 			/>
 	</LinearLayout>
 </RelativeLayout>

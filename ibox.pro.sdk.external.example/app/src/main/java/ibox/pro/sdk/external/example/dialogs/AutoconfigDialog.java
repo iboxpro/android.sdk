@@ -14,7 +14,10 @@ public class AutoconfigDialog extends ReaderServiceDialog {
 
     @Override
     protected void startServiceAction() throws PaymentControllerException {
-        PaymentController.getInstance().startAutoConfig();
+        if (PaymentController.getInstance().getReaderType().isQpos())
+            PaymentController.getInstance().readerDownloadAndSetConfig();
+        else
+            PaymentController.getInstance().startAutoConfig();
     }
 
     @Override
@@ -35,4 +38,11 @@ public class AutoconfigDialog extends ReaderServiceDialog {
         dismiss();
     }
 
+    @Override
+    public void onReaderConfigFinished(boolean success) {
+        super.onReaderConfigFinished(success);
+        stopProgress();
+        Toast.makeText(getContext(), getContext().getString(success ? R.string.success : R.string.failed), Toast.LENGTH_LONG).show();
+        dismiss();
+    }
 }

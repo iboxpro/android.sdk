@@ -19,7 +19,6 @@
         android:orientation="vertical"
         >
 
-
     <Button
         android:id="@+id/mifare_btn_poll"
         android:layout_width="match_parent"
@@ -126,6 +125,138 @@
             android:layout_marginTop="3dp"
             />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars = "vertical"
+            android:text="New methods"
+            />
+
+        <RadioGroup
+            android:id="@+id/rg_mifare_card_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@+id/payment_rb_card"
+            >
+            <RadioButton
+                android:id="@+id/rb_mifare_card_type_classic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Classic"
+                />
+            <RadioButton
+                android:id="@+id/rb_mifare_card_type_ultralight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ultralight"
+                />
+        </RadioGroup>
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_new_timeout"
+            android:text="30"
+            android:hint="Timeout"
+            />
+
+        <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_new_block"
+        android:text=""
+            android:hint="block"
+        />
+
+
+        <Button
+            android:id="@+id/mifare_btn_new_poll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Poll"
+            android:layout_marginTop="3dp"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_new_key_type"
+            android:hint="KeyType"
+            android:text=""
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_new_key_value"
+            android:hint="KeyValue"
+            android:text=""
+            />
+        <Button
+            android:id="@+id/mifare_btn_new_authenticate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Authenticate"
+            android:layout_marginTop="3dp"
+            />
+        <Button
+            android:id="@+id/mifare_btn_new_read"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Read card"
+            android:layout_marginTop="3dp"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_new_data"
+            android:hint="Data"
+            android:text=""
+            />
+        <Button
+            android:id="@+id/mifare_btn_new_write"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Write card"
+            android:layout_marginTop="3dp"
+            />
+        <Button
+            android:id="@+id/mifare_btn_new_finish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Finish"
+            android:layout_marginTop="3dp"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_new_start_block"
+            android:hint="Start block"
+            android:text=""
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_new_end_block"
+            android:hint="End block"
+            android:text=""
+            />
+
+        <Button
+            android:id="@+id/mifare_btn_new_fastread"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fast Read"
+            android:layout_marginTop="3dp"
+            />
+
+        <TextView
+            android:id="@+id/mifare_txt_log"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:scrollbars = "vertical"
+            />
+
         <Button
             android:id="@+id/mifare_btn_beep"
             android:layout_width="match_parent"
@@ -133,7 +264,6 @@
             android:text="Beep"
             android:layout_marginTop="3dp"
             />
-
 
         <Button
             android:id="@+id/mifare_btn_disable_sound"
@@ -159,12 +289,16 @@
             android:layout_marginTop="3dp"
             />
 
-    <TextView
-        android:id="@+id/mifare_txt_log"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:scrollbars = "vertical"
-        />
+        <Button
+            android:id="@+id/mifare_btn_read_card_panhash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Read card pan hash"
+            android:layout_marginTop="3dp"
+            />
+
+
+
 
     </LinearLayout>
     </ScrollView>

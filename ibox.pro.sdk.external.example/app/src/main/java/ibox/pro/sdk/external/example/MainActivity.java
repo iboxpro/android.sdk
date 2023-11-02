@@ -45,10 +45,11 @@ public class MainActivity extends PermissionsActivity implements TabHost.OnTabCh
 	public List<LinkedCard> LinkedCards;
 	public ArrayList<PaymentProductItem> Products;
 
-	public static final PaymentController.Currency CURRENCY = PaymentController.Currency.RUB;
+	public static PaymentController.Currency CURRENCY = PaymentController.Currency.RUB;
 
 	private FragmentTabHost mTabHost;
-	
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -186,6 +187,10 @@ public class MainActivity extends PermissionsActivity implements TabHost.OnTabCh
 							ClientPhone = result.getAccount().getClientPhone();
 							ClientWeb = result.getAccount().getClientWeb();
 							AcquirersByMethods = result.getAccount().getAcquirersByMethods();
+
+
+							MainActivity.CURRENCY = PaymentController.Currency.getCurrencyByCode(result.getAccount().getCurrencyCode());
+
 							if (result.getAccount().getLinkedCards() != null)
 								LinkedCards.addAll(result.getAccount().getLinkedCards());
 							Products = result.getProducts();
