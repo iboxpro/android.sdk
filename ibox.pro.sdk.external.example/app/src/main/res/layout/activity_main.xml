@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     >
-    <android.support.v4.app.FragmentTabHost
+    <androidx.fragment.app.FragmentTabHost
         android:id="@android:id/tabhost"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
                 android:layout_width="match_parent"
                 />
         </LinearLayout>
-    </android.support.v4.app.FragmentTabHost>
+    </androidx.fragment.app.FragmentTabHost>
     <TextView
         android:id="@+id/version"
         android:layout_width="match_parent"

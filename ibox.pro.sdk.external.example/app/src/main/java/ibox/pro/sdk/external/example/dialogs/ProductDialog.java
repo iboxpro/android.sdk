@@ -5,7 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -23,7 +23,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -191,20 +190,13 @@ public class ProductDialog extends Dialog implements View.OnClickListener, Adapt
             if (listener != null)
                 listener.onRequestSetImage(String.valueOf(view.getTag()));
         } else {
-            switch (view.getId()) {
-                case R.id.product_btn_ok:
-                    if (isValid())
-                        dismiss();
-                    else
-                        Toast.makeText(getContext(), getValidReport(), Toast.LENGTH_LONG).show();
-                    break;
-                case R.id.product_btn_cancel:
-                    cancel();
-                    break;
-                case R.id.product_btn_prepare:
-                    new PrepareProductTask(mCurrentProduct, getValuesForPrepare()).execute();
-                    break;
-            }
+            int id = view.getId();
+            if (id ==R.id.product_btn_ok && isValid())
+                    dismiss();
+            else if (id == R.id.product_btn_cancel)
+                cancel();
+            else if (id == R.id.product_btn_prepare)
+                new PrepareProductTask(mCurrentProduct, getValuesForPrepare()).execute();
         }
     }
 

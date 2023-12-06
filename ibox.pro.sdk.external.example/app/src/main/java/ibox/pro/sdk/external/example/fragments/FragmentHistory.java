@@ -2,14 +2,12 @@ package ibox.pro.sdk.external.example.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -19,7 +17,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
@@ -45,7 +42,6 @@ import ibox.pro.sdk.external.example.CommonAsyncTask;
 import ibox.pro.sdk.external.example.MainActivity;
 import ibox.pro.sdk.external.example.R;
 import ibox.pro.sdk.external.example.Utils;
-import ibox.pro.sdk.external.example.dialogs.ResultDialog;
 import ibox.pro.sdk.external.example.dialogs.ReversePaymentDialog;
 
 public class FragmentHistory extends Fragment implements ReversePaymentDialog.OnPaymentCancelledListener {

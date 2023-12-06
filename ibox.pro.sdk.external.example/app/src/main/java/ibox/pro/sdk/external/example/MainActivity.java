@@ -2,12 +2,10 @@ package ibox.pro.sdk.external.example;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTabHost;
+
+import androidx.fragment.app.FragmentTabHost;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.TabHost;
