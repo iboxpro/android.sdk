@@ -558,4 +558,9 @@ public class FragmentMifare extends Fragment  implements PaymentControllerListen
     public void onSwitchedToCNP() {
 
     }
+
+    @Override
+    public void onReaderConfigUpdate(String s, Hashtable<String, Object> hashtable) {
+
+    }
 }

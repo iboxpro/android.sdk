@@ -678,6 +678,11 @@ public class PaymentDialog extends Dialog implements PaymentControllerListener {
 	}
 
 	@Override
+	public void onReaderConfigUpdate(String s, Hashtable<String, Object> hashtable) {
+
+	}
+
+	@Override
 	public void onSearchMifareCard(Hashtable<String, String> cardData) {
 
 	}

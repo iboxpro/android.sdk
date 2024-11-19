@@ -234,6 +234,11 @@ public class UnattendedActivity extends PermissionsActivity implements PaymentCo
     }
 
     @Override
+    public void onReaderConfigUpdate(String s, Hashtable<String, Object> hashtable) {
+
+    }
+
+    @Override
     public void onSearchMifareCard(Hashtable<String, String> cardData) {
 
     }

@@ -3,6 +3,8 @@ package ibox.pro.sdk.external.example.dialogs;
 import android.content.Context;
 import android.widget.Toast;
 
+import java.util.Hashtable;
+
 import ibox.pro.sdk.external.PaymentController;
 import ibox.pro.sdk.external.PaymentControllerException;
 import ibox.pro.sdk.external.example.R;
@@ -15,7 +17,7 @@ public class AutoconfigDialog extends ReaderServiceDialog {
     @Override
     protected void startServiceAction() throws PaymentControllerException {
         if (PaymentController.getInstance().getReaderType().isQpos())
-            PaymentController.getInstance().readerDownloadAndSetConfig();
+            PaymentController.getInstance().readerDownloadAndSetConfig(true);
         else
             PaymentController.getInstance().startAutoConfig();
     }
@@ -36,6 +38,11 @@ public class AutoconfigDialog extends ReaderServiceDialog {
                 .append(isDefault ? getContext().getString(R.string.settings_autoconfig_default) : config);
         Toast.makeText(getContext(), result.toString(),Toast.LENGTH_LONG).show();
         dismiss();
+    }
+
+    @Override
+    public void onReaderConfigUpdate(String s, Hashtable<String, Object> hashtable) {
+
     }
 
     @Override

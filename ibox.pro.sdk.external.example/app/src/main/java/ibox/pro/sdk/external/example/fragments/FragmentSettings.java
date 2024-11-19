@@ -505,6 +505,11 @@ public class FragmentSettings extends Fragment {
 		}
 
 		@Override
+		public void onReaderConfigUpdate(String s, Hashtable<String, Object> hashtable) {
+
+		}
+
+		@Override
 		public void onSearchMifareCard(Hashtable<String, String> cardData) {
 
 		}
