@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    android:padding="5dp"
+    android:orientation="horizontal"
+    android:background="@color/black"
+    android:gravity="center_vertical"
+    >
+    <EditText
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:inputType="number"
+        android:maxLength="4"
+        android:text="1227"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="5dp"
+        android:text="покупатель (клиент)"
+        />
+</LinearLayout>

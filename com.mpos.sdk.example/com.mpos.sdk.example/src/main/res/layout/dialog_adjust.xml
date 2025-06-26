@@ -1,0 +1,96 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    >
+    
+    <TextView 
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+    	android:paddingRight="@dimen/activity_horizontal_margin"
+        android:text="@string/adjust_dlg_lbl_signature"
+        />
+    
+    <com.mpos.sdk.ui.SignatureView
+        android:id="@+id/adjust_dlg_sw_signature"
+        android:layout_height="200dp"
+        android:layout_width="match_parent"
+        android:background="#ffffff"
+        />
+    
+    <LinearLayout 
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingTop="10dp"      
+        android:paddingBottom="10dp"  
+    	android:paddingLeft="@dimen/activity_horizontal_margin"
+    	android:paddingRight="@dimen/activity_horizontal_margin"
+    	android:orientation="vertical"
+        >
+    
+        <RelativeLayout 
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"            
+            >
+            
+            <TextView
+                android:id="@+id/adjust_dlg_lbl_email" 
+	            android:layout_height="wrap_content"
+	            android:layout_width="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:text="@string/adjust_dlg_lbl_email"
+	            />
+            
+            <EditText 
+                android:id="@+id/adjust_dlg_edt_email"
+                android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:layout_marginLeft="10dp"
+				android:layout_centerVertical="true"
+				android:layout_toRightOf="@id/adjust_dlg_lbl_email"
+                android:textSize="16sp"
+                android:inputType="textEmailAddress"
+                />            
+        </RelativeLayout>
+        
+        <RelativeLayout 
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"            
+            >
+            
+            <TextView
+                android:id="@+id/adjust_dlg_lbl_phone"
+	            android:layout_height="wrap_content"
+	            android:layout_width="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:text="@string/adjust_dlg_lbl_phone"
+	            />
+            
+            <EditText 
+                android:id="@+id/adjust_dlg_edt_phone"
+                android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:layout_marginLeft="10dp"
+				android:layout_centerVertical="true"
+				android:layout_toRightOf="@id/adjust_dlg_lbl_phone"
+                android:textSize="16sp"
+                android:inputType="phone"
+                />            
+        </RelativeLayout>
+        
+        
+        <Button 
+            android:id="@+id/adjust_dlg_btn_send"
+	        android:layout_height="wrap_content"
+	        android:layout_width="match_parent"
+	        android:layout_marginTop="10dp"
+	        android:text="@string/adjust_dlg_btn_send"
+	        />
+        
+    </LinearLayout>
+           
+</LinearLayout>
